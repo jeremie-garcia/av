@@ -27,8 +27,10 @@ if __name__ == '__main__':
 
     #4 call-back each frameduration
 
-    #4 create a PyQtApp to use pyQtTimer
+    # 4 create a PyQtApp to use pyQtTimer
     app = QtWidgets.QApplication(sys.argv)
+    label = QtWidgets.QLabel("Hello World")
+    label.show()
 
     def timer_update():
         if (pygame.mixer.music.get_busy()):
