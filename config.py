@@ -1,4 +1,8 @@
 class Color(): #couleur
+    """
+    Objet de type couleur
+    Trois attributs : r, g, b (valeurs de 0 à 255 en RGB)
+    """
     def __init__(self, r, g, b):
         self.r = r
         self.g = g
@@ -8,6 +12,10 @@ class Color(): #couleur
         return "Color {},{},{}".format(self.r, self.g, self.b)
 
 class Gradation(): #dégradé
+    """
+    Objet de type dégradé
+    Deux attributs : A, B, deux couleurs (objets de classe color) entre lesquels on fera un dégradé linéaire
+    """
     def __init__(self,  A, B):
         self.A = A
         self.B = B
@@ -24,51 +32,37 @@ class Gradation(): #dégradé
         return "Line {}: {}".format(self.line, self.error)"""
 
 INPUTS = ["rms", "sp_centroid", "sp_flatness", "sp_contrast", "sp_bandwidth", "sp_rolloff"]
-OUTPUTS = ["size", "px", "py", "vibration"]
+OUTPUTS = ["size", "px", "py", "vibration", "color"]
 
 def readfile(file):
-    binds = {"errors":[]}
+    """
+            file (str) : chemin du fichier de configuration que l'on souhaite ouvrir
+            retourne :
+                - binds : dictionnaire tel que binds[sortie] = entree ou binds[sortie] = formule
+                - variables : dictionnaire tel que variables[nom] = objet ou valeur
+        """
+    binds = {"errors": []}
     variables = {}
     with open(file) as f:
-        for i,l in enumerate(f):
+        for i, l in enumerate(f):
             words = l.split()
+            if words[0] == "assign" or words[0] == "on": #assignation ou assignation event
+                try: binds[words[-1]] = words[0:l.index("to")]
+                except: binds["errors"].append(i+1)
+            elif words[0] == "var": #délaration var
+                if "color" in l: #déclaration de couleur
+                    r, g, b = words[-1].split("(")[-1][:-1].split(",") #récupération des trois couleurs
+                    r, g, b = int(r), int(g), int(b)
+                    if not(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
+                        binds["errors"].append(i+1)
+                    variables[words[0]] =  Color(r,g,b)
 
-            # reconnaissance assignation -> a to b
-            # si a est une formule, on save le texte de la formule pour plus tard, à utiliser avec exec(a)
-            try:
-                indexto = words.index("to")
+                elif "grad" in l: #déclaration de dégradé
+                    A, B = words[-1].split("(")[-1][:-1].split(",") #récupération deux couleurs
+                    if not(A in variables.keys() and B in variables.keys()):
+                        binds["errors"].append(i+1)
+                    variables[words[0]] = Gradation(A,B)
 
-                if indexto:
-                    binds[words[-1]] = "".join(words[:indexto])
-                else:
-                        #binds["errors"].append(readError(l, "incorrect input or output"))
-                    raise NameError
-
-            except ValueError: #si pas de to, déclaration variable
-                try:
-                    if l.split()[-1].split("(")[:-1][0] == "color": #déclaration de couleur
-                        r, g, b = words[-1].split("(")[-1][:-1].split(",") #récupération des trois couleurs
-                        r, g, b = int(r), int(g), int(b)
-                        if not(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
-                            #binds["errors"].append(readError(l, "out of range values for color"))
-                            raise ValueError
-                        variables[words[0]] =  Color(r,g,b)
-
-                    if l.split()[-1].split("(")[:-1][0] == "grad": #déclaration de dégradé
-                        A, B = words[-1].split("(")[-1][:-1].split(",") #récupération deux couleurs
-                        if not(A in variables.keys() and B in variables.keys()):
-                            #binds["errors"].append(readError(l, "color doesn't exist"))
-                            raise ValueError
-                        variables[words[0]] = Gradation(A,B)
-
-                except ValueError:
-                    binds["errors"].append(i+1) # si ligne non reconnue
-
-            except NameError:
-                binds["errors"].append(i+1) # si ligne non reconnue
-
-
-    return binds, variables
 
 if __name__ == "__main__":
     b, v = readfile("conf.ig")
