@@ -47,7 +47,7 @@ def readfile(file):
         for i, l in enumerate(f):
             words = l.split()
             if words[0] == "assign" or words[0] == "on": #assignation ou assignation event
-                try: binds[words[-1]] = words[0:l.index("to")]
+                try: binds[words[-1]] = "".join(words[1:words.index("to")])
                 except: binds["errors"].append(i+1)
             elif words[0] == "var": #délaration var
                 if "color" in l: #déclaration de couleur
@@ -55,13 +55,14 @@ def readfile(file):
                     r, g, b = int(r), int(g), int(b)
                     if not(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
                         binds["errors"].append(i+1)
-                    variables[words[0]] =  Color(r,g,b)
+                    variables[words[1]] =  Color(r,g,b)
 
                 elif "grad" in l: #déclaration de dégradé
                     A, B = words[-1].split("(")[-1][:-1].split(",") #récupération deux couleurs
                     if not(A in variables.keys() and B in variables.keys()):
                         binds["errors"].append(i+1)
-                    variables[words[0]] = Gradation(A,B)
+                    variables[words[1]] = Gradation(A,B)
+    return binds, variables
 
 
 if __name__ == "__main__":

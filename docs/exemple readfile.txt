@@ -1,0 +1,18 @@
+Fichier de config exemple :
+
+	assign sp_centroid to size
+	assign rms to px
+	assign 3 * sp_flatness to py
+	var A = color(5,18,62)
+	var B = color(3,9999,52)
+	var C = color(5,5,5)
+	var oui = grad(A,C)
+	assign oui to px
+	assign 3*sp_centroid to vibration
+
+
+Sortie de readfile:
+
+	{'errors': [5], 'size': 'sp_centroid', 'px': 'oui', 'py': '3*sp_flatness', 'vibration': '3*sp_centroid'},
+	{'A': Color object: 5,18,62, 'C': Color object: 5,5,5, 'oui': Gradation object: A to C}
+
