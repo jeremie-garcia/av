@@ -1,3 +1,5 @@
+import config_ui, sys
+
 class Color(): #couleur
     """
     Objet de type couleur
@@ -31,8 +33,9 @@ class Gradation(): #dégradé
     def __repr__(self):
         return "Line {}: {}".format(self.line, self.error)"""
 
-INPUTS = ["rms", "sp_centroid", "sp_flatness", "sp_contrast", "sp_bandwidth", "sp_rolloff"]
+INPUTS = ["rms", "sp_centroid", "sp_flatness", "sp_contrast", "sp_bandwidth", "sp_rolloff", "beat"]
 OUTPUTS = ["size", "px", "py", "vibration", "color"]
+VARTYPES = ["value", "color", "grad"]
 
 def readfile(file):
     """
@@ -66,6 +69,4 @@ def readfile(file):
 
 
 if __name__ == "__main__":
-    b, v = readfile("conf.ig")
-    print(b)
-    print(v)
+    config_ui.openWindow()
