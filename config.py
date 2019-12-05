@@ -1,4 +1,4 @@
-import config_ui, sys
+import config_ui, sys, random
 
 class Color(): #couleur
     """
