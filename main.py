@@ -2,8 +2,8 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pygame
 import librosa
-import view, sound_analyzer, figures
-import selector_test
+import view, sound_analyzer # figures
+import selector
 
 if __name__ == "__main__":
 
@@ -13,11 +13,12 @@ if __name__ == "__main__":
     # create the radar view and the time navigation interface
     the_sound = sound_analyzer.Sound()
     the_view = view.View(the_sound)
-    the_view.move(10, 10)
+    #the_view.fit_scene_in_view()
+    #the_view.move(10, 10)
 
     #the_sound.change(the_view.chosen_sound)
     # create the inspector
-    selec = selector_test.Selector(the_view)
+    selec = selector.Selector(the_view.view)
 
     # create a QDockWidget for the inspector
     selec_dock = QtWidgets.QDockWidget()
@@ -29,15 +30,6 @@ if __name__ == "__main__":
     win.setWindowTitle("Sound Visualisator")
     win.setCentralWidget(the_view)
     win.addDockWidget(QtCore.Qt.DockWidgetArea(1), selec_dock)
-    # win.resize(1000, 600)
-    # win.show()
     win.showMaximized()
 
-    # create the second view
-    # second_view = radarview.PanZoomView(main_window.scene)
-    # second_view.scale(0.1, -0.1)
-    # second_view.show()
-    # second_view.move(300, 300)
-
-    # enter the main loop
     app.exec_()

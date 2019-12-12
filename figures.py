@@ -1,11 +1,12 @@
 """Defines different formes and their characteristics of reprepresented pictures"""
 
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QPainter, QPaintDevice, QBrush, QPainterPath
+from PyQt5.QtGui import QPainter, QPaintDevice, QBrush, QPainterPath, QPen, QColor
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt, QRectF
 import PyQt5.QtCore
 import PyQt5
+
 
 
 class Ellipse(QtWidgets.QGraphicsEllipseItem):
@@ -92,3 +93,123 @@ class Triangle(QtWidgets.QGraphicsPolygonItem):  # TODO classe parente QWidget.Q
         path.lineTo(10, 25)
         qp.drawPath(path)
         qp.end()
+
+
+
+
+
+
+
+
+
+
+
+"""class de test - ben"""
+
+class figure_test():
+    def __init__(self,window1_parameters):
+        self.parameters=window1_parameters
+        self.drawingToolsWindow1={"pen" : QPen(),"brush" : QBrush()}
+        self.color=[]
+
+            
+        
+    def draw(self,view,scene,recorded_frames):
+        if self.parameters["form"]=="Rectangle":
+            self.SetToolsColor(recorded_frames)
+            self.Rectangle(view,scene,recorded_frames)
+
+        else :
+            self.SetToolsColor(recorded_frames)
+            self.Ellipse(view,scene,recorded_frames)
+
+
+            
+
+    def SetToolsColor(self,recorded_frames):
+        self.drawingToolsWindow1["pen"].setWidth(20)
+        self.drawingToolsWindow1["brush"].setStyle(1)      #the number changes the type of background
+        "set the color "
+        if self.parameters["color"]=="Red":
+            self.color=[255,0,0]
+        elif self.parameters["color"]=="Green":
+            self.color=[0,255,0]
+        elif self.parameters["color"]=="Blue":
+            self.color=[0,0,255]
+        elif self.parameters["color"]=="Yellow":
+            self.color=[255,255,0]
+        elif self.parameters["color"]=="Grey":
+            self.color=[255,255,255]
+        else: self.color=[255,0,255]
+        
+        
+        "set the color ratio"
+        if self.parameters["colorPara"]== "RMS":
+
+            self.color[0] *=recorded_frames["rms"]
+            self.color[1] *= recorded_frames["rms"]
+            self.color[2] *= recorded_frames["rms"]
+        elif self.parameters["colorPara"]== "Spectral centroid":
+            self.color[0]*=recorded_frames["spectral_centroid"]
+            self.color[1] *= recorded_frames["spectral_centroid"]
+            self.color[2] *= recorded_frames["spectral_centroid"]
+        else:
+            self.color[0]*=recorded_frames["spectral_flatness"]
+            self.color[1] *= recorded_frames["spectral_flatness"]
+            self.color[2] *= recorded_frames["spectral_flatness"]
+
+        "fix the color of the Tools"
+
+        self.drawingToolsWindow1["brush"].setColor(QColor(self.color[0],self.color[1],self.color[2]))
+        self.drawingToolsWindow1["pen"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
+
+
+            
+            
+    
+    def Rectangle(self, view, scene, recorded_frames):
+
+        "fix the horiz value"
+
+        if self.parameters["horizPara"] == "RMS":
+            self.horiz_value = recorded_frames["rms"]* view.width()
+        elif self.parameters["horizPara"] == "Spectral centroid":
+            self.horiz_value = recorded_frames["spectral_centroid"] * view.width()
+        else:
+            self.horiz_value = recorded_frames["spectral_flatness"] * view.width()
+
+        "fix the vertic value"
+        if self.parameters["verticPara"]== "RMS":
+            self.vertic_value=recorded_frames["rms"]* view.height()
+        elif self.parameters["verticPara"]== "Spectral centroid":
+            self.vertic_value=recorded_frames["spectral_centroid"] * view.height()
+        else:
+            self.vertic_value=recorded_frames["spectral_flatness"] * view.height()
+
+
+        scene.addRect(view.width()//2, view.height()//2 , self.horiz_value,self.vertic_value,self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+
+
+    def Ellipse(self,view, scene, recorded_frames):
+
+        "fix the horiz value"
+
+        if self.parameters["horizPara"] == "RMS":
+            self.horiz_value = recorded_frames["rms"] * view.width()
+        elif self.parameters["horizPara"] == "spectral_centroid":
+            self.horiz_value = recorded_frames["Spectral centroid"] * view.width()
+        else:
+            self.horiz_value = recorded_frames["spectral_flatness"] * view.width()
+
+        "fix the vertic value"
+        if self.parameters["verticPara"] == "RMS":
+            self.vertic_value = recorded_frames["rms"] * view.height()
+        elif self.parameters["verticPara"] == "Spectral centroid":
+            self.vertic_value = recorded_frames["spectral_centroid"] * view.height()
+        else:
+            self.vertic_value = recorded_frames["spectral_flatness"] * view.height()
+
+        #scene.setSceneRect(0,0,view.width(),view.height())
+        scene.addEllipse(view.width()//2, view.height()//2, self.horiz_value, self.vertic_value,self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+
+        #fix the center shifting

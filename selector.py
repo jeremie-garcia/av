@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget, QListView
 
-from selector_test_ui import Ui_Form
+from selector_ui import Ui_Selector
 
 class Selector(QWidget):
     """ Widget displaying selection parameters"""
@@ -10,29 +10,40 @@ class Selector(QWidget):
         super(Selector, self).__init__()
 
         self.view = the_view
-        self.ui_selector = Ui_Form()
+        self.ui_selector = Ui_Selector()
 
         self.ui_selector.setupUi(self)
-        self.view.parameters_window1 = [None, None, None, None, None] #form,horizontal para, vertical para, color, color para
-        #self.window2_parameters = (None, None, None, None, None)
-        #self.window3_parameters = (None, None, None, None, None)
-        #self.window4_parameters = (None, None, None, None, None)
 
-        #Window1
-        self.ui_selector.ColorComboBox_a.currentIndexChanged.connect(self.update_color_window1)
-        self.ui_selector.SizeParameterComboBox_a.currentIndexChanged.connect(self.update_sizeParameter_window1)
-        #self.ui_selector.ColorComboBox_a.currentIndexChanged.connect(self.update_Window1_para)
-        #self.ui_selector.ColorComboBox_a.currentIndexChanged.connect(self.updateWindow1_para)
+
+        """Window 1 connection ComboBox to Parameters"""
+        self.ui_selector.FormComboBox_1.currentIndexChanged.connect(self.update_form_window1)
+        self.ui_selector.ColorComboBox_1.currentIndexChanged.connect(self.update_color_window1)
+        self.ui_selector.ColorParameterComboBox_1.currentIndexChanged.connect(self.update_colorPara_window1)
+        self.ui_selector.HorizontalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_horizSizePara_window1)
+        self.ui_selector.VerticalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_vertiSizePara_window1)
+
+
 
 
 
         self.show()
 
-    def update_color_window1(self):
-        self.view.parameters_window1[3]=self.ui_selector.ColorComboBox_a.currentText()
-        print(self.window1_parameters)
+    """Window 1 updates"""
 
-    def update_sizeParameter_window1(self):
-        self.view.parameters_window1[2]=self.ui_selector.SizeParameterComboBox_a.currentText()
-        print(self.window1_parameters)
+    def update_form_window1(self):
+        self.view.parameters_window1["form"]=self.ui_selector.FormComboBox_1.currentText()
+
+    def update_color_window1(self):
+        self.view.parameters_window1["color"]=self.ui_selector.ColorComboBox_1.currentText()
+
+    def update_colorPara_window1(self):
+        self.view.parameters_window1["colorPara"]=self.ui_selector.ColorParameterComboBox_1.currentText()
+
+    def update_horizSizePara_window1(self):
+        self.view.parameters_window1["horizPara"]=self.ui_selector.HorizontalSizeParameterComboBox_1.currentText()
+
+    def update_vertiSizePara_window1(self):
+        self.view.parameters_window1["verticPara"]=self.ui_selector.VerticalSizeParameterComboBox_1.currentText()
+
+
 

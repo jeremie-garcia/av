@@ -386,7 +386,7 @@ class Ui_Selector(object):
         self.gridLayout.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
 
         self.retranslateUi(Selector)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Selector)
 
     def retranslateUi(self, Selector):
