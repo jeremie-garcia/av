@@ -7,6 +7,11 @@ import math
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QPen, QBrush, QColor
+import sound_analyzer
+import pygame
+import sys
+import figures
+from PyQt5.QtGui import QPen, QColor,  QGradient
 
 # constants
 WIDTH = 800  # Initial window width (pixels)
@@ -39,7 +44,7 @@ class PanZoomView(QtWidgets.QGraphicsView):
 class View(QtWidgets.QWidget):
     """An interactive view of the sound"""
 
-    def __init__(self):
+    def __init__(self,the_sound):
         super().__init__()
 
         self.time_increment = 1
@@ -48,7 +53,11 @@ class View(QtWidgets.QWidget):
         root_layout = QtWidgets.QVBoxLayout(self)
         self.scene = QtWidgets.QGraphicsScene()
         self.view = PanZoomView(self.scene)
+        self.sound = the_sound
         self.time_entry = QtWidgets.QLineEdit()
+        self.parameters_window1=["Ellipse","RMS"]
+
+
         toolbar = self.create_toolbar()
 
         # add components to the root_layout
@@ -58,10 +67,13 @@ class View(QtWidgets.QWidget):
         # create and setup the timer
         self.timer = QtCore.QTimer(self)
         # self.timer.timeout.connect(self.advance)
-
+        #root_layout.
         # show the window
         self.show()
-
+    def sound1_chosen(self):
+        self.chosen_sound="s1"
+    def sound2_chosen(self):
+        self.chosen_sound="s2"
     def create_toolbar(self):
         # create layout for time controls and entry
         toolbar = QtWidgets.QHBoxLayout()
@@ -86,11 +98,16 @@ class View(QtWidgets.QWidget):
         def add_comboBox(sounds):
             """adds a comboBox to the hbox and connects the slot"""
             sounds_ComboBox = QtWidgets.QComboBox()
+
             for sound in sounds:
                 sounds_ComboBox.addItem(sound)
 
             # comboBox.clicked.connect(slot)
+            #for element in list_sounds:
+            #sounds_ComboBox.currentTextChanged('Sound 1').connect(self.sound1_chosen)
+            #sounds_ComboBox.currentTextChanged('Sound 2').connect(self.sound2_chosen) #def fonction 1 pour choisir son 1
             toolbar.addWidget(sounds_ComboBox)
+
 
 
         # labels
@@ -143,7 +160,45 @@ class View(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def playpause(self):
         """this slot toggles the replay using the timer as model"""
+        #windows1
+
+        #Ellipse=figures.Ellipse()
+        #self.scene.addEllipse()
+
+
         if self.timer.isActive():
             self.timer.stop()
         else:
-            self.timer.start(ANIMATION_DELAY)
+            self.sound.analyze()
+            pygame.mixer.init()
+            pygame.mixer.music.load(self.sound.filename)
+
+            self.timer.timeout.connect(self.timer_update)
+
+            pygame.mixer.music.play(0)
+            self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
+
+
+
+
+    def timer_update(self):
+        if (pygame.mixer.music.get_busy()):
+            self.scene.clear()
+            qpen=QPen()
+            qpen.setWidth(10)
+            current_time = pygame.mixer.music.get_pos()
+                # find closest frame in descriptors
+            index = current_time // self.sound.analyse_parameters["frame_duration_ms"]
+            index = round(min(index, self.sound.rms_frames[0].size - 1))
+            rms = self.sound.rms_frames[0][index]
+            spectral_centroid = self.sound.spectral_centroid_frames[0][index]
+
+            spectral_flatness = self.sound.spectral_flatness_frames[0][index]
+
+            self.scene.addEllipse(self.view.size().height() //2 ,self.view.size().width() //2,10*spectral_centroid,10*spectral_centroid,qpen,qbrush)
+            self.fit_scene_in_view()
+
+
+            #print(rms, spectral_flatness, spectral_centroid)
+        else:
+            self.timer.stop()

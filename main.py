@@ -2,7 +2,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pygame
 import librosa
-import view, sound_analizer, figures
+import view, sound_analyzer, figures
 import selector_test
 
 if __name__ == "__main__":
@@ -11,15 +11,18 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication([])
 
     # create the radar view and the time navigation interface
-    the_view = view.View()
+    the_sound = sound_analyzer.Sound()
+    the_view = view.View(the_sound)
     the_view.move(10, 10)
 
+    #the_sound.change(the_view.chosen_sound)
     # create the inspector
     selec = selector_test.Selector(the_view)
 
     # create a QDockWidget for the inspector
     selec_dock = QtWidgets.QDockWidget()
     selec_dock.setWidget(selec)
+
 
     # create the QMainWindow and add both widgets
     win = QtWidgets.QMainWindow()
