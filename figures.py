@@ -3,11 +3,12 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QPainter, QPaintDevice, QBrush, QPainterPath
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRectF
+import PyQt5.QtCore
 import PyQt5
 
 
-class Ellipse(QtWidgets.QWidget):
+class Ellipse(QtWidgets.QGraphicsEllipseItem):
     def __init__(self):
         super().__init__()
         self.line_color = None  # doit être une couleur de Qt (ex: Qt.red)
@@ -15,28 +16,24 @@ class Ellipse(QtWidgets.QWidget):
         self.line_width = None
         self.semi_minor_axe = None
         self.semi_major_axe = None
+        self.rect = QRectF()
 
-        self.set_atributes()
+        self.update_atributes()
 
-        self.setGeometry(300, 300, 300, 300)
-        self.show()
+    def update_atributes(self):
+        self.line_color = Qt.blue  # à modifier en fonction du choix de l'utilisateur ou de l'analyse du son
+        self.fill_color = Qt.white  # idem
+        self.semi_minor_axe = 150  # idem
+        self.semi_major_axe = 150  # idem
+        self.rect = QRectF(0, 0, self.semi_major_axe, self.semi_minor_axe)
+        self.rect.
+        self.setBrush(QBrush(self.fill_color, Qt.SolidPattern))
 
-    def set_atributes(self):
-        self.line_color = Qt.red  # à modifier en fonction du choix de l'utilisateur ou de l'analyse du son
-        self.fill_color = Qt.red
-        self.semi_minor_axe = 100  # idem
-        self.semi_major_axe = 100  # idem
-
-    def paintEvent(self, event):
-        qp = QPainter()
-        qp.begin(self)
-        qp.setPen(self.line_color)
-        qp.setBrush(QBrush(self.fill_color, Qt.SolidPattern))  # J'ai rajouté le remplissage du cercle
-        qp.drawArc(20, 20, self.semi_minor_axe, self.semi_major_axe, 0, 5700)
-        qp.end()
+        self.setRect(self.rect)
+        self.update()
 
 
-class Rectangle(QtWidgets.QWidget):
+class Rectangle(QtWidgets.QWidget):  #TODO classe parente : QtWidgets.QGraphicsRectItem
     def __init__(self):
         super().__init__()
         self.line_color = None
@@ -63,9 +60,8 @@ class Rectangle(QtWidgets.QWidget):
         qp.drawRect(320, 20, self.width, self.height)
         qp.end()
 
-
 #QGraphicsItem plutot
-class Triangle(QtWidgets.QWidget):
+class Triangle(QtWidgets.QWidget):  # TODO classe parente QWidget.QgraphicspolygonItem
     def __init__(self):
         super().__init__()
         self.line_color = None
