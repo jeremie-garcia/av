@@ -26,14 +26,14 @@ class Ellipse(QtWidgets.QGraphicsEllipseItem):
         self.semi_minor_axe = 150  # idem
         self.semi_major_axe = 150  # idem
         self.rect = QRectF(0, 0, self.semi_major_axe, self.semi_minor_axe)
-        self.rect.
+        self.setPen(QPen(self.line_color, self.line_width))
         self.setBrush(QBrush(self.fill_color, Qt.SolidPattern))
 
         self.setRect(self.rect)
         self.update()
 
 
-class Rectangle(QtWidgets.QWidget):  #TODO classe parente : QtWidgets.QGraphicsRectItem
+class Rectangle(QtWidgets.QGraphicsRectItem):  #TODO classe parente : QtWidgets.QGraphicsRectItem
     def __init__(self):
         super().__init__()
         self.line_color = None
@@ -42,26 +42,23 @@ class Rectangle(QtWidgets.QWidget):  #TODO classe parente : QtWidgets.QGraphicsR
         self.height = None
         self.width = None
 
-        self.set_atributes()
-
+        self.update_attributes()
         self.setGeometry()
 
-    def set_atributes(self):
+    def update_atributes(self):
         self.line_color = Qt.blue
         self.fill_color = Qt.blue
         self.height = 100
         self.width = 100
+        self.setRect(0, 0, self.height, self.width) # à valider
+        self.setPen(QPen(self.line_color, self.line_width))
+        self.setBrush(QBrush(self.fill_color, Qt.SolidPattern))
 
-    def paintEvent(self, event):
-        qp = QPainter()
-        qp.begin(self)
-        qp.setPen(self.line_color)
-        qp.setBrush(QBrush(self.fill_color, Qt.SolidPattern))
-        qp.drawRect(320, 20, self.width, self.height)
-        qp.end()
+        self.update()
+
 
 #QGraphicsItem plutot
-class Triangle(QtWidgets.QWidget):  # TODO classe parente QWidget.QgraphicspolygonItem
+class Triangle(QtWidgets.QGraphicsPolygonItem):  # TODO classe parente QWidget.QgraphicspolygonItem
     def __init__(self):
         super().__init__()
         self.line_color = None
@@ -74,10 +71,13 @@ class Triangle(QtWidgets.QWidget):  # TODO classe parente QWidget.Qgraphicspolyg
 
         self.setGeometry()
 
-    def set_atributes(self):
+    def update_atributes(self):
         # Penser à utilser QPaninterPath.currentPosition() pour le calcul des positions des lignes du tiangle
         self.line_color = Qt.green
         self.fill_color = Qt.green
+
+        self.setPen(QPen(self.line_color, self.line_width))
+        self.setBrush(QBrush(self.fill_color, Qt.SolidPattern))
 
     def paintEvent(self, event):
         qp = QPainter()
