@@ -44,7 +44,6 @@ class Triangle(QtWidgets.QGraphicsPolygonItem):  # TODO a mettre dans la classe 
 
 class Figure(QtWidgets.QGraphicsItem):
     def __init__(self, window1_parameters):
-        print('init')
         super().__init__()
         self.parameters = window1_parameters
         self.drawingToolsWindow1 = {"pen": QPen(), "brush": QBrush()}
@@ -55,7 +54,6 @@ class Figure(QtWidgets.QGraphicsItem):
         self.qrectf = QRectF()
 
     def draw(self, view, scene, recorded_frames):
-        print('draw')
         if self.parameters["form"] == "Rectangle":
             self.SetToolsColor(recorded_frames)
             self.Rectangle(view, scene, recorded_frames)
@@ -96,8 +94,7 @@ class Figure(QtWidgets.QGraphicsItem):
             self.color[1] *= recorded_frames["spectral_flatness"]
             self.color[2] *= recorded_frames["spectral_flatness"]
 
-        "fix the color of the Tools"
-
+        # fix the color of the Tools
         self.drawingToolsWindow1["brush"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
         self.drawingToolsWindow1["pen"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
