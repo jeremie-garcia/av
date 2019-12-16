@@ -1,7 +1,6 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pygame
-import librosa
 import view, sound_analyzer # figures
 import selector
 

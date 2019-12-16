@@ -63,9 +63,9 @@ class Figure(QtWidgets.QGraphicsItem):
             self.scene.addRect(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
 
         else:
-            #self.SetToolsColor(recorded_frames)
-            #self.Ellipse(recorded_frames)
-
+            pass
+            # self.SetToolsColor(recorded_frames)
+            # self.Ellipse(recorded_frames)
 
 
     def SetToolsColor(self, recorded_frames):
@@ -123,19 +123,12 @@ class Figure(QtWidgets.QGraphicsItem):
         else:
             self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
 
-
         self.qrectf.setHeight(self.minor_axe)
         self.qrectf.setWidth(self.major_axe)
+
         self.scene.setSceneRect(self.qrectf)
-
-
-    def Rectangle(self,recorded_frames):
-
-
-        #self.qrectf = QRectF(self.view.width()//2, self.view.height()//2, self.major_axe, self.minor_axe)
-        # self.rect = QtWidgets.QGraphicsRectItem(self.qrectf)
-        # scene.addItem(self.qretf)
         self.scene.addRect(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+
 
     def Ellipse(self, recorded_frames):
 
