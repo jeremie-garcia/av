@@ -22,6 +22,27 @@ class Selector(QWidget):
         self.ui_selector.HorizontalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_horizSizePara_window1)
         self.ui_selector.VerticalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_vertiSizePara_window1)
 
+        """Window 2 connection ComboBox to Parameters"""
+        self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_form_window2)
+        self.ui_selector.ColorComboBox_2.currentIndexChanged.connect(self.update_color_window2)
+        self.ui_selector.ColorParameterComboBox_2.currentIndexChanged.connect(self.update_colorPara_window2)
+        self.ui_selector.HorizontalSizeParameterComboBox_2.currentIndexChanged.connect(self.update_horizSizePara_window2)
+        self.ui_selector.VerticalSizeParameterComboBox_2.currentIndexChanged.connect(self.update_vertiSizePara_window2)
+
+        """Window 3 connection ComboBox to Parameters"""
+        self.ui_selector.FormComboBox_3.currentIndexChanged.connect(self.update_form_window3)
+        self.ui_selector.ColorComboBox_3.currentIndexChanged.connect(self.update_color_window3)
+        self.ui_selector.ColorParameterComboBox_3.currentIndexChanged.connect(self.update_colorPara_window3)
+        self.ui_selector.HorizontalSizeParameterComboBox_3.currentIndexChanged.connect(self.update_horizSizePara_window3)
+        self.ui_selector.VerticalSizeParameterComboBox_3.currentIndexChanged.connect(self.update_vertiSizePara_window3)
+
+        """Window 4 connection ComboBox to Parameters"""
+        self.ui_selector.FormComboBox_4.currentIndexChanged.connect(self.update_form_window4)
+        self.ui_selector.ColorComboBox_4.currentIndexChanged.connect(self.update_color_window4)
+        self.ui_selector.ColorParameterComboBox_4.currentIndexChanged.connect(self.update_colorPara_window4)
+        self.ui_selector.HorizontalSizeParameterComboBox_4.currentIndexChanged.connect(self.update_horizSizePara_window4)
+        self.ui_selector.VerticalSizeParameterComboBox_4.currentIndexChanged.connect(self.update_vertiSizePara_window4)
+
 
 
 
@@ -31,19 +52,71 @@ class Selector(QWidget):
     """Window 1 updates"""
 
     def update_form_window1(self):
-        self.view.parameters_window1["form"]=self.ui_selector.FormComboBox_1.currentText()
+        self.view.parameters_window1["form"] = self.ui_selector.FormComboBox_1.currentText()
 
     def update_color_window1(self):
-        self.view.parameters_window1["color"]=self.ui_selector.ColorComboBox_1.currentText()
+        self.view.parameters_window1["color"] = self.ui_selector.ColorComboBox_1.currentText()
 
     def update_colorPara_window1(self):
-        self.view.parameters_window1["colorPara"]=self.ui_selector.ColorParameterComboBox_1.currentText()
+        self.view.parameters_window1["colorPara"] = self.ui_selector.ColorParameterComboBox_1.currentText()
 
     def update_horizSizePara_window1(self):
-        self.view.parameters_window1["horizPara"]=self.ui_selector.HorizontalSizeParameterComboBox_1.currentText()
+        self.view.parameters_window1["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_1.currentText()
 
     def update_vertiSizePara_window1(self):
-        self.view.parameters_window1["verticPara"]=self.ui_selector.VerticalSizeParameterComboBox_1.currentText()
+        self.view.parameters_window1["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_1.currentText()
+
+    """Window 2 updates"""
+
+    def update_form_window2(self):
+        self.view.parameters_window2["form"] = self.ui_selector.FormComboBox_2.currentText()
+
+    def update_color_window2(self):
+        self.view.parameters_window2["color"] = self.ui_selector.ColorComboBox_2.currentText()
+
+    def update_colorPara_window2(self):
+        self.view.parameters_window2["colorPara"] = self.ui_selector.ColorParameterComboBox_2.currentText()
+
+    def update_horizSizePara_window2(self):
+        self.view.parameters_window2["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_2.currentText()
+
+    def update_vertiSizePara_window2(self):
+        self.view.parameters_window2["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_2.currentText()
+
+    """Window 3 updates"""
+
+    def update_form_window3(self):
+        self.view.parameters_window3["form"] = self.ui_selector.FormComboBox_3.currentText()
+
+    def update_color_window3(self):
+        self.view.parameters_window3["color"] = self.ui_selector.ColorComboBox_3.currentText()
+
+    def update_colorPara_window3(self):
+        self.view.parameters_window3["colorPara"] = self.ui_selector.ColorParameterComboBox_3.currentText()
+
+    def update_horizSizePara_window3(self):
+        self.view.parameters_window3["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_3.currentText()
+
+    def update_vertiSizePara_window3(self):
+        self.view.parameters_window3["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_3.currentText()
+
+    """Window 4 updates"""
+
+    def update_form_window4(self):
+        self.view.parameters_window4["form"] = self.ui_selector.FormComboBox_4.currentText()
+
+    def update_color_window4(self):
+        self.view.parameters_window4["color"] = self.ui_selector.ColorComboBox_4.currentText()
+
+    def update_colorPara_window4(self):
+        self.view.parameters_window4["colorPara"] = self.ui_selector.ColorParameterComboBox_4.currentText()
+
+    def update_horizSizePara_window4(self):
+        self.view.parameters_window4["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_4.currentText()
+
+    def update_vertiSizePara_window4(self):
+        self.view.parameters_window4["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_4.currentText()
+
 
 
 
