@@ -3,7 +3,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QPainter, QBrush, QPainterPath, QPen, QColor
 from PyQt5.QtCore import Qt, QRectF
-
+import view
 
 # QGraphicsItem plutot
 class Triangle(QtWidgets.QGraphicsPolygonItem):  # TODO a mettre dans la classe figure
@@ -42,25 +42,31 @@ class Triangle(QtWidgets.QGraphicsPolygonItem):  # TODO a mettre dans la classe 
         qp.end()
 
 
+
 class Figure(QtWidgets.QGraphicsItem):
-    def __init__(self, window1_parameters):
+    def __init__(self, window1_parameters,the_view,the_scene):
         super().__init__()
         self.parameters = window1_parameters
         self.drawingToolsWindow1 = {"pen": QPen(), "brush": QBrush()}
         self.color = []
+        self.view=the_view
+        self.scene=the_scene
+
 
         self.minor_axe = None
         self.major_axe = None
         self.qrectf = QRectF()
 
-    def draw(self, view, scene, recorded_frames):
+
+    def QRectInit(self):
         if self.parameters["form"] == "Rectangle":
-            self.SetToolsColor(recorded_frames)
-            self.Rectangle(view, scene, recorded_frames)
+            self.scene.addRect(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
 
         else:
-            self.SetToolsColor(recorded_frames)
-            self.Ellipse(view, scene, recorded_frames)
+            #self.SetToolsColor(recorded_frames)
+            #self.Ellipse(recorded_frames)
+
+
 
     def SetToolsColor(self, recorded_frames):
         self.drawingToolsWindow1["pen"].setWidth(20)
@@ -98,50 +104,60 @@ class Figure(QtWidgets.QGraphicsItem):
         self.drawingToolsWindow1["brush"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
         self.drawingToolsWindow1["pen"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
-    def Rectangle(self, view, scene, recorded_frames):
+    def update(self, recorded_frames):
+        self.SetToolsColor(recorded_frames)
 
-        # fix the horiz value
+        #fix the horiz value
         if self.parameters["horizPara"] == "RMS":
-            self.major_axe = recorded_frames["rms"] * view.width()
+            self.major_axe = recorded_frames["rms"] * self.view.width()
         elif self.parameters["horizPara"] == "Spectral centroid":
-            self.major_axe = recorded_frames["spectral_centroid"] * view.width()
+            self.major_axe = recorded_frames["spectral_centroid"] * self.view.width()
         else:
-            self.major_axe = recorded_frames["spectral_flatness"] * view.width()
+            self.major_axe = recorded_frames["spectral_flatness"] * self.view.width()
 
-        # fix the vertic value
+            # fix the vertic value
         if self.parameters["verticPara"] == "RMS":
-            self.minor_axe = recorded_frames["rms"] * view.height()
+            self.minor_axe = recorded_frames["rms"] * self.view.height()
         elif self.parameters["verticPara"] == "Spectral centroid":
-            self.minor_axe = recorded_frames["spectral_centroid"] * view.height()
+            self.minor_axe = recorded_frames["spectral_centroid"] * self.view.height()
         else:
-            self.minor_axe = recorded_frames["spectral_flatness"] * view.height()
+            self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
 
-        self.qrectf = QRectF(view.width()//2, view.height()//2, self.major_axe, self.minor_axe)
+
+        self.qrectf.setHeight(self.minor_axe)
+        self.qrectf.setWidth(self.major_axe)
+        self.scene.setSceneRect(self.qrectf)
+
+
+    def Rectangle(self,recorded_frames):
+
+
+        #self.qrectf = QRectF(self.view.width()//2, self.view.height()//2, self.major_axe, self.minor_axe)
         # self.rect = QtWidgets.QGraphicsRectItem(self.qrectf)
         # scene.addItem(self.qretf)
-        scene.addRect(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+        self.scene.addRect(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
 
-    def Ellipse(self, view, scene, recorded_frames):
+    def Ellipse(self, recorded_frames):
 
         # fix the horiz value
         if self.parameters["horizPara"] == "RMS":
-            self.major_axe = recorded_frames["rms"] * view.width()
+            self.major_axe = recorded_frames["rms"] * self.view.width()
         elif self.parameters["horizPara"] == "spectral_centroid":
-            self.major_axe = recorded_frames["Spectral centroid"] * view.width()
+            self.major_axe = recorded_frames["Spectral centroid"] * self.view.width()
         else:
-            self.major_axe = recorded_frames["spectral_flatness"] * view.width()
+            self.major_axe = recorded_frames["spectral_flatness"] * self.view.width()
 
         # fix the vertic value
         if self.parameters["verticPara"] == "RMS":
-            self.minor_axe = recorded_frames["rms"] * view.height()
+            self.minor_axe = recorded_frames["rms"] * self.view.height()
         elif self.parameters["verticPara"] == "Spectral centroid":
-            self.minor_axe = recorded_frames["spectral_centroid"] * view.height()
+            self.minor_axe = recorded_frames["spectral_centroid"] * self.view.height()
         else:
-            self.minor_axe = recorded_frames["spectral_flatness"] * view.height()
+            self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
 
-        self.qrectf = QRectF(view.width() // 2, view.height() // 2, self.major_axe, self.minor_axe)
-        scene.addEllipse(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+        self.qrectf = QRectF(self.view.width() // 2, self.view.height() // 2, self.major_axe, self.minor_axe)
+        self.scene.addEllipse(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
 
         # scene.setSceneRect(0,0,view.width(),view.height())
-        scene.addEllipse(view.width() // 2, view.height() // 2, self.major_axe, self.minor_axe,
-                         self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+        self.scene.addEllipse(self.view.width() // 2, self.view.height() // 2, self.major_axe, self.minor_axe, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+

@@ -151,6 +151,7 @@ class View(QtWidgets.QWidget):
         else:
                 self.sound.analyze()
                 self.sound.normalize()
+                figure=figures.Figure(self.view.parameters_window1,self.view,self.scene)
                 pygame.mixer.init()
 
                 pygame.mixer.music.load(self.sound.filename)
@@ -164,7 +165,7 @@ class View(QtWidgets.QWidget):
         if pygame.mixer.music.get_busy():
             self.scene.clear()
 
-            figure = figures.Figure(self.view.parameters_window1)
+
 
             current_time = pygame.mixer.music.get_pos()
 
@@ -176,7 +177,7 @@ class View(QtWidgets.QWidget):
             recorded_values = {"rms": float(rms) , "spectral_centroid": float(spectral_centroid),
                              "spectral_flatness": float(spectral_flatness)}
 
-            figure.draw(self.view, self.scene, recorded_values)
+            figure.update(recorded_values)
 
             # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,
             #                       10*spectral_centroid, 10*spectral_centroid, qpen, qpaint)
