@@ -1,7 +1,7 @@
 """Defines different formes and their characteristics of reprepresented pictures"""
 
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QPainter, QBrush, QPainterPath, QPen, QColor
+from PyQt5.QtGui import QPainter, QBrush, QPainterPath, QPen, QColor, QLinearGradient, QRadialGradient
 from PyQt5.QtCore import Qt, QRectF
 import view
 
@@ -47,11 +47,13 @@ class Figure(QtWidgets.QGraphicsItem):
     def __init__(self, window1_parameters,the_view,the_scene):
         super().__init__()
         self.parameters = window1_parameters
+
+        self.gradient = QLinearGradient()
+
         self.drawingToolsWindow1 = {"pen": QPen(), "brush": QBrush()}
         self.color = []
         self.view=the_view
         self.scene=the_scene
-
 
         self.minor_axe = None
         self.major_axe = None
@@ -69,8 +71,7 @@ class Figure(QtWidgets.QGraphicsItem):
 
 
     def SetToolsColor(self, recorded_frames):
-        self.drawingToolsWindow1["pen"].setWidth(20)
-        self.drawingToolsWindow1["brush"].setStyle(1)      # the number changes the type of background
+        self.drawingToolsWindow1["pen"].setWidth(2)
         # set the color
         if self.parameters["color"] == "Red":
             self.color = [255, 0, 0]
@@ -101,7 +102,11 @@ class Figure(QtWidgets.QGraphicsItem):
             self.color[2] *= recorded_frames["spectral_flatness"]
 
         # fix the color of the Tools
-        self.drawingToolsWindow1["brush"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
+        self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
+        self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2],175))
+        self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
+        self.drawingToolsWindow1["brush"] = QBrush(self.gradient)
+
         self.drawingToolsWindow1["pen"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
     def update(self, recorded_frames):
@@ -122,6 +127,13 @@ class Figure(QtWidgets.QGraphicsItem):
             self.minor_axe = recorded_frames["spectral_centroid"] * self.view.height()
         else:
             self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
+
+        #self.gradient.setCenter(self.view.height()//2, self.view.width()//2)
+        #self.gradient.setRadius((self.minor_axe**2 + self.major_axe**2)**0.5)
+        #self.gradient.setStart(0,0)
+        #self.gradient.setFinalStop(self.view.height(), self.view.width())
+        self.gradient.setStart((self.view.height() - self.minor_axe)//2, (self.view.width() - self.major_axe)//2)
+        self.gradient.setFinalStop(self.view.height() - self.minor_axe//2, self.view.width() - self.major_axe//2)
 
         self.qrectf.setHeight(self.minor_axe)
         self.qrectf.setWidth(self.major_axe)
