@@ -1,6 +1,13 @@
 import config, sys
 from PyQt5 import QtCore, QtWidgets
 
+"""
+TODO:
+
+- Ajouter choix nom conf + enregistrer avec ce nom dans un dossier séparé 'configurations'
+- bug suppression ligne + passage mode fonction
+"""
+
 DEBUG = False
 VAROFFSET = 1
 ASSIOFFSET = 1
@@ -194,15 +201,6 @@ class Ui_IOConfig(object):
         self.enregistrerButton.setText(_translate("IOConfig", "Enregistrer"))
         self.validerButton.setText(_translate("IOConfig", "Valider"))
 
-    def fillCombo(self, combo, list):
-        """
-        Remplit combo avec les valeurs de list
-        :param combo: comboBox
-        :param list: liste des valeurs
-        """
-        combo.clear()
-        for x in list: combo.addItem(x)
-
     def addAssiLine(self, IOConfig):
         """
         Ajoute une ligne d'assignation
@@ -241,8 +239,8 @@ class Ui_IOConfig(object):
 
         IOConfig.assiLines[-1][3].setText("x")
 
-        self.fillCombo(IOConfig.assiLines[-1][2], OUTPUTS)
-        self.fillCombo(IOConfig.assiLines[-1][1], self.inputs(IOConfig))
+        fillCombo(IOConfig.assiLines[-1][2], OUTPUTS)
+        fillCombo(IOConfig.assiLines[-1][1], self.inputs(IOConfig))
 
         IOConfig.assiLines[currentRow][3].clicked.connect(lambda: self.delLine(IOConfig, IOConfig.assiLines, currentRow, self.assiGridLay, self.addAssiButton, ASSIOFFSET))
         IOConfig.assiLines[currentRow][0].stateChanged.connect(lambda s: self.lineFormula(IOConfig, s, currentRow))
@@ -276,7 +274,7 @@ class Ui_IOConfig(object):
         IOConfig.varLines[-1][3].setText("x")
 
         self.update_inputs(IOConfig)
-        self.fillCombo(IOConfig.varLines[-1][1], VARTYPES)
+        fillCombo(IOConfig.varLines[-1][1], VARTYPES)
 
         IOConfig.varLines[currentRow][3].clicked.connect(lambda: self.delLine(IOConfig, IOConfig.varLines, currentRow, self.varGridLay, self.addVarButton, VAROFFSET))
         IOConfig.varLines[currentRow][0].editingFinished.connect(lambda: self.update_inputs(IOConfig))
@@ -343,7 +341,7 @@ class Ui_IOConfig(object):
         for assiLine in IOConfig.assiLines:
             if assiLine[1].__class__.__name__=="QComboBox":
                 pos = assiLine[1].currentIndex()
-                self.fillCombo(assiLine[1], INPUTS)
+                fillCombo(assiLine[1], INPUTS)
                 assiLine[1].setCurrentIndex(pos)
         debug(INPUTS)
 
@@ -366,6 +364,14 @@ class Ui_IOConfig(object):
             self.update_inputs(IOConfig)
             IOConfig.assiLines[row][1].setCurrentIndex(0)
 
+def fillCombo(combo, list):
+    """
+    Remplit combo avec les valeurs de list
+    :param combo: comboBox
+    :param list: liste des valeurs
+    """
+    combo.clear()
+    for x in list: combo.addItem(x)
 
 def debug(*args):
     if DEBUG: print(*args)

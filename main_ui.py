@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'mainwindow.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.2
-#
-# WARNING! All changes made in this file will be lost!
-
-
+import sys, config_ui
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+"""
+TODO :
+
+- remplissage liste sons
+- liste configurations
+- remplacer numéros confs par combo box avec nom
+"""
 
 class Ui_mainWindow(object):
     def setupUi(self, mainWindow):
@@ -133,12 +132,14 @@ class Ui_mainWindow(object):
         self.pushButton.setText(_translate("mainWindow", "|>"))
         self.checkBox.setText(_translate("mainWindow", "Boucle"))
 
-
-if __name__ == "__main__":
-    import sys
+def openWindow():
     app = QtWidgets.QApplication(sys.argv)
     mainWindow = QtWidgets.QWidget()
     ui = Ui_mainWindow()
     ui.setupUi(mainWindow)
     mainWindow.show()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    openWindow()
