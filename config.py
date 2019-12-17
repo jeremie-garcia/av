@@ -33,9 +33,7 @@ class Gradation(): #dégradé
     def __repr__(self):
         return "Line {}: {}".format(self.line, self.error)"""
 
-INPUTS = ["rms", "sp_centroid", "sp_flatness", "sp_contrast", "sp_bandwidth", "sp_rolloff", "beat"]
-OUTPUTS = ["size", "px", "py", "vibration", "color"]
-VARTYPES = ["value", "color", "grad"]
+SOUND_INPUTS = ["rms", "sp_centroid", "sp_flatness", "sp_contrast", "sp_bandwidth", "sp_rolloff", "beat"]
 
 def readfile(file):
     """
@@ -67,6 +65,30 @@ def readfile(file):
                     variables[words[1]] = Gradation(A,B)
     return binds, variables
 
+def save(window):
+    assignations = {}
+    vars = {}
+    for line in window.assiLines: # sortie: source
+        assignations[line[2].currentText()] = line[2].currentText()
+    for line in window.varLines: # nom: (type, valeur)
+        vars[line[0].displayText()] = (line[1].currentText(), line[2].displayText())
+
+    with open("av.conf", "w") as f:
+        for a in assignations:
+            f.write("assign {} to {}\n".format(a, assignations[a]))
+        for v in vars:
+            if vars[v][0] == "value":
+                f.write("var {} = {}\n".format(v, vars[v][1]))
+            else:
+                f.write("var {} = {}({})\n".format(v, vars[v][0], vars[v][1]))
+
+    config_ui.debug(assignations)
+    config_ui.debug(vars)
+
+def valider(IOConfig):
+    save(IOConfig)
+    config_ui.debug("Goodbye, human")
+    IOConfig.close()
 
 if __name__ == "__main__":
     config_ui.openWindow()
