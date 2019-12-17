@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     # create the QMainWindow and add both widgets
     win = QtWidgets.QMainWindow()
-    win.setWindowTitle("Sound Visualisator")
+    win.setWindowTitle("Sound Visualiser")
     win.setCentralWidget(the_view)
     win.addDockWidget(QtCore.Qt.DockWidgetArea(1), selec_dock)
     win.showMaximized()
