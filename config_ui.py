@@ -1,7 +1,7 @@
 import config, sys
 from PyQt5 import QtCore, QtWidgets
 
-DEBUG = True
+DEBUG = False
 VAROFFSET = 1
 ASSIOFFSET = 1
 
@@ -210,10 +210,10 @@ class Ui_IOConfig(object):
         :return:
         """
         IOConfig.assiLines.append([])
-        actualRow = len(IOConfig.assiLines) - 1  #indice ligne créée
-        gridRow = actualRow + ASSIOFFSET
+        currentRow = len(IOConfig.assiLines) - 1  #indice ligne créée
+        gridRow = currentRow + ASSIOFFSET
 
-        debug("creates assi line #{}".format(actualRow))
+        debug("creates assi line #{}".format(currentRow))
 
         self.assiGridLay.addWidget(self.addAssiButton, gridRow + 1, 3, 1, 1)
         IOConfig.assiLines[-1].append(QtWidgets.QCheckBox(IOConfig))
@@ -226,16 +226,16 @@ class Ui_IOConfig(object):
         IOConfig.assiLines[-1][0].setText("")
         IOConfig.assiLines[-1][0].setChecked(False)
         IOConfig.assiLines[-1][0].setTristate(False)
-        IOConfig.assiLines[-1][0].setObjectName("checkBox_"+str(actualRow-1))
+        IOConfig.assiLines[-1][0].setObjectName("checkBox_"+str(currentRow-1))
         self.assiGridLay.addWidget(IOConfig.assiLines[-1][0], gridRow, 0, 1, 1, QtCore.Qt.AlignHCenter)
         IOConfig.assiLines[-1].append(QtWidgets.QComboBox(IOConfig))
-        IOConfig.assiLines[-1][1].setObjectName("inputCombo_"+str(actualRow-1))
+        IOConfig.assiLines[-1][1].setObjectName("inputCombo_"+str(currentRow-1))
         self.assiGridLay.addWidget(IOConfig.assiLines[-1][1], gridRow, 1, 1, 1)
         IOConfig.assiLines[-1].append(QtWidgets.QComboBox(IOConfig))
-        IOConfig.assiLines[-1][2].setObjectName("outputCombo_"+str(actualRow-1))
+        IOConfig.assiLines[-1][2].setObjectName("outputCombo_"+str(currentRow-1))
         self.assiGridLay.addWidget(IOConfig.assiLines[-1][2], gridRow, 2, 1, 1)
         IOConfig.assiLines[-1].append(QtWidgets.QPushButton(IOConfig))
-        IOConfig.assiLines[-1][3].setObjectName("delAssiButton_"+str(actualRow-1))
+        IOConfig.assiLines[-1][3].setObjectName("delAssiButton_"+str(currentRow-1))
         self.assiGridLay.addWidget(IOConfig.assiLines[-1][3], gridRow, 3)
         IOConfig.assiLines[-1][3].setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
 
@@ -244,7 +244,8 @@ class Ui_IOConfig(object):
         self.fillCombo(IOConfig.assiLines[-1][2], OUTPUTS)
         self.fillCombo(IOConfig.assiLines[-1][1], self.inputs(IOConfig))
 
-        IOConfig.assiLines[actualRow][3].clicked.connect(lambda: self.delLine(IOConfig, IOConfig.assiLines, actualRow, self.assiGridLay, self.addAssiButton, ASSIOFFSET))
+        IOConfig.assiLines[currentRow][3].clicked.connect(lambda: self.delLine(IOConfig, IOConfig.assiLines, currentRow, self.assiGridLay, self.addAssiButton, ASSIOFFSET))
+        IOConfig.assiLines[currentRow][0].stateChanged.connect(lambda s: self.lineFormula(IOConfig, s, currentRow))
 
     def addVarLine(self, IOConfig):
         """
@@ -252,23 +253,23 @@ class Ui_IOConfig(object):
         :param IOConfig: fenêtre de travail
         """
         IOConfig.varLines.append([])
-        actualRow = len(IOConfig.varLines) - 1 #indice de la ligne qu'on crée
-        gridRow = actualRow + VAROFFSET
+        currentRow = len(IOConfig.varLines) - 1 #indice de la ligne qu'on crée
+        gridRow = currentRow + VAROFFSET
 
-        debug("creates var line #{}".format(actualRow))
+        debug("creates var line #{}".format(currentRow))
 
         self.varGridLay.addWidget(self.addVarButton, gridRow + 1, 3)
         IOConfig.varLines[-1].append(QtWidgets.QLineEdit(IOConfig))
-        IOConfig.varLines[-1][0].setObjectName("nomLine_"+str(actualRow-1))
+        IOConfig.varLines[-1][0].setObjectName("nomLine_"+str(currentRow-1))
         self.varGridLay.addWidget(IOConfig.varLines[-1][0], gridRow, 0)
         IOConfig.varLines[-1].append(QtWidgets.QComboBox(IOConfig))
-        IOConfig.varLines[-1][1].setObjectName("typeCombo_"+str(actualRow-1))
+        IOConfig.varLines[-1][1].setObjectName("typeCombo_"+str(currentRow-1))
         self.varGridLay.addWidget(IOConfig.varLines[-1][1], gridRow, 1)
         IOConfig.varLines[-1].append(QtWidgets.QLineEdit(IOConfig))
-        IOConfig.varLines[-1][2].setObjectName("valeurLine_"+str(actualRow-1))
+        IOConfig.varLines[-1][2].setObjectName("valeurLine_"+str(currentRow-1))
         self.varGridLay.addWidget(IOConfig.varLines[-1][2], gridRow, 2)
         IOConfig.varLines[-1].append(QtWidgets.QPushButton(IOConfig))
-        IOConfig.varLines[-1][3].setObjectName("delVarButton_"+str(actualRow-1))
+        IOConfig.varLines[-1][3].setObjectName("delVarButton_"+str(currentRow-1))
         self.varGridLay.addWidget(IOConfig.varLines[-1][3], gridRow, 3)
         IOConfig.varLines[-1][3].setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
 
@@ -277,8 +278,8 @@ class Ui_IOConfig(object):
         self.update_inputs(IOConfig)
         self.fillCombo(IOConfig.varLines[-1][1], VARTYPES)
 
-        IOConfig.varLines[actualRow][3].clicked.connect(lambda: self.delLine(IOConfig, IOConfig.varLines, actualRow, self.varGridLay, self.addVarButton, VAROFFSET))
-        IOConfig.varLines[actualRow][0].editingFinished.connect(lambda: self.update_inputs(IOConfig))
+        IOConfig.varLines[currentRow][3].clicked.connect(lambda: self.delLine(IOConfig, IOConfig.varLines, currentRow, self.varGridLay, self.addVarButton, VAROFFSET))
+        IOConfig.varLines[currentRow][0].editingFinished.connect(lambda: self.update_inputs(IOConfig))
 
     def delLine(self, IOConfig, table, n, gridLay, addButton, offset): #n indice de la ligne dans table
         """
@@ -332,16 +333,38 @@ class Ui_IOConfig(object):
         obj.clicked.connect(lambda: func(IOConfig, table, p, gridLay, addButton, offset))
         debug("Reconnected {} to line {}".format(obj.objectName(), p))
 
+
     def inputs(self, IOConfig):
-        return [_ for _ in config.SOUND_INPUTS] + [line[0].displayText() for line in IOConfig.varLines]
+        return [_ for _ in config.SOUND_INPUTS] + [line[0].displayText() for line in IOConfig.varLines if line[0].displayText() != ""]
+
 
     def update_inputs(self, IOConfig):
         INPUTS = self.inputs(IOConfig)
         for assiLine in IOConfig.assiLines:
-            pos = assiLine[1].currentIndex()
-            self.fillCombo(assiLine[1], INPUTS)
-            assiLine[1].setCurrentIndex(pos)
-        print(INPUTS)
+            if assiLine[1].__class__.__name__=="QComboBox":
+                pos = assiLine[1].currentIndex()
+                self.fillCombo(assiLine[1], INPUTS)
+                assiLine[1].setCurrentIndex(pos)
+        debug(INPUTS)
+
+
+    def lineFormula(self, IOConfig, state, row):
+        if state == 2: # si a été cochée
+            self.assiGridLay.removeWidget(IOConfig.assiLines[row][1])
+            IOConfig.assiLines[row][1].deleteLater()
+            IOConfig.assiLines[row][1] = QtWidgets.QLineEdit(IOConfig)
+            IOConfig.assiLines[row][1].setObjectName("inputFormula_" + str(row - 1))
+            self.assiGridLay.addWidget(IOConfig.assiLines[row][1], row + 1, 1, 1, 1)
+
+        else: # si a été décochée
+            if IOConfig.assiLines[row][1].__class__.__name__ == "QLineEdit":
+                self.assiGridLay.removeWidget(IOConfig.assiLines[row][1])
+                IOConfig.assiLines[row][1].deleteLater()
+            IOConfig.assiLines[row][1] = QtWidgets.QComboBox(IOConfig)
+            IOConfig.assiLines[row][1].setObjectName("inputCombo_" + str(row - 1))
+            self.assiGridLay.addWidget(IOConfig.assiLines[row][1], row + 1, 1, 1, 1)
+            self.update_inputs(IOConfig)
+            IOConfig.assiLines[row][1].setCurrentIndex(0)
 
 
 def debug(*args):

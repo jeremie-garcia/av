@@ -69,15 +69,22 @@ def save(window):
     assignations = {}
     vars = {}
     for line in window.assiLines: # sortie: source
-        assignations[line[2].currentText()] = line[2].currentText()
+        if line[1].__class__.__name__ == "QComboBox":
+            assignations[line[2].currentText()] = line[1].currentText()
+            print("combo")
+        else:
+            assignations[line[2].currentText()] = line[1].displayText()
     for line in window.varLines: # nom: (type, valeur)
-        vars[line[0].displayText()] = (line[1].currentText(), line[2].displayText())
+        name = line[0].displayText()
+        value = line[2].displayText()
+        if name != "" and value != "":
+            vars[name] = (line[1].currentText(), line[2].displayText())
 
     with open("av.conf", "w") as f:
         for a in assignations:
             f.write("assign {} to {}\n".format(a, assignations[a]))
         for v in vars:
-            if vars[v][0] == "value":
+            if vars[v][0] == "value" and vars[v][0] != "":
                 f.write("var {} = {}\n".format(v, vars[v][1]))
             else:
                 f.write("var {} = {}({})\n".format(v, vars[v][0], vars[v][1]))
