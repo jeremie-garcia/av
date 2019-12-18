@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     #the_sound.change(the_view.chosen_sound)
     # create the inspector
-    selec = selector.Selector(the_view.view)
+    selec = selector.Selector(the_view)
 
     # create a QDockWidget for the inspector
     selec_dock = QtWidgets.QDockWidget()
