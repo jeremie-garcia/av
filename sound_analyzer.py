@@ -6,8 +6,14 @@ import librosa
 
 class Sound(object):
     def __init__(self):
-        self.filename='sounds/s1.wav'
-        self.dictionnaire_sounds={'Sound 1': 'sounds/s1.wav', 'Sound 2':'sounds/s2.wav', 'Sound 3':'sounds/s3.wav', 'Sound 4':'sounds/s4.wav', 'Sound 5':'sounds/s5.wav', 'Sound 6':'sounds/s6.wav', 'Sound 7':'sounds/s7.wav', 'Sound 8':'sounds/s8.wav', 'Sound 9':'sounds/s9.wav', 'Sound 10':'sounds/s10.wav', 'Sound 11':'sounds/s11.wav'}
+        self.filename='sounds/franceGall.wav'
+        self.dictionnaire_sounds={'Sound 1': 'sounds/s1.wav', 'Sound 2': 'sounds/s2.wav', 'Sound 3': 'sounds/s3.wav',
+                                  'Sound 4': 'sounds/s4.wav', 'Sound 5': 'sounds/s5.wav', 'Sound 6': 'sounds/s6.wav',
+                                  'Sound 7': 'sounds/s7.wav', 'Sound 8': 'sounds/s8.wav', 'Sound 9': 'sounds/s9.wav',
+                                  'Sound 10': 'sounds/s10.wav', 'Sound 11': 'sounds/s11.wav',
+                                  'La Moulaga': 'sounds/moulaga.wav', 'France Gall': 'sounds/franceGall.wav',
+                                  'Dire Straits': 'sounds/dire_straits.wav', 'Numb': 'sounds/Numb.wav',
+                                  'Djadja': 'sounds/djadja.wav', 'TNT': 'sounds/acdc-tnt.wav', 'Da Ba Dee': 'sounds/dabadee.wav'}
         self.rms_frames=None
         self.spectral_centroid_frames=None
         self.spectral_flatness_frames=None
