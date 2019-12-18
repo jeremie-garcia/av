@@ -27,32 +27,28 @@ class Selector(QWidget):
         self.ui_selector.FormComboBox_1.currentIndexChanged.connect(self.update_form_window1)
         self.ui_selector.ColorComboBox_1.currentIndexChanged.connect(self.update_color_window1)
         self.ui_selector.ColorParameterComboBox_1.currentIndexChanged.connect(self.update_colorPara_window1)
-        self.ui_selector.HorizontalSizeParameterComboBox_1.currentIndexChanged.connect(
-            self.update_horizSizePara_window1)
+        self.ui_selector.HorizontalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_horizSizePara_window1)
         self.ui_selector.VerticalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_vertiSizePara_window1)
 
         """Window 2 connection ComboBox to Parameters"""
         self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_form_window2)
         self.ui_selector.ColorComboBox_2.currentIndexChanged.connect(self.update_color_window2)
         self.ui_selector.ColorParameterComboBox_2.currentIndexChanged.connect(self.update_colorPara_window2)
-        self.ui_selector.HorizontalSizeParameterComboBox_2.currentIndexChanged.connect(
-            self.update_horizSizePara_window2)
+        self.ui_selector.HorizontalSizeParameterComboBox_2.currentIndexChanged.connect(self.update_horizSizePara_window2)
         self.ui_selector.VerticalSizeParameterComboBox_2.currentIndexChanged.connect(self.update_vertiSizePara_window2)
 
         """Window 3 connection ComboBox to Parameters"""
         self.ui_selector.FormComboBox_3.currentIndexChanged.connect(self.update_form_window3)
         self.ui_selector.ColorComboBox_3.currentIndexChanged.connect(self.update_color_window3)
         self.ui_selector.ColorParameterComboBox_3.currentIndexChanged.connect(self.update_colorPara_window3)
-        self.ui_selector.HorizontalSizeParameterComboBox_3.currentIndexChanged.connect(
-            self.update_horizSizePara_window3)
+        self.ui_selector.HorizontalSizeParameterComboBox_3.currentIndexChanged.connect(self.update_horizSizePara_window3)
         self.ui_selector.VerticalSizeParameterComboBox_3.currentIndexChanged.connect(self.update_vertiSizePara_window3)
 
         """Window 4 connection ComboBox to Parameters"""
         self.ui_selector.FormComboBox_4.currentIndexChanged.connect(self.update_form_window4)
         self.ui_selector.ColorComboBox_4.currentIndexChanged.connect(self.update_color_window4)
         self.ui_selector.ColorParameterComboBox_4.currentIndexChanged.connect(self.update_colorPara_window4)
-        self.ui_selector.HorizontalSizeParameterComboBox_4.currentIndexChanged.connect(
-            self.update_horizSizePara_window4)
+        self.ui_selector.HorizontalSizeParameterComboBox_4.currentIndexChanged.connect(self.update_horizSizePara_window4)
         self.ui_selector.VerticalSizeParameterComboBox_4.currentIndexChanged.connect(self.update_vertiSizePara_window4)
 
         """sound connection"""
