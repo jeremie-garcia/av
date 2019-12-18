@@ -163,7 +163,10 @@ class View(QtWidgets.QWidget):
         else:
                 self.sound.analyze()
                 self.sound.normalize()
-                self.window_constructor()
+                # self.window_constructor()
+
+                self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
+                self.figure.Item_Init()
 
 
                 pygame.mixer.init()
@@ -189,11 +192,12 @@ class View(QtWidgets.QWidget):
             spectral_flatness = self.sound.spectral_flatness_frames[0][index]
             recorded_values = {"rms": float(rms) , "spectral_centroid": float(spectral_centroid),
                              "spectral_flatness": float(spectral_flatness)}
-            if len(self.window_number_activated)==1:
-                self.figure.update(recorded_values)
-            elif len(self.window_number_activated)==2:
-                self.figure1.update(recorded_values)
-                self.figure2.update(recorded_values)
+            # if len(self.window_number_activated)==1:
+            #     self.figure.update(recorded_values)
+            # elif len(self.window_number_activated)==2:
+            #     self.figure1.update(recorded_values)
+            #     self.figure2.update(recorded_values)
+            self.figure.update(recorded_values)
             self.view.update()
 
             # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,

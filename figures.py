@@ -5,73 +5,45 @@ from PyQt5.QtGui import QPainter, QBrush, QPainterPath, QPen, QColor, QLinearGra
 from PyQt5.QtCore import Qt, QRectF
 import view
 
-# QGraphicsItem plutot
-class Triangle(QtWidgets.QGraphicsPolygonItem):  # TODO a mettre dans la classe figure
-    def __init__(self):
-        super().__init__()
-        self.line_color = None
-        self.fill_color = None
-        self.line_width = None
-        self.first_side = None  # length of the first side of the triangle
-        self.second_side = None  # length of the second side of the triangle
-
-        self.set_atributes()
-
-        self.setGeometry()
-
-    def update_atributes(self):
-        # Penser à utilser QPaninterPath.currentPosition() pour le calcul des positions des lignes du tiangle
-        self.line_color = Qt.green
-        self.fill_color = Qt.green
-
-        self.setPen(QPen(self.line_color, self.line_width))
-        self.setBrush(QBrush(self.fill_color, Qt.SolidPattern))
-
-    def paintEvent(self, event):
-        qp = QPainter()
-        path = QPainterPath()
-        path.moveTo(10, 25)  # à confirmer
-        qp.begin(self)
-        qp.setRenderHint(QPainter.Antialiasing)
-        qp.setPen(self.line_color)
-        qp.setBrush(QBrush(self.fill_color, Qt.SolidPattern))
-        path.lineTo(160, 400)
-        path.lineTo(350, 100)
-        path.lineTo(10, 25)
-        qp.drawPath(path)
-        qp.end()
-
-
 
 class Figure(QtWidgets.QGraphicsItem):
-    def __init__(self, window1_parameters,the_view,the_scene):
+    def __init__(self, window1_parameters, the_view, the_scene):
         super().__init__()
         self.parameters = window1_parameters
 
         self.gradient = QLinearGradient()
 
-        self.drawingToolsWindow1 = {"pen": QPen(), "brush": QBrush()}
+        self.pen = QPen()
+        self.brush = QBrush()
         self.color = []
-        self.view=the_view
-        self.scene=the_scene
+        self.view = the_view
+        self.scene = the_scene
 
         self.minor_axe = None
         self.major_axe = None
         self.qrectf = QRectF()
+        self.item = None
 
-
-    def QRectInit(self):
+    def Item_Init(self):
         if self.parameters["form"] == "Rectangle":
-            self.scene.addRect(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
+            self.item = QtWidgets.QGraphicsRectItem()
+            self.item.setRect(self.qrectf)
+            self.item.setBrush(self.brush)
+            self.item.setPen(self.pen)
+            self.scene.addItem(self.item)
+
+        if self.parameters["form"] == "Ellipse":
+            self.item = QtWidgets.QGraphicsEllipseItem()
+            self.item.setRect(self.qrectf)
+            self.item.setBrush(self.brush)
+            self.item.setPen(self.pen)
+            self.scene.addItem(self.item)
 
         else:
-            pass
-            # self.SetToolsColor(recorded_frames)
-            # self.Ellipse(recorded_frames)
-
+            raise NameError('Forme non définie')
 
     def SetToolsColor(self, recorded_frames):
-        self.drawingToolsWindow1["pen"].setWidth(2)
+        self.pen.setWidth(2)
         # set the color
         if self.parameters["color"] == "Red":
             self.color = [255, 0, 0]
@@ -103,16 +75,17 @@ class Figure(QtWidgets.QGraphicsItem):
 
         # fix the color of the Tools
         self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
-        self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2],175))
+        self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 175))
         self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
-        self.drawingToolsWindow1["brush"] = QBrush(self.gradient)
+        self.brush = QBrush(self.gradient)
 
-        self.drawingToolsWindow1["pen"].setColor(QColor(self.color[0], self.color[1], self.color[2]))
+        self.pen.setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
     def update(self, recorded_frames):
+
         self.SetToolsColor(recorded_frames)
 
-        #fix the horiz value
+        # fix the horizontal value
         if self.parameters["horizPara"] == "RMS":
             self.major_axe = recorded_frames["rms"] * self.view.width()
         elif self.parameters["horizPara"] == "Spectral centroid":
@@ -120,7 +93,7 @@ class Figure(QtWidgets.QGraphicsItem):
         else:
             self.major_axe = recorded_frames["spectral_flatness"] * self.view.width()
 
-            # fix the vertic value
+            # fix the vertical value
         if self.parameters["verticPara"] == "RMS":
             self.minor_axe = recorded_frames["rms"] * self.view.height()
         elif self.parameters["verticPara"] == "Spectral centroid":
@@ -128,41 +101,19 @@ class Figure(QtWidgets.QGraphicsItem):
         else:
             self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
 
-        #self.gradient.setCenter(self.view.height()//2, self.view.width()//2)
-        #self.gradient.setRadius((self.minor_axe**2 + self.major_axe**2)**0.5)
-        #self.gradient.setStart(0,0)
-        #self.gradient.setFinalStop(self.view.height(), self.view.width())
+        # self.gradient.setCenter(self.view.height()//2, self.view.width()//2)
+        # self.gradient.setRadius((self.minor_axe**2 + self.major_axe**2)**0.5)
+        # self.gradient.setStart(0,0)
+        # self.gradient.setFinalStop(self.view.height(), self.view.width())
         self.gradient.setStart((self.view.height() - self.minor_axe)//2, (self.view.width() - self.major_axe)//2)
         self.gradient.setFinalStop(self.view.height() - self.minor_axe//2, self.view.width() - self.major_axe//2)
 
         self.qrectf.setHeight(self.minor_axe)
         self.qrectf.setWidth(self.major_axe)
 
+        self.item.setRect(self.qrectf)
+        self.item.setBrush(self.brush)
+        self.item.setPen(self.pen)
+
         self.scene.setSceneRect(self.qrectf)
-        self.scene.addRect(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
-
-
-    def Ellipse(self, recorded_frames):
-
-        # fix the horiz value
-        if self.parameters["horizPara"] == "RMS":
-            self.major_axe = recorded_frames["rms"] * self.view.width()
-        elif self.parameters["horizPara"] == "spectral_centroid":
-            self.major_axe = recorded_frames["Spectral centroid"] * self.view.width()
-        else:
-            self.major_axe = recorded_frames["spectral_flatness"] * self.view.width()
-
-        # fix the vertic value
-        if self.parameters["verticPara"] == "RMS":
-            self.minor_axe = recorded_frames["rms"] * self.view.height()
-        elif self.parameters["verticPara"] == "Spectral centroid":
-            self.minor_axe = recorded_frames["spectral_centroid"] * self.view.height()
-        else:
-            self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
-
-        self.qrectf = QRectF(self.view.width() // 2, self.view.height() // 2, self.major_axe, self.minor_axe)
-        self.scene.addEllipse(self.qrectf, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
-
-        # scene.setSceneRect(0,0,view.width(),view.height())
-        self.scene.addEllipse(self.view.width() // 2, self.view.height() // 2, self.major_axe, self.minor_axe, self.drawingToolsWindow1["pen"], self.drawingToolsWindow1["brush"])
 
