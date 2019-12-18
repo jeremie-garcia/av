@@ -40,7 +40,7 @@ class Figure(QtWidgets.QGraphicsItem):
             self.scene.addItem(self.item)
 
         else:
-            raise NameError('Forme non définie')
+            print('Forme non définie')
 
     def SetToolsColor(self, recorded_frames):
         self.pen.setWidth(2)
@@ -82,7 +82,6 @@ class Figure(QtWidgets.QGraphicsItem):
         self.pen.setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
     def update(self, recorded_frames):
-
         self.SetToolsColor(recorded_frames)
 
         # fix the horizontal value

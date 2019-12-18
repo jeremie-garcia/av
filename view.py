@@ -52,7 +52,7 @@ class View(QtWidgets.QWidget):
         self.view = PanZoomView(self.scene)
         self.sound = the_sound
         self.time_entry = QtWidgets.QLineEdit()
-        self.window_number_activated=[]
+        self.window_number_activated = []
         self.view.parameters_window1 = {"form": "Ellipse", "horizPara": "RMS",
                                         "verticPara": "RMS", "color": "Red", "colorPara": "RMS"}
         self.view.parameters_window2 = {"form": None, "horizPara": None, "verticPara": None,
@@ -98,7 +98,7 @@ class View(QtWidgets.QWidget):
 
         toolbar.addStretch()
 
-        #def add_comboBox(sounds):
+        # def add_comboBox(sounds):
         #     """adds a comboBox to the hbox and connects the slot"""
         #     sounds_ComboBox = QtWidgets.QComboBox()
         #
@@ -132,10 +132,11 @@ class View(QtWidgets.QWidget):
     def fit_scene_in_view(self):
         self.view.fitInView(self.view.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
-
     def window_constructor(self):
         if len(self.window_number_activated)==1:
-            self.figure = figures.Figure(self,self.view.parameters_window1,{"x":self.view.width()//2,"y":self.view.height()//2},{"x":self.view.width(),"y":self.view.height()})
+            self.figure = figures.Figure(self, self.view.parameters_window1,
+                                         {"x": self.view.width()//2, "y": self.view.height()//2},
+                                         {"x": self.view.width(), "y": self.view.height()})
             self.figure.ItemInit()
         elif len(self.window_number_activated)==2:
             self.figure1 = figures.Figure(self,self.view.parameters_window1,{"x":self.view.width()//4,"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2})
@@ -156,32 +157,28 @@ class View(QtWidgets.QWidget):
         """this slot toggles the replay using the timer as model"""
         # windows1
 
-
         if self.timer.isActive():
             self.timer.stop()
             pygame.mixer.music.stop()           # pause and play again after <-- to set
         else:
-                self.sound.analyze()
-                self.sound.normalize()
-                # self.window_constructor()
+            self.sound.analyze()
+            self.sound.normalize()
+            # self.window_constructor()
 
-                self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
-                self.figure.Item_Init()
+            self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
+            self.figure.Item_Init()
 
+            pygame.mixer.init()
 
-                pygame.mixer.init()
+            pygame.mixer.music.load(self.sound.filename)
 
-                pygame.mixer.music.load(self.sound.filename)
+            self.timer.timeout.connect(self.timer_update)
 
-                self.timer.timeout.connect(self.timer_update)
-
-                pygame.mixer.music.play(0)
-                self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
+            pygame.mixer.music.play(0)
+            self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
 
     def timer_update(self):
         if pygame.mixer.music.get_busy():
-
-
 
             current_time = pygame.mixer.music.get_pos()
 

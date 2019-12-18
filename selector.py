@@ -58,12 +58,7 @@ class Selector(QWidget):
 
     """sound combo box list of sounds"""
 
-
-
-
-
-    """Window 1 updates"""
-
+    # Window 1 updates
     def update_form_window1(self):
         self.view.parameters_window1["form"] = self.ui_selector.FormComboBox_1.currentText()
 
