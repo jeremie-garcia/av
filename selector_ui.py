@@ -11,12 +11,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Selector(object):
     def setupUi(self, Selector):
         Selector.setObjectName("Selector")
-        Selector.resize(927, 1513)
-        Selector.setMinimumSize(QtCore.QSize(927, 1513))
+        Selector.resize(746, 970)
+        Selector.setMinimumSize(QtCore.QSize(746, 720))
         Selector.setMouseTracking(False)
         Selector.setTabletTracking(False)
         self.verticalLayoutWidget = QtWidgets.QWidget(Selector)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(40, 40, 841, 1451))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(40, 40, 679, 901))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
