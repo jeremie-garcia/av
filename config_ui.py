@@ -8,7 +8,7 @@ TODO:
 - bug suppression ligne + passage mode fonction
 """
 
-DEBUG = True
+DEBUG = False
 VAROFFSET = 1
 ASSIOFFSET = 1
 
@@ -264,36 +264,47 @@ class Ui_IOConfig(object):
         Ajoute une ligne de variables
         :param IOConfig: fenêtre de travail
         """
-        IOConfig.varLines.append([])
-        currentRow = len(IOConfig.varLines) - 1 #indice de la ligne qu'on crée
-        gridRow = currentRow + VAROFFSET
+        currentRow = len(IOConfig.varLines)  # indice ligne créée
+        try:
+            gridRow = IOConfig.varLines[-1].gridRow + 1
+        except:
+            gridRow = 1
 
-        debug("creates var line #{}".format(currentRow))
+        debug("creates var line index {}, row {}".format(currentRow, gridRow))
+
+        IOConfig.varLines.append(Line("VAR", currentRow, gridRow, []))
+        contents = IOConfig.varLines[-1].contents
 
         self.varGridLay.addWidget(self.addVarButton, gridRow + 1, 3)
-        IOConfig.varLines[-1].append(QtWidgets.QLineEdit(IOConfig))
-        IOConfig.varLines[-1][0].setObjectName("nomLine_"+str(currentRow-1))
-        self.varGridLay.addWidget(IOConfig.varLines[-1][0], gridRow, 0)
-        IOConfig.varLines[-1].append(QtWidgets.QComboBox(IOConfig))
-        IOConfig.varLines[-1][1].setObjectName("typeCombo_"+str(currentRow-1))
-        self.varGridLay.addWidget(IOConfig.varLines[-1][1], gridRow, 1)
-        IOConfig.varLines[-1].append(QtWidgets.QLineEdit(IOConfig))
-        IOConfig.varLines[-1][2].setObjectName("valeurLine_"+str(currentRow-1))
-        self.varGridLay.addWidget(IOConfig.varLines[-1][2], gridRow, 2)
-        IOConfig.varLines[-1].append(QtWidgets.QPushButton(IOConfig))
-        IOConfig.varLines[-1][3].setObjectName("delVarButton_"+str(currentRow-1))
-        self.varGridLay.addWidget(IOConfig.varLines[-1][3], gridRow, 3)
-        IOConfig.varLines[-1][3].setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
+        contents.append(QtWidgets.QLineEdit(IOConfig))
+        contents[0].setObjectName("nomLine_"+str(currentRow - 1))
+        self.varGridLay.addWidget(contents[0], gridRow, 0)
+        contents.append(QtWidgets.QComboBox(IOConfig))
+        contents[1].setObjectName("typeCombo_"+str(currentRow - 1))
+        self.varGridLay.addWidget(contents[1], gridRow, 1)
+        contents.append(QtWidgets.QLineEdit(IOConfig))
+        contents[2].setObjectName("valeurLine_"+str(currentRow - 1))
+        self.varGridLay.addWidget(contents[2], gridRow, 2)
+        contents.append(QtWidgets.QPushButton(IOConfig))
+        contents[3].setObjectName("delVarButton_"+str(currentRow - 1))
+        self.varGridLay.addWidget(contents[3], gridRow, 3)
+        contents[3].setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
 
-        IOConfig.varLines[-1][3].setText("x")
+        contents[3].setText("x")
 
         self.update_inputs(IOConfig)
-        fillCombo(IOConfig.varLines[-1][1], VARTYPES)
+        fillCombo(contents[1], VARTYPES)
 
-        IOConfig.varLines[currentRow][3].clicked.connect(lambda: self.delLine(IOConfig, currentRow, currentRow + VAROFFSET, "VAR"))
-        IOConfig.varLines[currentRow][0].editingFinished.connect(lambda: self.update_inputs(IOConfig))
+        line = IOConfig.varLines[-1]
+        contents[3].clicked.connect(lambda: self.delLine(IOConfig, line))
+        contents[0].editingFinished.connect(lambda: self.update_inputs(IOConfig))
 
     def delLine(self, IOConfig, line):
+        """
+        Supprime une ligne de la fenêtre
+        :param IOConfig: fenêtre
+        :param line: ligne à supprimer
+        """
         debug("destroying {} line #{}".format(line.type, line.tableRow))
 
         if line.type == "ASSI":
@@ -317,10 +328,12 @@ class Ui_IOConfig(object):
             debug("reco {} {}".format(x.tableRow, x.gridRow))
 
         del lines[tableRow]
+        self.update_inputs(IOConfig)
 
 
     def inputs(self, IOConfig):
-        return [_ for _ in config.SOUND_INPUTS] + [line[0].displayText() for line in IOConfig.varLines if line[0].displayText() != ""]
+        return [_ for _ in config.SOUND_INPUTS] + [line.contents[0].displayText() for line in IOConfig.varLines if
+                                                   not line.contents[0].displayText() == ""]
 
 
     def update_inputs(self, IOConfig):

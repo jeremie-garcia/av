@@ -69,25 +69,25 @@ def save(window):
     assignations = {}
     vars = {}
     for line in window.assiLines: # sortie: source
-        if line[1].__class__.__name__ == "QComboBox":
-            assignations[line[2].currentText()] = line[1].currentText()
-            print("combo")
+        if line.contents[1].__class__.__name__ == "QComboBox":
+            assignations[line.contents[2].currentText()] = line.contents[1].currentText()
+            config_ui.debug("combo")
         else:
-            assignations[line[2].currentText()] = line[1].displayText()
+            assignations[line.contents[2].currentText()] = line.contents[1].displayText()
     for line in window.varLines: # nom: (type, valeur)
-        name = line[0].displayText()
-        value = line[2].displayText()
+        name = line.contents[0].displayText()
+        value = line.contents[2].displayText()
         if name != "" and value != "":
-            vars[name] = (line[1].currentText(), line[2].displayText())
+            vars[name] = (line.contents[1].currentText(), line.contents[2].displayText())
 
     with open("av.conf", "w") as f:
-        for a in assignations:
-            f.write("assign {} to {}\n".format(a, assignations[a]))
         for v in vars:
             if vars[v][0] == "value" and vars[v][0] != "":
                 f.write("var {} = {}\n".format(v, vars[v][1]))
             else:
                 f.write("var {} = {}({})\n".format(v, vars[v][0], vars[v][1]))
+        for a in assignations:
+            f.write("assign {} to {}\n".format(a, assignations[a]))
 
     config_ui.debug(assignations)
     config_ui.debug(vars)
