@@ -49,13 +49,13 @@ class Figure(QtWidgets.QGraphicsItem):
         
         # sets the starting and the final point of the gradient
         if self.parameters["form"] == "Rectangle":
-            self.gradient.setStart((self.view.height() - self.minor_axe)//2 ,(self.view.width() - self.major_axe)//2)
-            self.gradient.setFinalStop(self.view.height() - self.minor_axe//2, self.view.width() - self.major_axe//2)
+            self.gradient.setStart(0,0)
+            self.gradient.setFinalStop(self.major_axe, self.minor_axe)
         elif self.parameters["form"] == "Ellipse":
             #self.gradient.setCenter(self.view.height() // 2, self.view.width() // 2)
-            #self.gradient.setRadius((self.major_axe)
-            self.gradient.setStart(0, 0)
-            self.gradient.setFinalStop(self.view.height(), self.view.width())
+            #self.gradient.setRadius(self.major_axe)
+            self.gradient.setStart(0,0)
+            self.gradient.setFinalStop(self.major_axe, self.minor_axe)
         
         # updates brush
         self.brush = QBrush(self.gradient)
