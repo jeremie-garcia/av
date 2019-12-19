@@ -41,7 +41,7 @@ class Figure(QtWidgets.QGraphicsItem):
             print('Forme non définie')
 
      
-     def update_gradient(self):
+    def update_gradient(self):
         # sets the color of the gradient
         self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
         self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
