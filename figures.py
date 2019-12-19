@@ -41,20 +41,22 @@ class Figure(QtWidgets.QGraphicsItem):
             print('Forme non définie')
 
     def update_gradient(self):
-        # sets the color of the gradient
-        self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
-        self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
-        self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
-        
-        # sets the starting and the final point of the gradient
+        # sets the starting and the final point of the gradient and its color
         if self.parameters["form"] == "Rectangle":
             self.gradient.setStart(0, 0)
             self.gradient.setFinalStop(self.major_axe, self.minor_axe)
+            self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
+            self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
+            self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
         elif self.parameters["form"] == "Ellipse":
-            # self.gradient.setCenter(self.view.height() // 2, self.view.width() // 2)
-            # self.gradient.setRadius(self.major_axe)
-            self.gradient.setStart(0,0)
+            #self.gradient = QRadialGradient()
+            #self.gradient.setCenter(self.major_axe//2, self.minor_axe//2)
+            #self.gradient.setRadius(self.major_axe)
+            self.gradient.setStart(0, 0)
             self.gradient.setFinalStop(self.major_axe, self.minor_axe)
+            self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
+            self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
+            self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
         
         # updates brush
         self.brush = QBrush(self.gradient)
