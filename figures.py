@@ -10,9 +10,7 @@ class Figure(QtWidgets.QGraphicsItem):
     def __init__(self, window1_parameters, the_view, the_scene):
         super().__init__()
         self.parameters = window1_parameters
-
         self.gradient = QLinearGradient()
-
         self.pen = QPen()
         self.brush = QBrush()
         self.color = []
@@ -42,9 +40,30 @@ class Figure(QtWidgets.QGraphicsItem):
         else:
             print('Forme non définie')
 
+     
+     def update_gradient(self):
+        # sets the color of the gradient
+        self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
+        self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
+        self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
+        
+        # sets the starting and the final point of the gradient
+        if self.parameters["form"] == "Rectangle":
+            self.gradient.setStart((self.view.height() - self.minor_axe)//2 ,(self.view.width() - self.major_axe)//2)
+            self.gradient.setFinalStop(self.view.height() - self.minor_axe//2, self.view.width() - self.major_axe//2)
+        elif self.parameters["form"] == "Ellipse":
+            #self.gradient.setCenter(self.view.height() // 2, self.view.width() // 2)
+            #self.gradient.setRadius((self.major_axe)
+            self.gradient.setStart(0, 0)
+            self.gradient.setFinalStop(self.view.height(), self.view.width())
+        
+        # updates brush
+        self.brush = QBrush(self.gradient)
+        
+        
     def SetToolsColor(self, recorded_frames):
         self.pen.setWidth(2)
-        # set the color
+        # sets color
         if self.parameters["color"] == "Red":
             self.color = [255, 0, 0]
         elif self.parameters["color"] == "Green":
@@ -58,7 +77,7 @@ class Figure(QtWidgets.QGraphicsItem):
         else:
             self.color = [255, 0, 255]
 
-        # set the color ratio
+        # sets color ratio
         if self.parameters["colorPara"] == "RMS":
 
             self.color[0] *= recorded_frames["rms"]
@@ -73,16 +92,10 @@ class Figure(QtWidgets.QGraphicsItem):
             self.color[1] *= recorded_frames["spectral_flatness"]
             self.color[2] *= recorded_frames["spectral_flatness"]
 
-        # fix the color of the Tools
-        self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
-        self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 175))
-        self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
-        self.brush = QBrush(self.gradient)
-
+        # fix the color of the Tool
         self.pen.setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
     def update(self, recorded_frames):
-        self.SetToolsColor(recorded_frames)
 
         # fix the horizontal value
         if self.parameters["horizPara"] == "RMS":
@@ -92,20 +105,17 @@ class Figure(QtWidgets.QGraphicsItem):
         else:
             self.major_axe = recorded_frames["spectral_flatness"] * self.view.width()
 
-            # fix the vertical value
+        # fix the vertical value
         if self.parameters["verticPara"] == "RMS":
             self.minor_axe = recorded_frames["rms"] * self.view.height()
         elif self.parameters["verticPara"] == "Spectral centroid":
             self.minor_axe = recorded_frames["spectral_centroid"] * self.view.height()
         else:
             self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
-
-        # self.gradient.setCenter(self.view.height()//2, self.view.width()//2)
-        # self.gradient.setRadius((self.minor_axe**2 + self.major_axe**2)**0.5)
-        # self.gradient.setStart(0,0)
-        # self.gradient.setFinalStop(self.view.height(), self.view.width())
-        self.gradient.setStart((self.view.height() - self.minor_axe)//2, (self.view.width() - self.major_axe)//2)
-        self.gradient.setFinalStop(self.view.height() - self.minor_axe//2, self.view.width() - self.major_axe//2)
+        
+        # updates color and gradient
+        self.SetToolsColor(recorded_frames)
+        self.update_gradient()
 
         self.qrectf.setHeight(self.minor_axe)
         self.qrectf.setWidth(self.major_axe)
