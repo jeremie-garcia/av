@@ -44,6 +44,10 @@ class View(QtWidgets.QWidget):
     def __init__(self, the_sound):
         super().__init__()
 
+        self.figure = None
+        self.figure1 = None
+        self.figure2 = None
+
         self.time_increment = 1
 
         # create components
@@ -151,16 +155,18 @@ class View(QtWidgets.QWidget):
 
             self.figure2.ItemInit()
 
-
     @QtCore.pyqtSlot()
     def playpause(self):
         """this slot toggles the replay using the timer as model"""
         # windows1
+        self.scene.clearFocus()
 
         if self.timer.isActive():
             self.timer.stop()
-            pygame.mixer.music.stop()           # pause and play again after <-- to set
+            pygame.mixer.music.stop()    # pause and play again after <-- to set
+
         else:
+            self.scene.clear()
             self.sound.analyze()
             self.sound.normalize()
             # self.window_constructor()
@@ -175,6 +181,7 @@ class View(QtWidgets.QWidget):
             self.timer.timeout.connect(self.timer_update)
 
             pygame.mixer.music.play(0)
+
             self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
 
     def timer_update(self):
@@ -187,8 +194,8 @@ class View(QtWidgets.QWidget):
             rms = self.sound.rms_frames[0][index]
             spectral_centroid = self.sound.spectral_centroid_frames[0][index]
             spectral_flatness = self.sound.spectral_flatness_frames[0][index]
-            recorded_values = {"rms": float(rms) , "spectral_centroid": float(spectral_centroid),
-                             "spectral_flatness": float(spectral_flatness)}
+            recorded_values = {"rms": float(rms), "spectral_centroid": float(spectral_centroid),
+                               "spectral_flatness": float(spectral_flatness)}
             # if len(self.window_number_activated)==1:
             #     self.figure.update(recorded_values)
             # elif len(self.window_number_activated)==2:
