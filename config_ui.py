@@ -1,14 +1,13 @@
-import config, sys
+import config, sys, main
 from PyQt5 import QtCore, QtWidgets
 
 """
 TODO:
 
-- Ajouter choix nom conf + enregistrer avec ce nom dans un dossier séparé 'configurations'
-- bug suppression ligne + passage mode fonction
+- Gestion nom configs
 """
 
-DEBUG = False
+
 VAROFFSET = 1
 ASSIOFFSET = 1
 
@@ -39,6 +38,52 @@ class Ui_IOConfig(object):
         self.gridLayout.setObjectName("gridLayout")
         self.genVertLay = QtWidgets.QVBoxLayout()
         self.genVertLay.setObjectName("genVertLay")
+        self.confHorLay = QtWidgets.QHBoxLayout()
+        self.confHorLay.setObjectName("confHorLay")
+        self.confCombo = QtWidgets.QComboBox(IOConfig)
+        self.confCombo.setObjectName("confCombo")
+        self.confHorLay.addWidget(self.confCombo)
+        self.addConfButton = QtWidgets.QPushButton(IOConfig)
+        self.addConfButton.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.addConfButton.sizePolicy().hasHeightForWidth())
+        self.addConfButton.setSizePolicy(sizePolicy)
+        self.addConfButton.setObjectName("addConfButton")
+        self.confHorLay.addWidget(self.addConfButton)
+        self.delConfButton = QtWidgets.QPushButton(IOConfig)
+        self.delConfButton.setEnabled(False)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.delConfButton.sizePolicy().hasHeightForWidth())
+        self.delConfButton.setSizePolicy(sizePolicy)
+        self.delConfButton.setObjectName("delConfButton")
+        self.confHorLay.addWidget(self.delConfButton)
+        self.confHorLay.setStretch(1, 1)
+        self.confHorLay.setStretch(2, 1)
+        self.genVertLay.addLayout(self.confHorLay)
+        self.nameHorLay = QtWidgets.QHBoxLayout()
+        self.nameHorLay.setObjectName("nameHorLay")
+        self.nomConfLabel = QtWidgets.QLabel(IOConfig)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.nomConfLabel.sizePolicy().hasHeightForWidth())
+        self.nomConfLabel.setSizePolicy(sizePolicy)
+        self.nomConfLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.nomConfLabel.setObjectName("nomConfLabel")
+        self.nameHorLay.addWidget(self.nomConfLabel)
+        self.nomConfLine = QtWidgets.QLineEdit(IOConfig)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.nomConfLine.sizePolicy().hasHeightForWidth())
+        self.nomConfLine.setSizePolicy(sizePolicy)
+        self.nomConfLine.setObjectName("nomConfLine")
+        self.nameHorLay.addWidget(self.nomConfLine)
+        self.genVertLay.addLayout(self.nameHorLay)
         self.assiVertLay = QtWidgets.QVBoxLayout()
         self.assiVertLay.setObjectName("assiVertLay")
         self.line_4 = QtWidgets.QFrame(IOConfig)
@@ -186,15 +231,18 @@ class Ui_IOConfig(object):
         self.annulerButton.clicked.connect(IOConfig.close)
         self.addAssiButton.clicked.connect(lambda: self.addAssiLine(IOConfig))
         self.addVarButton.clicked.connect(lambda: self.addVarLine(IOConfig))
-        self.enregistrerButton.clicked.connect(lambda: config.save(IOConfig))
+        self.enregistrerButton.clicked.connect(lambda: config.save(self, IOConfig))
         self.validerButton.clicked.connect(lambda: config.valider(IOConfig))
+        #self.nomConfLine.textChanged.connect(self.updateConfig)
 
-        self.addAssiLine(IOConfig)
-        self.addVarLine(IOConfig)
+        #self.addAssiLine(IOConfig)
+        #self.addVarLine(IOConfig)
+        IOConfig.configs = self.updateConfig()
+        self.showConfig(IOConfig, 1)
 
     def retranslateUi(self, IOConfig):
         _translate = QtCore.QCoreApplication.translate
-        IOConfig.setWindowTitle(_translate("IOConfig", "I/O Configurator"))
+        IOConfig.setWindowTitle(_translate("IOConfig", "I/O Configurateur"))
         self.assiLabel.setText(_translate("IOConfig", "Assignations"))
         self.sortielabel.setText(_translate("IOConfig", "Sortie"))
         self.addAssiButton.setText(_translate("IOConfig", "+"))
@@ -208,6 +256,9 @@ class Ui_IOConfig(object):
         self.annulerButton.setText(_translate("IOConfig", "Annuler"))
         self.enregistrerButton.setText(_translate("IOConfig", "Enregistrer"))
         self.validerButton.setText(_translate("IOConfig", "Valider"))
+        self.addConfButton.setText(_translate("IOConfig", "+"))
+        self.delConfButton.setText(_translate("IOConfig", "x"))
+        self.nomConfLabel.setText(_translate("IOConfig", "Nom"))
 
     def addAssiLine(self, IOConfig):
         """
@@ -219,7 +270,7 @@ class Ui_IOConfig(object):
         try: gridRow = IOConfig.assiLines[-1].gridRow + 1
         except: gridRow = 1
 
-        debug("creates assi line index {}, row {}".format(currentRow, gridRow))
+        main.debug("creates assi line index {}, row {}".format(currentRow, gridRow))
 
         IOConfig.assiLines.append(Line("ASSI", currentRow, gridRow, []))
         contents = IOConfig.assiLines[-1].contents
@@ -248,7 +299,7 @@ class Ui_IOConfig(object):
         self.assiGridLay.addWidget(contents[3], gridRow, 3)
         contents[3].setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
 
-        debug("assiLines index t {}, g {}".format(currentRow, gridRow))
+        main.debug("assiLines index t {}, g {}".format(currentRow, gridRow))
 
         contents[3].setText("x")
 
@@ -270,7 +321,7 @@ class Ui_IOConfig(object):
         except:
             gridRow = 1
 
-        debug("creates var line index {}, row {}".format(currentRow, gridRow))
+        main.debug("creates var line index {}, row {}".format(currentRow, gridRow))
 
         IOConfig.varLines.append(Line("VAR", currentRow, gridRow, []))
         contents = IOConfig.varLines[-1].contents
@@ -305,7 +356,7 @@ class Ui_IOConfig(object):
         :param IOConfig: fenêtre
         :param line: ligne à supprimer
         """
-        debug("destroying {} line #{}".format(line.type, line.tableRow))
+        main.debug("destroying {} line #{}".format(line.type, line.tableRow))
 
         if line.type == "ASSI":
             lines = IOConfig.assiLines
@@ -321,43 +372,28 @@ class Ui_IOConfig(object):
         tableRow = line.tableRow
         gridRow = line.gridRow
 
-        debug("destroyed line t {}, g {}".format(tableRow, gridRow))
+        main.debug("destroyed line t {}, g {}".format(tableRow, gridRow))
 
         for x in lines[tableRow + 1:]:
             x.tableRow -= 1
-            debug("reco {} {}".format(x.tableRow, x.gridRow))
+            main.debug("reco {} {}".format(x.tableRow, x.gridRow))
 
         del lines[tableRow]
         self.update_inputs(IOConfig)
 
-
-    def inputs(self, IOConfig):
-        return [_ for _ in config.SOUND_INPUTS] + [line.contents[0].displayText() for line in IOConfig.varLines if
-                                                   not line.contents[0].displayText() == ""]
-
-
-    def update_inputs(self, IOConfig):
-        INPUTS = self.inputs(IOConfig)
-        for assiLine in IOConfig.assiLines:
-            if assiLine.contents[1].__class__.__name__=="QComboBox":
-                pos = assiLine.contents[1].currentIndex()
-                fillCombo(assiLine.contents[1], INPUTS)
-                assiLine.contents[1].setCurrentIndex(pos)
-
-
     def lineFormula(self, IOConfig, line, state):
-        debug("line t {}, g {}".format(line.tableRow, line.gridRow))
+        main.debug("line t {}, g {}".format(line.tableRow, line.gridRow))
 
-        if state == 2: # si a été cochée
-            debug("ligne t{} : to formule".format(line.tableRow))
+        if state == 2:  # si a été cochée
+            main.debug("ligne t{} : to formule".format(line.tableRow))
             self.assiGridLay.removeWidget(line.contents[1])
             line.contents[1].deleteLater()
             line.contents[1] = QtWidgets.QLineEdit(IOConfig)
             line.contents[1].setObjectName("inputFormula_" + str(line.tableRow))
             self.assiGridLay.addWidget(line.contents[1], line.gridRow, 1)
 
-        else: # si a été décochée
-            debug("ligne {} : fin formule".format(line.tableRow))
+        else:  # si a été décochée
+            main.debug("ligne {} : fin formule".format(line.tableRow))
             if line.contents[1].__class__.__name__ == "QLineEdit":
                 self.assiGridLay.removeWidget(line.contents[1])
                 line.contents[1].deleteLater()
@@ -367,6 +403,72 @@ class Ui_IOConfig(object):
             self.update_inputs(IOConfig)
             line.contents[1].setCurrentIndex(0)
 
+    def inputs(self, IOConfig):
+        return [_ for _ in config.SOUND_INPUTS] + [line.contents[0].displayText() for line in IOConfig.varLines if
+                                                   not line.contents[0].displayText() == ""]
+
+    def update_inputs(self, IOConfig):
+        INPUTS = self.inputs(IOConfig)
+        for assiLine in IOConfig.assiLines:
+            if assiLine.contents[1].__class__.__name__=="QComboBox":
+                pos = assiLine.contents[1].currentIndex()
+                fillCombo(assiLine.contents[1], INPUTS)
+                assiLine.contents[1].setCurrentIndex(pos)
+
+    def updateConfig(self):
+        configs = main.initConf()
+        fillCombo(self.confCombo, [c[1].name for c in configs.items()])
+        return configs
+
+    def addConfig(self, IOConfig, name):
+        id = IOConfig.configs[-1].id + 1
+        IOConfig.append(config.Configuration(id, name))
+
+    def showConfig(self, IOConfig, id):
+        main.debug(IOConfig.configs)
+        toShow = IOConfig.configs[id]
+        IOConfig.currentConf = id
+
+        assiDict = toShow.assiDict
+        varDict = toShow.varDict
+        main.debug(assiDict, varDict)
+
+        self.reset(IOConfig)
+
+        for var in varDict:
+            self.addVarLine(IOConfig)
+            line = IOConfig.varLines[-1]
+            value = varDict[var].getValue()
+            name = var
+            main.debug("{}: {}".format(name, value))
+            line.contents[0].setText(name)
+            line.contents[2].setText(value)
+
+        self.update_inputs(IOConfig)
+
+        for assi in assiDict:
+            if not assi == "errors":
+                self.addAssiLine(IOConfig)
+                line = IOConfig.assiLines[-1]
+                input = assiDict[assi]
+                output = assi
+                main.debug(input, output)
+                line.contents[2].setCurrentIndex(line.contents[2].findText(output))
+
+                if line.contents[1].findText(input) == -1: # si formule
+                    line.contents[0].toggle()
+                    line.contents[1].setText(input)
+                else:
+                    line.contents[1].setCurrentIndex(line.contents[1].findText(input))
+        
+        self.nomConfLine.setText(toShow.name)
+
+    def reset(self,IOConfig):
+        for a in IOConfig.assiLines:
+            self.delLine(IOConfig, a)
+        for v in IOConfig.varLines:
+            self.delLine(IOConfig, v)
+
 def fillCombo(combo, list):
     """
     Remplit combo avec les valeurs de list
@@ -375,9 +477,6 @@ def fillCombo(combo, list):
     """
     combo.clear()
     for x in list: combo.addItem(x)
-
-def debug(*args):
-    if DEBUG: print(*args)
 
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)
