@@ -19,7 +19,7 @@ class Color(): #couleur
         return "Color {},{},{}".format(self.r, self.g, self.b)
 
     def getValue(self):
-        return "{}, {}, {}".format(self.r, self.g, self.b)
+        return "{},{},{}".format(self.r, self.g, self.b)
 
 class Gradation(): #dégradé
     """
@@ -34,7 +34,7 @@ class Gradation(): #dégradé
         return "Gradation from {} to {}".format(self.A, self.B)
 
     def getValue(self):
-        return "{}, {}".format(self.A, self.B)
+        return "{},{}".format(self.A, self.B)
 
 class Configuration():
     def __init__(self, id, name, assiDict = {}, varDict = {}):
@@ -67,7 +67,7 @@ def readfile(file):
                 confName = l[:-1]
             else:
                 words = l.split()
-                if words[0] == "assign" or words[0] == "on": #assignation ou assignation event
+                if words[0] == "assign": #assignation
                     try: binds[words[-1]] = "".join(words[1:words.index("to")])
                     except: binds["errors"].append(i+1)
                 elif words[0] == "var": #délaration var
@@ -76,7 +76,7 @@ def readfile(file):
                         r, g, b = int(r), int(g), int(b)
                         if not(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
                             binds["errors"].append(i+1)
-                        variables[words[1]] =  Color(r,g,b)
+                        variables[words[1]] = Color(r,g,b)
 
                     elif "grad" in l: #déclaration de dégradé
                         A, B = words[-1].split("(")[-1][:-1].split(",") #récupération deux couleurs

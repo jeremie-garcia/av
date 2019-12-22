@@ -13,7 +13,7 @@ def initConf():
     for i,f in enumerate(confFiles):
         tmp = config.readfile(config.configFolder + "/" + f)
         try : configs[tmp.id] = tmp
-        except : debug(tmp)
+        except : debug("Erreur {}".format(tmp))
 
     return configs
 

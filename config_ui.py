@@ -235,10 +235,9 @@ class Ui_IOConfig(object):
         self.validerButton.clicked.connect(lambda: config.valider(IOConfig))
         #self.nomConfLine.textChanged.connect(self.updateConfig)
 
-        #self.addAssiLine(IOConfig)
-        #self.addVarLine(IOConfig)
         IOConfig.configs = self.updateConfig()
-        self.showConfig(IOConfig, 1)
+        self.confCombo.currentIndexChanged.connect(lambda x: self.showConfig(IOConfig, x))
+        #self.showConfig(IOConfig, 0)
 
     def retranslateUi(self, IOConfig):
         _translate = QtCore.QCoreApplication.translate
@@ -416,8 +415,12 @@ class Ui_IOConfig(object):
                 assiLine.contents[1].setCurrentIndex(pos)
 
     def updateConfig(self):
+        """
+        Màj configs combobox
+        :return: liste configs fichiers
+        """
         configs = main.initConf()
-        fillCombo(self.confCombo, [c[1].name for c in configs.items()])
+        fillCombo(self.confCombo, [c.name for c in list(configs.values())[::-1]])
         return configs
 
     def addConfig(self, IOConfig, name):
@@ -438,10 +441,13 @@ class Ui_IOConfig(object):
         for var in varDict:
             self.addVarLine(IOConfig)
             line = IOConfig.varLines[-1]
+            main.debug(varDict[var])
             value = varDict[var].getValue()
-            name = var
-            main.debug("{}: {}".format(name, value))
-            line.contents[0].setText(name)
+            typeIndex = 2 if varDict[var].__class__.__name__ == "Gradation" \
+                        else 1 if varDict[var].__class__.__name__ == "Color" else 0
+            main.debug("{}: {}".format(var, value))
+            line.contents[0].setText(var)
+            line.contents[1].setCurrentIndex(typeIndex)
             line.contents[2].setText(value)
 
         self.update_inputs(IOConfig)
@@ -450,11 +456,15 @@ class Ui_IOConfig(object):
             if not assi == "errors":
                 self.addAssiLine(IOConfig)
                 line = IOConfig.assiLines[-1]
-                input = assiDict[assi]
-                output = assi
+                main.debug(self.inputs(IOConfig))
+                fillCombo(line.contents[1], self.inputs(IOConfig))
+                output = assiDict[assi]
+                input = assi
+
                 main.debug(input, output)
                 line.contents[2].setCurrentIndex(line.contents[2].findText(output))
 
+                main.debug("contents : {}, searching {} => {}".format(line.contents[1].count(), input, line.contents[1].findText(input)))
                 if line.contents[1].findText(input) == -1: # si formule
                     line.contents[0].toggle()
                     line.contents[1].setText(input)
@@ -466,8 +476,10 @@ class Ui_IOConfig(object):
     def reset(self,IOConfig):
         for a in IOConfig.assiLines:
             self.delLine(IOConfig, a)
+            IOConfig.assiLines = []
         for v in IOConfig.varLines:
             self.delLine(IOConfig, v)
+            IOConfig.varLines = []
 
 def fillCombo(combo, list):
     """
