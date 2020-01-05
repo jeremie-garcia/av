@@ -36,6 +36,7 @@ if __name__ == '__main__':
 
     def timer_update():
         if (pygame.mixer.music.get_busy()):
+            Donnee = [] #on réorganise les données
             current_time = pygame.mixer.music.get_pos()
             # find closest frame in descriptors
             index = current_time // frame_duration_ms
@@ -47,6 +48,7 @@ if __name__ == '__main__':
             wave =  waveform[index] #les valeurs du signal
             zero_crossing_rate = zero_crossing_rate_frames[0][index]
             print(rms, spectral_flatness, spectral_centroid, chroma_stft,zero_crossing_rate, wave)
+            Donnee.append({'rms' : rms, 'freq' : spectral_centroid, 'flat' : spectral_flatness,'zero' : zero_crossing_rate})
         else:
             timer.stop()
 
