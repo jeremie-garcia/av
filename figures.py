@@ -22,6 +22,7 @@ class Figure(QtWidgets.QGraphicsItem):
         self.qrectf = QRectF()
         self.item = None
 
+
     def Item_Init(self):
         if self.parameters["form"] == "Rectangle":
             self.item = QtWidgets.QGraphicsRectItem()

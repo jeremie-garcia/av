@@ -48,23 +48,33 @@ class View(QtWidgets.QWidget):
         # create components
         root_layout = QtWidgets.QVBoxLayout(self)
         self.scene = QtWidgets.QGraphicsScene()
-        self.view = PanZoomView(self.scene)
+        self.zoomview = PanZoomView(self.scene)
         self.sound = the_sound
         self.time_entry = QtWidgets.QLineEdit()
-        self.window_number_activated = [1]
-        self.view.parameters_window1 = {"form": "Ellipse", "horizPara": "RMS",
+
+        self.figures_list = [True, False, False, False]
+        self.figure1 = None
+        self.figure2 = None
+        self.figure3 = None
+        self.figure4 = None
+
+        self.zoomview.parameters_window1 = {"form": "Ellipse", "horizPara": "RMS",
                                         "verticPara": "RMS", "color": "Red", "colorPara": "RMS"}
-        self.view.parameters_window2 = {"form": None, "horizPara": None, "verticPara": None,
+        self.zoomview.parameters_window2 = {"form": None, "horizPara": None, "verticPara": None,
                                         "color": None, "colorPara": None}
-        self.view.parameters_window3 = {"form": None, "horizPara": None, "verticPara": None,
+        self.zoomview.parameters_window3 = {"form": None, "horizPara": None, "verticPara": None,
                                         "color": None, "colorPara": None}
-        self.view.parameters_window4 = {"form": None, "horizPara": None, "verticPara": None,
+        self.zoomview.parameters_window4 = {"form": None, "horizPara": None, "verticPara": None,
                                         "color": None, "colorPara": None}
+
+        self.dict_fig = {'fig1': self.figure1, 'fig2': self.figure2, 'fig3': self.figure3, 'fig4': self.figure4}
+        self.dict_parameter_window = {'fig1': self.zoomview.parameters_window1, 'fig2': self.zoomview.parameters_window2,
+                                 'fig3': self.zoomview.parameters_window3, 'fig4': self.zoomview.parameters_window4}
 
         toolbar = self.create_toolbar()
 
         # add components to the root_layout
-        root_layout.addWidget(self.view)
+        root_layout.addWidget(self.zoomview)
         root_layout.addLayout(toolbar)
 
         # create and setup the timer
@@ -88,8 +98,8 @@ class View(QtWidgets.QWidget):
 
         # lambda function allows to pass extra arguments to slots
         # added space around '-' character to avoid different look and feel
-        add_button('-', lambda: self.view.zoom_view(1/1.1))
-        add_button('+', lambda: self.view.zoom_view(1.1))
+        add_button('-', lambda: self.zoomview.zoom_view(1 / 1.1))
+        add_button('+', lambda: self.zoomview.zoom_view(1.1))
 
         toolbar.addStretch()
 
@@ -97,97 +107,44 @@ class View(QtWidgets.QWidget):
 
         toolbar.addStretch()
 
-        # def add_comboBox(sounds):
-        #     """adds a comboBox to the hbox and connects the slot"""
-        #     sounds_ComboBox = QtWidgets.QComboBox()
-        #
-        #     for sound in sounds:
-        #         sounds_ComboBox.addItem(sound)
-        #
-        #     toolbar.addWidget(sounds_ComboBox)
-        #     # return sounds_ComboBox.currentText()
-        #
-        # # labels
-        # lbl = QtWidgets.QLabel("Sounds")
-        # toolbar.addWidget(lbl)
-        #
-        # add_comboBox(list_sounds)
-        #
-        # toolbar.addStretch()
-
         # shortcuts and key bindings
         def add_shortcut(text, slot):
             """creates an application-wide key binding"""
             shortcut = QtWidgets.QShortcut(QtGui.QKeySequence(text), self)
             shortcut.activated.connect(slot)
 
-        add_shortcut('-', lambda: self.view.zoom_view(1/1.1))
-        add_shortcut('+', lambda: self.view.zoom_view(1.1))
+        add_shortcut('-', lambda: self.zoomview.zoom_view(1 / 1.1))
+        add_shortcut('+', lambda: self.zoomview.zoom_view(1.1))
         add_shortcut(' ', self.playpause)
         add_shortcut('q', QtCore.QCoreApplication.instance().quit)
 
         return toolbar
 
     def fit_scene_in_view(self):
-        self.view.fitInView(self.view.sceneRect(), QtCore.Qt.KeepAspectRatio)
+        self.zoomview.fitInView(self.zoomview.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     def window_constructor(self):
+        for index in range(1, len(self.figures_list) + 1):
 
-        if len(self.window_number_activated) == 1:
-            self.figure1 = figures.Figure(self, self.view.parameters_window1)
-            self.figure1.Item_Init()
-
-        elif len(self.window_number_activated) == 2:
-            self.figure1 = figures.Figure(self, self.view.parameters_window1)
-            self.figure1.Item_Init()
-            self.figure1.setPos(QtCore.QPoint(self.view.width()//4, self.view.height()//2))
-            if 2 in self.window_number_activated:
-                self.figure2 = figures.Figure(self,self.view.parameters_window2)
-                self.figure2.Item_Init()
-                self.figure2.setPos(QtCore.QPoint(3*(self.view.width()//4), self.view.height()//2))
-            elif 3 in self.window_number_activated:
-                self.figure3 = figures.Figure(self,self.view.parameters_window3)
-                self.figure3.Item_Init()
-                self.figure3.setPos(QtCore.QPoint(3 * (self.view.width() // 4), self.view.height() // 2))
-
+            if self.figures_list[index - 1]:
+                self.dict_fig['fig{}'.format(index)] = figures.Figure(self, self.dict_parameter_window['fig{}'.format(index)])
+                self.dict_fig['fig{}'.format(index)].Item_Init()
             else:
-                self.figure4 = figures.Figure(self,self.view.parameters_window4)
-                self.figure4.Item_Init()
-                self.figure4.setPos(QtCore.QPoint(3 * (self.view.width() // 4), self.view.height() // 2))
+                self.dict_fig['fig{}'.format(index)] = None
 
-        elif len(self.window_number_activated)==3:
-            self.figure1 = figures.Figure(self, self.view.parameters_window1)
-            self.figure1.Item_Init()
+        print(self.dict_fig.values())
 
-            if 2 not in self.window_number_activated:
-                self.figure3 = figures.Figure(self, self.view.parameters_window3)
-                self.figure3.Item_Init()
-                self.figure4 = figures.Figure(self, self.view.parameters_window4)
-                self.figure4.Item_Init()
+        nb_figure = sum(self.figures_list)
 
-            elif 3 not in self.window_number_activated:
-                self.figure2 = figures.Figure(self, self.view.parameters_window2)
-                self.figure2.Item_Init()
-                self.figure4 = figures.Figure(self, self.view.parameters_window4)
-                self.figure4.Item_Init()
-            else:
-                self.figure2 = figures.Figure(self, self.view.parameters_window2)
-                self.figure2.Item_Init()
-                self.figure3 = figures.Figure(self, self.view.parameters_window3)
-                self.figure3.Item_Init()
-
-        else :
-            self.figure2 = figures.Figure(self, self.view.parameters_window2)
-            self.figure2.Item_Init()
-            self.figure3 = figures.Figure(self, self.view.parameters_window3)
-            self.figure3.Item_Init()
-            self.figure4 = figures.Figure(self, self.view.parameters_window4)
-            self.figure4.Item_Init()
+        if nb_figure == 2:
+            self.figure1.setPos(20, 40)
+            for index in range(1, len(self.figures_list) + 1):
+                if self.figures_list[index - 1]:
+                    print(index-1)
+                    # self.dict_fig['fig{}'.format(index)].moveBy(0, -10)
 
 
-
-
-#{"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2}
+# {"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2}
     @QtCore.pyqtSlot()
     def playpause(self):
         """this slot toggles the replay using the timer as model"""
@@ -201,8 +158,8 @@ class View(QtWidgets.QWidget):
             self.sound.normalize()
             self.window_constructor()
 
-            #self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
-            #self.figure.Item_Init()
+            # self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
+            # self.figure.Item_Init()
 
             pygame.mixer.init()
 
@@ -223,15 +180,14 @@ class View(QtWidgets.QWidget):
             rms = self.sound.rms_frames[0][index]
             spectral_centroid = self.sound.spectral_centroid_frames[0][index]
             spectral_flatness = self.sound.spectral_flatness_frames[0][index]
-            recorded_values = {"rms": float(rms) , "spectral_centroid": float(spectral_centroid),
-                             "spectral_flatness": float(spectral_flatness)}
-            if len(self.window_number_activated)==1:
-                self.figure1.update(recorded_values)
-            elif len(self.window_number_activated)==2:
-                self.figure1.update(recorded_values)
-                self.figure2.update(recorded_values)
+            recorded_values = {"rms": float(rms), "spectral_centroid": float(spectral_centroid),
+                               "spectral_flatness": float(spectral_flatness)}
 
-            self.view.update()
+            for figure in self.dict_fig.values():
+                if figure is not None:
+                    figure.update(recorded_values)
+
+            self.zoomview.update()
 
             # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,
             #                       10*spectral_centroid, 10*spectral_centroid, qpen, qpaint)

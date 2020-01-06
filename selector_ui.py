@@ -534,12 +534,12 @@ class Ui_Selector(object):
         self.SoundLabel.setText(_translate("Selector", "Sound"))
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Selector = QtWidgets.QWidget()
-    ui = Ui_Selector()
-    ui.setupUi(Selector)
-    Selector.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     Selector = QtWidgets.QWidget()
+#     ui = Ui_Selector()
+#     ui.setupUi(Selector)
+#     Selector.show()
+#     sys.exit(app.exec_())
 
