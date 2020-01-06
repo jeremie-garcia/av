@@ -15,7 +15,7 @@ class Selector(QWidget):
         self.ui_selector = Ui_Selector()
 
         self.ui_selector.setupUi(self)
-        self.ui_selector.SoundComboBox.addItems(self.sound.dictionnaire_sounds)
+        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionnary)
 
         """Window_number"""
 
@@ -139,6 +139,3 @@ class Selector(QWidget):
 
     def update_sound(self):
         self.sound.filename = self.sound.dictionnaire_sounds[self.ui_selector.SoundComboBox.currentText()]
-
-
-

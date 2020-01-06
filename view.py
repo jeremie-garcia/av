@@ -1,5 +1,4 @@
 """Sound visualization.
-
 This module allows the visualization of a sound and its variations
 on a scalable graphics view"""
 
@@ -241,4 +240,3 @@ class View(QtWidgets.QWidget):
         else:
             self.timer.stop()
             pygame.mixer.music.stop()
-

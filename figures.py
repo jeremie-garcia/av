@@ -7,15 +7,15 @@ import view
 
 
 class Figure(QtWidgets.QGraphicsItem):
-    def __init__(self, window1_parameters, the_view, the_scene):
+    def __init__(self, the_view, window_parameters):
         super().__init__()
-        self.parameters = window1_parameters
+        self.parameters = window_parameters
         self.gradient = QLinearGradient()
         self.pen = QPen()
         self.brush = QBrush()
         self.color = []
         self.view = the_view
-        self.scene = the_scene
+        self.scene = the_view.scene
 
         self.minor_axe = None
         self.major_axe = None
