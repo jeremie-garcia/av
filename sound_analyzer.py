@@ -1,4 +1,5 @@
 import librosa
+import numpy as np
 
 
 class Sound(object):
@@ -37,14 +38,21 @@ class Sound(object):
         print("'{}' loaded".format(self.filename))
 
     def normalize(self):
-        maxi_rms = max(self.rms_frames[0])
+        norm_rms = (3 + np.std(self.rms_frames[0])) * np.median(self.rms_frames[0])
         for i in range(len(self.rms_frames[0])):
-            self.rms_frames[0][i] /= maxi_rms
+            self.rms_frames[0][i] /= norm_rms
+            if self.rms_frames[0][i] >= 1:
+                self.rms_frames[0][i] = 1
 
-        maxi_spectral_centroid = max(self.spectral_centroid_frames[0])
+        norm_spectral_centroid = (1 + np.std(self.spectral_centroid_frames[0])) * np.median(self.spectral_centroid_frames[0])
         for i in range(len(self.spectral_centroid_frames[0])):
-            self.spectral_centroid_frames[0][i] /= maxi_spectral_centroid
+            self.spectral_centroid_frames[0][i] /= norm_spectral_centroid
+            if self.spectral_centroid_frames[0][i] >= 1:
+                self.spectral_centroid_frames[0][i] = 1
 
-        maxi_spectral_flatness = max(self.spectral_flatness_frames[0])
+        norm_spectral_flatness = (10 + np.std(self.spectral_flatness_frames[0])) ** 2 * np.median(self.spectral_flatness_frames[0])
         for i in range(len(self.spectral_flatness_frames[0])):
-            self.spectral_flatness_frames[0][i] /= maxi_spectral_flatness
+            self.spectral_flatness_frames[0][i] /= norm_spectral_flatness
+            if self.spectral_flatness_frames[0][i] >= 1:
+                self.spectral_flatness_frames[0][i] = 1
+
