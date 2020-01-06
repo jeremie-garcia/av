@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QWidget, QListView
 from selector_ui import Ui_Selector
+
 
 
 class Selector(QWidget):
@@ -9,17 +11,17 @@ class Selector(QWidget):
         super(Selector, self).__init__()
 
         self.view = the_view.view
-        self.sound = the_view.sound
+        self.sound=the_view.sound
         self.ui_selector = Ui_Selector()
 
         self.ui_selector.setupUi(self)
-        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionnary)
+        self.ui_selector.SoundComboBox.addItems(self.sound.dictionnaire_sounds)
 
         """Window_number"""
-        # self.ui_selector.FormComboBox_1.currentIndexChanged.connect(self.update_window_number)
-        # self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_window_number)
-        # self.ui_selector.FormComboBox_3.currentIndexChanged.connect(self.update_window_number)
-        # self.ui_selector.FormComboBox_4.currentIndexChanged.connect(self.update_window_number)
+
+        self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_window_number)
+        self.ui_selector.FormComboBox_3.currentIndexChanged.connect(self.update_window_number)
+        self.ui_selector.FormComboBox_4.currentIndexChanged.connect(self.update_window_number)
 
         """Window 1 connection ComboBox to Parameters"""
         self.ui_selector.FormComboBox_1.currentIndexChanged.connect(self.update_form_window1)
@@ -136,4 +138,7 @@ class Selector(QWidget):
     """sound_update"""
 
     def update_sound(self):
-        self.sound.filename = self.sound.sounds_dictionnary[self.ui_selector.SoundComboBox.currentText()]
+        self.sound.filename = self.sound.dictionnaire_sounds[self.ui_selector.SoundComboBox.currentText()]
+
+
+

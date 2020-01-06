@@ -6,8 +6,8 @@ on a scalable graphics view"""
 import math
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-import pygame
 import figures
+import pygame
 
 
 # constants
@@ -44,10 +44,6 @@ class View(QtWidgets.QWidget):
     def __init__(self, the_sound):
         super().__init__()
 
-        self.figure = None
-        self.figure1 = None
-        self.figure2 = None
-
         self.time_increment = 1
 
         # create components
@@ -56,7 +52,7 @@ class View(QtWidgets.QWidget):
         self.view = PanZoomView(self.scene)
         self.sound = the_sound
         self.time_entry = QtWidgets.QLineEdit()
-        self.window_number_activated = []
+        self.window_number_activated = [1]
         self.view.parameters_window1 = {"form": "Ellipse", "horizPara": "RMS",
                                         "verticPara": "RMS", "color": "Red", "colorPara": "RMS"}
         self.view.parameters_window2 = {"form": None, "horizPara": None, "verticPara": None,
@@ -137,42 +133,77 @@ class View(QtWidgets.QWidget):
         self.view.fitInView(self.view.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     def window_constructor(self):
-        if len(self.window_number_activated)==1:
-            self.figure = figures.Figure(self, self.view.parameters_window1,
-                                         {"x": self.view.width()//2, "y": self.view.height()//2},
-                                         {"x": self.view.width(), "y": self.view.height()})
-            self.figure.ItemInit()
-        elif len(self.window_number_activated)==2:
-            self.figure1 = figures.Figure(self,self.view.parameters_window1,{"x":self.view.width()//4,"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2})
-            self.figure1.ItemInit()
+
+        if len(self.window_number_activated) == 1:
+            self.figure1 = figures.Figure(self, self.view.parameters_window1)
+            self.figure1.Item_Init()
+
+        elif len(self.window_number_activated) == 2:
+            self.figure1 = figures.Figure(self, self.view.parameters_window1)
+            self.figure1.Item_Init()
+            self.figure1.setPos(QtCore.QPoint(self.view.width()//4, self.view.height()//2))
             if 2 in self.window_number_activated:
-                self.figure2 = figures.Figure(self,self.view.parameters_window2,{"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2})
+                self.figure2 = figures.Figure(self,self.view.parameters_window2)
+                self.figure2.Item_Init()
+                self.figure2.setPos(QtCore.QPoint(3*(self.view.width()//4), self.view.height()//2))
             elif 3 in self.window_number_activated:
-                self.figure2 = figures.Figure(self,self.view.parameters_window3,{"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2})
+                self.figure3 = figures.Figure(self,self.view.parameters_window3)
+                self.figure3.Item_Init()
+                self.figure3.setPos(QtCore.QPoint(3 * (self.view.width() // 4), self.view.height() // 2))
+
             else:
-                self.figure2 = figures.Figure(self,self.view.parameters_window4,{"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2})
+                self.figure4 = figures.Figure(self,self.view.parameters_window4)
+                self.figure4.Item_Init()
+                self.figure4.setPos(QtCore.QPoint(3 * (self.view.width() // 4), self.view.height() // 2))
+
         elif len(self.window_number_activated)==3:
+            self.figure1 = figures.Figure(self, self.view.parameters_window1)
+            self.figure1.Item_Init()
 
-            self.figure2.ItemInit()
+            if 2 not in self.window_number_activated:
+                self.figure3 = figures.Figure(self, self.view.parameters_window3)
+                self.figure3.Item_Init()
+                self.figure4 = figures.Figure(self, self.view.parameters_window4)
+                self.figure4.Item_Init()
 
+            elif 3 not in self.window_number_activated:
+                self.figure2 = figures.Figure(self, self.view.parameters_window2)
+                self.figure2.Item_Init()
+                self.figure4 = figures.Figure(self, self.view.parameters_window4)
+                self.figure4.Item_Init()
+            else:
+                self.figure2 = figures.Figure(self, self.view.parameters_window2)
+                self.figure2.Item_Init()
+                self.figure3 = figures.Figure(self, self.view.parameters_window3)
+                self.figure3.Item_Init()
+
+        else :
+            self.figure2 = figures.Figure(self, self.view.parameters_window2)
+            self.figure2.Item_Init()
+            self.figure3 = figures.Figure(self, self.view.parameters_window3)
+            self.figure3.Item_Init()
+            self.figure4 = figures.Figure(self, self.view.parameters_window4)
+            self.figure4.Item_Init()
+
+
+
+
+#{"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2}
     @QtCore.pyqtSlot()
     def playpause(self):
         """this slot toggles the replay using the timer as model"""
         # windows1
-        self.scene.clearFocus()
 
         if self.timer.isActive():
             self.timer.stop()
-            pygame.mixer.music.stop()    # pause and play again after <-- to set
-
+            pygame.mixer.music.stop()           # pause and play again after <-- to set
         else:
-            self.scene.clear()
             self.sound.analyze()
             self.sound.normalize()
-            # self.window_constructor()
+            self.window_constructor()
 
-            self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
-            self.figure.Item_Init()
+            #self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
+            #self.figure.Item_Init()
 
             pygame.mixer.init()
 
@@ -181,7 +212,6 @@ class View(QtWidgets.QWidget):
             self.timer.timeout.connect(self.timer_update)
 
             pygame.mixer.music.play(0)
-
             self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
 
     def timer_update(self):
@@ -194,14 +224,14 @@ class View(QtWidgets.QWidget):
             rms = self.sound.rms_frames[0][index]
             spectral_centroid = self.sound.spectral_centroid_frames[0][index]
             spectral_flatness = self.sound.spectral_flatness_frames[0][index]
-            recorded_values = {"rms": float(rms), "spectral_centroid": float(spectral_centroid),
-                               "spectral_flatness": float(spectral_flatness)}
-            # if len(self.window_number_activated)==1:
-            #     self.figure.update(recorded_values)
-            # elif len(self.window_number_activated)==2:
-            #     self.figure1.update(recorded_values)
-            #     self.figure2.update(recorded_values)
-            self.figure.update(recorded_values)
+            recorded_values = {"rms": float(rms) , "spectral_centroid": float(spectral_centroid),
+                             "spectral_flatness": float(spectral_flatness)}
+            if len(self.window_number_activated)==1:
+                self.figure1.update(recorded_values)
+            elif len(self.window_number_activated)==2:
+                self.figure1.update(recorded_values)
+                self.figure2.update(recorded_values)
+
             self.view.update()
 
             # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,
