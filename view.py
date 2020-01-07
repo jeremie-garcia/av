@@ -52,11 +52,9 @@ class View(QtWidgets.QWidget):
         self.sound = the_sound
         self.time_entry = QtWidgets.QLineEdit()
 
+        self.isSoundPlayed = False
+
         self.figures_list = [True, False, False, False]
-        self.figure1 = None
-        self.figure2 = None
-        self.figure3 = None
-        self.figure4 = None
 
         self.zoomview.parameters_window1 = {"form": "Ellipse", "horizPara": "RMS",
                                         "verticPara": "RMS", "color": "Red", "colorPara": "RMS"}
@@ -67,7 +65,7 @@ class View(QtWidgets.QWidget):
         self.zoomview.parameters_window4 = {"form": None, "horizPara": None, "verticPara": None,
                                         "color": None, "colorPara": None}
 
-        self.dict_fig = {'fig1': self.figure1, 'fig2': self.figure2, 'fig3': self.figure3, 'fig4': self.figure4}
+        self.dict_fig = {'fig1': None, 'fig2': None, 'fig3': None, 'fig4': None}
         self.dict_parameter_window = {'fig1': self.zoomview.parameters_window1, 'fig2': self.zoomview.parameters_window2,
                                  'fig3': self.zoomview.parameters_window3, 'fig4': self.zoomview.parameters_window4}
 
@@ -82,7 +80,7 @@ class View(QtWidgets.QWidget):
         # self.timer.timeout.connect(self.advance)
         # root_layout.
         # show the window
-        self.show()
+        # self.show()
 
     # connection comboBox chosen Sound
 
@@ -137,11 +135,12 @@ class View(QtWidgets.QWidget):
         nb_figure = sum(self.figures_list)
 
         if nb_figure == 2:
-            self.figure1.setPos(20, 40)
+            self.dict_fig['fig1'].item.moveBy(10, 100)
             for index in range(1, len(self.figures_list) + 1):
                 if self.figures_list[index - 1]:
                     print(index-1)
-                    # self.dict_fig['fig{}'.format(index)].moveBy(0, -10)
+                    self.dict_fig['fig{}'.format(index)].item.moveBy(100,10)
+
 
 
 # {"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2}
@@ -152,23 +151,28 @@ class View(QtWidgets.QWidget):
 
         if self.timer.isActive():
             self.timer.stop()
-            pygame.mixer.music.stop()           # pause and play again after <-- to set
+            pygame.mixer.music.pause()           # pause and play again after <-- to set
         else:
-            self.sound.analyze()
-            self.sound.normalize()
-            self.window_constructor()
+            if self.isSoundPlayed:
+                pygame.mixer.music.unpause()
+                self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
+            else:
+                self.isSoundPlayed = True
+                self.sound.analyze()
+                self.sound.normalize()
+                self.window_constructor()
 
-            # self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
-            # self.figure.Item_Init()
+                # self.figure = figures.Figure(self.view.parameters_window1, self.view, self.scene)
+                # self.figure.Item_Init()
 
-            pygame.mixer.init()
+                pygame.mixer.init()
 
-            pygame.mixer.music.load(self.sound.filename)
+                pygame.mixer.music.load(self.sound.filename)
 
-            self.timer.timeout.connect(self.timer_update)
+                self.timer.timeout.connect(self.timer_update)
 
-            pygame.mixer.music.play(0)
-            self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
+                pygame.mixer.music.play(0)
+                self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
 
     def timer_update(self):
         if pygame.mixer.music.get_busy():
@@ -189,10 +193,11 @@ class View(QtWidgets.QWidget):
 
             self.zoomview.update()
 
-            # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,
-            #                       10*spectral_centroid, 10*spectral_centroid, qpen, qpaint)
+            # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,10*spectral_centroid, 10*spectral_centroid, qpen, qpaint)
 
             # print(rms, spectral_flatness, spectral_centroid)
         else:
             self.timer.stop()
             pygame.mixer.music.stop()
+            self.isSoundPlayed = False
+            self.scene.clear()
