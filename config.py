@@ -1,6 +1,6 @@
 import main, config_ui, sys, random
 
-SOUND_INPUTS = ["rms", "sp_centroid", "sp_flatness", "sp_contrast", "sp_bandwidth", "sp_rolloff", "beat"]
+SOUND_INPUTS = ["rms", "sp_centroid", "sp_flatness", "chroma", "zero_crossing"]
 configFolder = "configs"
 configExtension = ".conf"
 configFileName = configFolder + "/{}" + configExtension
@@ -69,18 +69,23 @@ def readfile(file):
                 words = l.split()
                 if words[0] == "assign": #assignation
                     try: binds[words[-1]] = "".join(words[1:words.index("to")])
-                    except: binds["errors"].append(i+1)
+                    except:
+                        main.debug("LINE ERROR (assi) : {}".format(l))
+                        binds["errors"].append(i+1)
                 elif words[0] == "var": #délaration var
                     if "color" in l: #déclaration de couleur
                         r, g, b = words[-1].split("(")[-1][:-1].split(",") #récupération des trois couleurs
                         r, g, b = int(r), int(g), int(b)
                         if not(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
+                            main.debug("LINE ERROR (var color): {}".format(l))
                             binds["errors"].append(i+1)
                         variables[words[1]] = Color(r,g,b)
 
                     elif "grad" in l: #déclaration de dégradé
                         A, B = words[-1].split("(")[-1][:-1].split(",") #récupération deux couleurs
                         if not(A in variables.keys() and B in variables.keys()):
+                            main.debug("LINE ERROR (var deg) : {}".format(l))
+                            main.debug(variables)
                             binds["errors"].append(i+1)
                         variables[words[1]] = Gradation(A,B)
 

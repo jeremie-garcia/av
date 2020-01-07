@@ -1,17 +1,10 @@
 import config, sys, main
 from PyQt5 import QtCore, QtWidgets
 
-"""
-TODO:
-
-- Gestion nom configs
-"""
-
-
 VAROFFSET = 1
 ASSIOFFSET = 1
 
-OUTPUTS = ["size", "px", "py", "vibration", "color"]
+OUTPUTS = ["size", "border_width", "color", "px", "py"]
 VARTYPES = ["value", "color", "grad"]
 
 class Line():
@@ -222,6 +215,16 @@ class Ui_IOConfig(object):
         self.validerButton.setSizePolicy(sizePolicy)
         self.validerButton.setObjectName("validerButton")
         self.buttonHorLay.addWidget(self.validerButton)
+
+        self.resetButton = QtWidgets.QPushButton(IOConfig)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.resetButton.sizePolicy().hasHeightForWidth())
+        self.resetButton.setSizePolicy(sizePolicy)
+        self.resetButton.setObjectName("resetButton")
+        self.buttonHorLay.addWidget(self.resetButton)
+
         self.genVertLay.addLayout(self.buttonHorLay)
         self.gridLayout.addLayout(self.genVertLay, 0, 0, 1, 1)
 
@@ -233,6 +236,7 @@ class Ui_IOConfig(object):
         self.addVarButton.clicked.connect(lambda: self.addVarLine(IOConfig))
         self.enregistrerButton.clicked.connect(lambda: config.save(self, IOConfig))
         self.validerButton.clicked.connect(lambda: config.valider(IOConfig))
+        self.resetButton.clicked.connect(lambda: self.reset(IOConfig))
         #self.nomConfLine.textChanged.connect(self.updateConfig)
 
         IOConfig.configs = self.updateConfig()
@@ -255,6 +259,7 @@ class Ui_IOConfig(object):
         self.annulerButton.setText(_translate("IOConfig", "Annuler"))
         self.enregistrerButton.setText(_translate("IOConfig", "Enregistrer"))
         self.validerButton.setText(_translate("IOConfig", "Valider"))
+        self.resetButton.setText(_translate("IOConfig", "Reset"))
         self.addConfButton.setText(_translate("IOConfig", "+"))
         self.delConfButton.setText(_translate("IOConfig", "x"))
         self.nomConfLabel.setText(_translate("IOConfig", "Nom"))
@@ -297,8 +302,6 @@ class Ui_IOConfig(object):
         contents[3].setObjectName("delAssiButton_" + str(currentRow - 1))
         self.assiGridLay.addWidget(contents[3], gridRow, 3)
         contents[3].setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
-
-        main.debug("assiLines index t {}, g {}".format(currentRow, gridRow))
 
         contents[3].setText("x")
 
@@ -364,6 +367,7 @@ class Ui_IOConfig(object):
             lines = IOConfig.varLines
             layout = self.varGridLay
 
+        main.debug("index {} in {}".format(line.tableRow, lines))
         for x in lines[line.tableRow].contents:
             layout.removeWidget(x)
             x.deleteLater()
@@ -428,7 +432,7 @@ class Ui_IOConfig(object):
         IOConfig.append(config.Configuration(id, name))
 
     def showConfig(self, IOConfig, id):
-        main.debug(IOConfig.configs)
+        main.debug("Loading config {} in {}".format(id, IOConfig.configs))
         toShow = IOConfig.configs[id]
         IOConfig.currentConf = id
 
@@ -456,7 +460,6 @@ class Ui_IOConfig(object):
             if not assi == "errors":
                 self.addAssiLine(IOConfig)
                 line = IOConfig.assiLines[-1]
-                main.debug(self.inputs(IOConfig))
                 fillCombo(line.contents[1], self.inputs(IOConfig))
                 output = assiDict[assi]
                 input = assi
@@ -473,13 +476,23 @@ class Ui_IOConfig(object):
         
         self.nomConfLine.setText(toShow.name)
 
-    def reset(self,IOConfig):
+
+    def reset(self, IOConfig):
+        if len(IOConfig.assiLines) > 0:
+            self.delLine(IOConfig, IOConfig.assiLines[0])
+        if len(IOConfig.varLines) > 0:
+            self.delLine(IOConfig, IOConfig.varLines[0])
+        if len(IOConfig.assiLines) != 0 or len(IOConfig.varLines) != 0:
+            self.reset(IOConfig)
+
+    def resete(self,IOConfig):
+        main.debug("assiLines : {} \nvarLines : {}".format(IOConfig.assiLines, IOConfig.varLines))
         for a in IOConfig.assiLines:
+            main.debug(IOConfig.assiLines.index(a))
             self.delLine(IOConfig, a)
-            IOConfig.assiLines = []
+
         for v in IOConfig.varLines:
             self.delLine(IOConfig, v)
-            IOConfig.varLines = []
 
 def fillCombo(combo, list):
     """

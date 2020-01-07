@@ -38,10 +38,11 @@ if __name__ == '__main__':
             # find closest frame in descriptors
             index = current_time // frame_duration_ms
             index = round(min(index, rms_frames[0].size - 1))
-            rms = rms_frames[0][index]
+            """rms = rms_frames[0][index]
             spectral_centroid = spectral_centroid_frames[0][index]
             spectral_flatness = spectral_flatness_frames[0][index]
-            print(rms, spectral_flatness, spectral_centroid)
+            print(rms, spectral_flatness, spectral_centroid)"""
+            print(index)
         else:
             timer.stop()
 
