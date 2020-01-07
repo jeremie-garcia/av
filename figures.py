@@ -97,22 +97,41 @@ class Figure(QtWidgets.QGraphicsItem):
         self.pen.setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
     def update(self, recorded_frames):
+        nb_figure = sum(self.view.figures_list)
 
-        # fix the horizontal value
-        if self.parameters["horizPara"] == "RMS":
-            self.horizontal_size = recorded_frames["rms"] * self.view.width() * 0.80
-        elif self.parameters["horizPara"] == "Spectral centroid":
-            self.horizontal_size = recorded_frames["spectral_centroid"] * self.view.width() * 0.80
-        else:
-            self.horizontal_size = recorded_frames["spectral_flatness"] * self.view.width() * 0.80
+        if nb_figure == 1 or nb_figure == 2:
+            # fix the horizontal value
+            if self.parameters["horizPara"] == "RMS":
+                self.horizontal_size = recorded_frames["rms"] * self.view.width() * 0.80 // nb_figure
+            elif self.parameters["horizPara"] == "Spectral centroid":
+                self.horizontal_size = recorded_frames["spectral_centroid"] * self.view.width() * 0.80 // nb_figure
+            else:
+                self.horizontal_size = recorded_frames["spectral_flatness"] * self.view.width() * 0.80 // nb_figure
 
-        # fix the vertical value
-        if self.parameters["verticPara"] == "RMS":
-            self.vertical_size = recorded_frames["rms"] * self.view.height() * 0.80
-        elif self.parameters["verticPara"] == "Spectral centroid":
-            self.vertical_size = recorded_frames["spectral_centroid"] * self.view.height() * 0.80
-        else:
-            self.vertical_size = recorded_frames["spectral_flatness"] * self.view.height() * 0.80
+            # fix the vertical value
+            if self.parameters["verticPara"] == "RMS":
+                self.vertical_size = recorded_frames["rms"] * self.view.height() * 0.80
+            elif self.parameters["verticPara"] == "Spectral centroid":
+                self.vertical_size = recorded_frames["spectral_centroid"] * self.view.height() * 0.80
+            else:
+                self.vertical_size = recorded_frames["spectral_flatness"] * self.view.height() * 0.80
+
+        elif nb_figure == 3 or nb_figure == 4:
+            if self.parameters["horizPara"] == "RMS":
+                self.horizontal_size = recorded_frames["rms"] * self.view.width() * 0.80 // 2
+            elif self.parameters["horizPara"] == "Spectral centroid":
+                self.horizontal_size = recorded_frames["spectral_centroid"] * self.view.width() * 0.80 // 2
+            else:
+                self.horizontal_size = recorded_frames["spectral_flatness"] * self.view.width() * 0.80 // 2
+
+            # fix the vertical value
+            if self.parameters["verticPara"] == "RMS":
+                self.vertical_size = recorded_frames["rms"] * self.view.height() * 0.80 // 2
+            elif self.parameters["verticPara"] == "Spectral centroid":
+                self.vertical_size = recorded_frames["spectral_centroid"] * self.view.height() * 0.80 // 2
+            else:
+                self.vertical_size = recorded_frames["spectral_flatness"] * self.view.height() * 0.80 // 2
+
         
         # updates color and gradient
         self.SetToolsColor(recorded_frames)

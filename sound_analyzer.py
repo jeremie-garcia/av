@@ -55,4 +55,3 @@ class Sound(object):
             self.spectral_flatness_frames[0][i] /= norm_spectral_flatness
             if self.spectral_flatness_frames[0][i] >= 1:
                 self.spectral_flatness_frames[0][i] = 1
-

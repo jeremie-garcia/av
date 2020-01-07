@@ -59,12 +59,12 @@ class View(QtWidgets.QWidget):
 
         self.zoomview.parameters_window1 = {"form": "Ellipse", "horizPara": "RMS",
                                         "verticPara": "RMS", "color": "Red", "colorPara": "RMS"}
-        self.zoomview.parameters_window2 = {"form": None, "horizPara": None, "verticPara": None,
-                                        "color": None, "colorPara": None}
-        self.zoomview.parameters_window3 = {"form": None, "horizPara": None, "verticPara": None,
-                                        "color": None, "colorPara": None}
-        self.zoomview.parameters_window4 = {"form": None, "horizPara": None, "verticPara": None,
-                                        "color": None, "colorPara": None}
+        self.zoomview.parameters_window2 = {"form": None, "horizPara": "RMS", "verticPara": "RMS",
+                                        "color": "Red", "colorPara": "RMS"}
+        self.zoomview.parameters_window3 = {"form": None, "horizPara": "RMS", "verticPara": "RMS",
+                                        "color": "Red", "colorPara": "RMS"}
+        self.zoomview.parameters_window4 = {"form": None, "horizPara": "RMS", "verticPara": "RMS",
+                                        "color": "Red", "colorPara": "RMS"}
 
         self.dict_fig = {'fig1': None, 'fig2': None, 'fig3': None, 'fig4': None}
         self.dict_parameter_window = {'fig1': self.zoomview.parameters_window1, 'fig2': self.zoomview.parameters_window2,
@@ -124,23 +124,42 @@ class View(QtWidgets.QWidget):
 
     def window_constructor(self):
         for index in range(1, len(self.figures_list) + 1):
-
             if self.figures_list[index - 1]:
                 self.dict_fig['fig{}'.format(index)] = figures.Figure(self, self.dict_parameter_window['fig{}'.format(index)])
                 self.dict_fig['fig{}'.format(index)].Item_Init()
             else:
                 self.dict_fig['fig{}'.format(index)] = None
 
-        print(self.dict_fig.values())
+        # print(self.dict_fig.values())
 
         nb_figure = sum(self.figures_list)
 
         if nb_figure == 2:
-            self.dict_fig['fig1'].item.moveBy(10, 100)
-            for index in range(1, len(self.figures_list) + 1):
-                if self.figures_list[index - 1]:
-                    print(index-1)
-                    self.dict_fig['fig{}'.format(index)].item.moveBy(100,10)
+            self.dict_fig['fig1'].item.setPos(-self.width() // 4, 0)
+            for index in range(1, len(self.figures_list)):
+                if self.figures_list[index]:
+                    self.dict_fig['fig{}'.format(index + 1)].item.setPos(self.width() // 4, 0)
+
+        elif nb_figure == 3:
+            self.dict_fig['fig1'].item.setPos(-self.width() // 4, -self.height() // 4)
+            if self.figures_list[1]:
+                self.dict_fig['fig2'].item.setPos(self.width() // 4, -self.height() // 4)
+                if self.figures_list[2]:
+                    self.dict_fig['fig3'].item.setPos(0, self.height() // 4)
+                else:
+                    self.dict_fig['fig4'].item.setPos(0, self.height() // 4)
+            else:
+                self.dict_fig['fig3'].item.setPos(self.width() // 4, -self.height() // 4)
+                self.dict_fig['fig4'].item.setPos(0, self.height() // 4)
+
+        elif nb_figure == 4:
+            self.dict_fig['fig1'].item.setPos(-self.width() // 4, -self.height() // 4)
+            self.dict_fig['fig2'].item.setPos(self.width() // 4, -self.height() // 4)
+            self.dict_fig['fig3'].item.setPos(-self.width() // 4, self.height() // 4)
+            self.dict_fig['fig4'].item.setPos(self.width() // 4, self.height() // 4)
+
+
+
 
 
 
