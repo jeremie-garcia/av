@@ -17,8 +17,8 @@ class Figure(QtWidgets.QGraphicsItem):
         self.view = the_view
         self.scene = the_view.scene
 
-        self.minor_axe = None
-        self.major_axe = None
+        self.vertical_size = None
+        self.horizontal_size = None
         self.qrectf = QRectF()
         self.item = None
 
@@ -45,7 +45,7 @@ class Figure(QtWidgets.QGraphicsItem):
         # sets the starting and the final point of the gradient and its color
         if self.parameters["form"] == "Rectangle":
             self.gradient.setStart(0, 0)
-            self.gradient.setFinalStop(self.major_axe, self.minor_axe)
+            self.gradient.setFinalStop(self.horizontal_size, self.vertical_size)
             self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
             self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
             self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
@@ -54,7 +54,7 @@ class Figure(QtWidgets.QGraphicsItem):
             #self.gradient.setCenter(self.major_axe//2, self.minor_axe//2)
             #self.gradient.setRadius(self.major_axe)
             self.gradient.setStart(0, 0)
-            self.gradient.setFinalStop(self.major_axe, self.minor_axe)
+            self.gradient.setFinalStop(self.horizontal_size, self.vertical_size)
             self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
             self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
             self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
@@ -100,26 +100,26 @@ class Figure(QtWidgets.QGraphicsItem):
 
         # fix the horizontal value
         if self.parameters["horizPara"] == "RMS":
-            self.major_axe = recorded_frames["rms"] * self.view.width()
+            self.horizontal_size = recorded_frames["rms"] * self.view.width() * 0.80
         elif self.parameters["horizPara"] == "Spectral centroid":
-            self.major_axe = recorded_frames["spectral_centroid"] * self.view.width()
+            self.horizontal_size = recorded_frames["spectral_centroid"] * self.view.width() * 0.80
         else:
-            self.major_axe = recorded_frames["spectral_flatness"] * self.view.width()
+            self.horizontal_size = recorded_frames["spectral_flatness"] * self.view.width() * 0.80
 
         # fix the vertical value
         if self.parameters["verticPara"] == "RMS":
-            self.minor_axe = recorded_frames["rms"] * self.view.height()
+            self.vertical_size = recorded_frames["rms"] * self.view.height() * 0.80
         elif self.parameters["verticPara"] == "Spectral centroid":
-            self.minor_axe = recorded_frames["spectral_centroid"] * self.view.height()
+            self.vertical_size = recorded_frames["spectral_centroid"] * self.view.height() * 0.80
         else:
-            self.minor_axe = recorded_frames["spectral_flatness"] * self.view.height()
+            self.vertical_size = recorded_frames["spectral_flatness"] * self.view.height() * 0.80
         
         # updates color and gradient
         self.SetToolsColor(recorded_frames)
         self.update_gradient()
 
-        self.qrectf.setHeight(self.minor_axe)
-        self.qrectf.setWidth(self.major_axe)
+        self.qrectf.setHeight(self.vertical_size)
+        self.qrectf.setWidth(self.horizontal_size)
 
         self.item.setRect(self.qrectf)
         self.item.setBrush(self.brush)

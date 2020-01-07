@@ -53,6 +53,7 @@ class View(QtWidgets.QWidget):
         self.time_entry = QtWidgets.QLineEdit()
 
         self.isSoundPlayed = False
+        self.isSoundChanged = False
 
         self.figures_list = [True, False, False, False]
 
@@ -175,7 +176,7 @@ class View(QtWidgets.QWidget):
                 self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
 
     def timer_update(self):
-        if pygame.mixer.music.get_busy():
+        if pygame.mixer.music.get_busy() and not self.isSoundChanged:
 
             current_time = pygame.mixer.music.get_pos()
 
@@ -196,6 +197,13 @@ class View(QtWidgets.QWidget):
             # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,10*spectral_centroid, 10*spectral_centroid, qpen, qpaint)
 
             # print(rms, spectral_flatness, spectral_centroid)
+        elif pygame.mixer.music.get_busy() and self.isSoundChanged:
+            self.timer.stop()
+            pygame.mixer.music.stop()
+            self.isSoundPlayed = False
+            self.isSoundChanged = False
+            self.scene.clear()
+
         else:
             self.timer.stop()
             pygame.mixer.music.stop()

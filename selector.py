@@ -54,8 +54,8 @@ class Selector(QWidget):
 
         """sound connection"""
         self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.update_sound)
+        self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.sound_changed)
 
-        self.show()
 
     """sound combo box list of sounds"""
 
@@ -140,3 +140,7 @@ class Selector(QWidget):
 
     def update_sound(self):
         self.sound.filename = self.sound.sounds_dictionnary[self.ui_selector.SoundComboBox.currentText()]
+
+    def sound_changed(self):
+        self.view.isSoundChanged = True
+        self.view.isSoundPlayed = False
