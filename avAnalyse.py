@@ -14,7 +14,6 @@ if __name__ == '__main__':
     # Load the audio as a waveform `waveform`
     # Store the sampling rate as `sr`
     waveform, sr = librosa.load(filename)
-    print(waveform)
 
     # 2. Extract features (rms, spectral centroid, spectral flatness)
     features_frame_length =  4096
@@ -24,7 +23,16 @@ if __name__ == '__main__':
     spectral_flatness_frames = librosa.feature.spectral_flatness(y=waveform, S= None, n_fft=features_frame_length )
     chroma_stft_frames = librosa.feature.chroma_stft(y=waveform, S= None, n_fft=features_frame_length)
     zero_crossing_rate_frames = librosa.feature.zero_crossing_rate(y = waveform, frame_length = features_frame_length)
-
+    donnee_brute = [] #on va réunir toutes les données en une seule liste
+    n = len(rms_frames[0]) #peut poser problèmes si les tableaux sont de taille différentes
+    for i in range(n):
+        _rms = rms_frames[0][i]
+        _spectral = spectral_centroid_frames[0][i]
+        _flat = spectral_flatness_frames[0][i]
+        _chroma = chroma_stft_frames[0][i]
+        _zero = zero_crossing_rate_frames[0][i]
+        donnee_brute.append({'rms' : _rms, 'freq' : _spectral, 'flat' : _flat,'zero' : _zero, 'chroma' : _chroma})
+    print(donnee_brute)
     #3 init pygame
     pygame.mixer.init()
     pygame.mixer.music.load(filename)
@@ -47,7 +55,7 @@ if __name__ == '__main__':
             chroma_stft = chroma_stft_frames[0][index] #les chroma du signal
             wave =  waveform[index] #les valeurs du signal
             zero_crossing_rate = zero_crossing_rate_frames[0][index]
-            print(rms, spectral_flatness, spectral_centroid, chroma_stft,zero_crossing_rate, wave)
+            #print(rms, spectral_flatness, spectral_centroid, chroma_stft,zero_crossing_rate, wave)
             Donnee.append({'rms' : rms, 'freq' : spectral_centroid, 'flat' : spectral_flatness,'zero' : zero_crossing_rate})
         else:
             timer.stop()
