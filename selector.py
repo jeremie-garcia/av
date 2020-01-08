@@ -126,15 +126,11 @@ class Selector(QWidget):
     def update_vertiSizePara_window4(self):
         self.zoomview.parameters_window4["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_4.currentText()
 
-    """window number update"""
-
     def update_window_number(self):
-        if self.ui_selector.FormComboBox_2.currentText() != 'None':
-            self.view.figures_list[1] = True
-        if self.ui_selector.FormComboBox_3.currentText() != 'None':
-            self.view.figures_list[2] = True
-        if self.ui_selector.FormComboBox_4.currentText() != 'None':
-            self.view.figures_list[3] = True
+        """update window number"""
+        self.view.figures_list[1] = self.ui_selector.FormComboBox_2.currentText() != 'None'
+        self.view.figures_list[2] = self.ui_selector.FormComboBox_3.currentText() != 'None'
+        self.view.figures_list[3] = self.ui_selector.FormComboBox_4.currentText() != 'None'
 
     """sound_update"""
 
