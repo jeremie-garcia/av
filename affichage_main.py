@@ -1,10 +1,8 @@
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pygame
 import librosa
-
 
 #Qt Designer File
 class Ui_Form(object):
@@ -13,7 +11,7 @@ class Ui_Form(object):
         Form.resize(736, 688)
         self.frame = QtWidgets.QFrame(Form)
         self.frame.setGeometry(QtCore.QRect(160, 110, 400, 400))
-        self.frame.setStyleSheet("image: url(:/fichier/C:/Users/gabth/Desktop/Enac.jpg);")
+        #self.frame.setStyleSheet("image: url(:/fichier/C:/Users/gabth/Desktop/Enac.jpg);")
         self.frame.setFrameShape(QtWidgets.QFrame.Box)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setLineWidth(13)
@@ -30,7 +28,7 @@ class Ui_Form(object):
 if __name__ == '__main__':
 
     # 0. select a sound file to open
-    filename = 'C:\\Users\\gabth\\Downloads\\s1.wav'
+    filename = 'sounds/s1.wav'
     #filename = 'sounds/s2.wav'
 
     # 1. extract descriptors from the audiofile using librosa
@@ -65,7 +63,7 @@ if __name__ == '__main__':
     # Aude renvoie un dictionnaire, qui a chaque clé (géométrie), renvoie la liste déjà normalisée des données a rentrer directement dans timer_update
     def interpreteur_dico_qt(dico):
         nb_param = len(dico)  # nombre de paramètre du qt à faire varier
-        for param, indice in enumerate dico:  # On parcourt ces parametres, que l'on identifie
+        for param, indice in enumerate(dico):  # On parcourt ces parametres, que l'on identifie
             if param == 'largeur':
                 ind_largeur = indice
             #if ... etc
@@ -85,7 +83,6 @@ if __name__ == '__main__':
 
         else:
             timer.stop()
-
 
     pygame.mixer.music.get_pos()
     timer = QtCore.QTimer()

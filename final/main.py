@@ -60,37 +60,33 @@ if __name__ == '__main__':
         _chroma = chroma_stft_frames[0][i]
         _zero = zero_crossing_rate_frames[0][i]
         donnee_brute.append({'rms' : _rms, 'sp_centroid' : _spectral, 'sp_flatness' : _flat,'zero' : _zero, 'chroma' : _chroma})
-    print(donnee_brute)
+    debug(donnee_brute)
 
     #3 init pygame
     pygame.mixer.init()
     pygame.mixer.music.load(filename)
 
-    def timer_update():
+    conf = config.readfile("configs/0.conf")
+    movements = config_interpreter.Traitement(donnee_brute, conf)
+    print(movements)
+
+    def timer_update(ui, movements):
         if (pygame.mixer.music.get_busy()):
-            Donnee = [] #on réorganise les données
             current_time = pygame.mixer.music.get_pos()
             # find closest frame in descriptors
             index = current_time // frame_duration_ms
             index = round(min(index, rms_frames[0].size - 1))
-            rms = rms_frames[0][index]
-            spectral_centroid = spectral_centroid_frames[0][index]
-            spectral_flatness = spectral_flatness_frames[0][index]
-            chroma_stft = chroma_stft_frames[0][index] #les chroma du signal
-            wave =  waveform[index] #les valeurs du signal
-            zero_crossing_rate = zero_crossing_rate_frames[0][index]
-            #print(rms, spectral_flatness, spectral_centroid, chroma_stft,zero_crossing_rate, wave)
-            Donnee.append({'rms' : rms, 'sp_centroid' : spectral_centroid, 'sp_flatness' : spectral_flatness,'zero' : zero_crossing_rate})
+            if 'largeur' in movements[index]:
+                donné_utile = movements[index]['largeur']
+                print(donné_utile*100)
+                ui.frame.setLineWidth(donné_utile*100)
+            # if... etc
+
         else:
             timer.stop()
 
-    conf = config.readfile("configs/0.conf")
-    movements = config_interpreter.Traitement(donnee_brute, conf)
-
-
-
     timer = QtCore.QTimer()
-    timer.timeout.connect(timer_update)
+    timer.timeout.connect(lambda: timer_update(ui, movements))
 
     pygame.mixer.music.play(0)
     timer.start(frame_duration_ms)

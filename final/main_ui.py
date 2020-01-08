@@ -81,6 +81,7 @@ class Ui_mainWindow(object):
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
+        self.frame.setStyleSheet("background-color:blue;")
         self.verticalLayout.addWidget(self.frame)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -128,6 +129,10 @@ class Ui_mainWindow(object):
         self.pushButton_2.setText(_translate("mainWindow", "<<"))
         self.pushButton.setText(_translate("mainWindow", "|>"))
         self.checkBox.setText(_translate("mainWindow", "Boucle"))
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.drawRect(5,5,120,40)
 
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)
