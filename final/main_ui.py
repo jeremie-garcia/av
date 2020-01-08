@@ -72,16 +72,13 @@ class Ui_mainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.frame = QtWidgets.QFrame(mainWindow)
+        self.frame = QtWidgets.QGraphicsView()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
         self.frame.setSizePolicy(sizePolicy)
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
-        self.frame.setStyleSheet("background-color:blue;")
         self.verticalLayout.addWidget(self.frame)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -120,6 +117,12 @@ class Ui_mainWindow(object):
 
         self.pushButton_3.clicked.connect(config_ui.openWindow)
 
+        scene = QtWidgets.QGraphicsScene()
+        self.frame.setScene(scene)
+        self.rectangle = scene.addRect(0,0,0,0)
+        self.ellipse = scene.addEllipse(0,0,0,0)
+
+
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
@@ -132,7 +135,7 @@ class Ui_mainWindow(object):
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
-        painter.drawRect(5,5,120,40)
+        painter.drawRect(15,15,120,40)
 
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)

@@ -35,7 +35,7 @@ if __name__ == '__main__':
     mainWindow.show()
 
     # 0. select a sound file to open
-    filename = 'sounds/s1.wav'
+    filename = 'sounds/skrillex.wav'
     #filename = 'sounds/s2.wav'
 
     # 1. extract descriptors from the audiofile using librosa
@@ -78,8 +78,12 @@ if __name__ == '__main__':
             index = round(min(index, rms_frames[0].size - 1))
             if 'largeur' in movements[index]:
                 donné_utile = movements[index]['largeur']
-                print(donné_utile*100)
-                ui.frame.setLineWidth(donné_utile*100)
+                dim = donné_utile*250
+                ui.ellipse.setRect(-dim,-dim, dim*2, dim*2)
+            if 'rect' in movements[index]:
+                donnee_utile = movements[index]['rect']
+                dim = donnee_utile/50
+                ui.rectangle.setRect(-dim, -dim, dim * 2, dim * 2)
             # if... etc
 
         else:
