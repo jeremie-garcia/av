@@ -485,15 +485,6 @@ class Ui_IOConfig(object):
         if len(IOConfig.assiLines) != 0 or len(IOConfig.varLines) != 0:
             self.reset(IOConfig)
 
-    def resete(self,IOConfig):
-        main.debug("assiLines : {} \nvarLines : {}".format(IOConfig.assiLines, IOConfig.varLines))
-        for a in IOConfig.assiLines:
-            main.debug(IOConfig.assiLines.index(a))
-            self.delLine(IOConfig, a)
-
-        for v in IOConfig.varLines:
-            self.delLine(IOConfig, v)
-
 def fillCombo(combo, list):
     """
     Remplit combo avec les valeurs de list

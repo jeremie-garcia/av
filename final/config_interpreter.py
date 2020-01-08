@@ -19,7 +19,6 @@ def Traitement(L,l):
 
 
         for cle1, valeur in dico_i.items():
-            print(cle1, valeur)
             if cle1 in traducteur.keys():
                 cle2 = traducteur[cle1]
                 dico_i_bis[cle2] = valeur

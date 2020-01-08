@@ -5,6 +5,9 @@ configFolder = "configs"
 configExtension = ".conf"
 configFileName = configFolder + "/{}" + configExtension
 
+soundsFolder = "sounds"
+soundsExtension = ".wav"
+
 class Color(): #couleur
     """
     Objet de type couleur
