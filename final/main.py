@@ -3,8 +3,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pygame
 import librosa
-import main_ui, config_interpreter, config
-
+import main_ui, config_interpreter, config, FonctionAnalyse
 DEBUG = True
 
 def initConf():
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     mainWindow.show()
 
     # 0. select a sound file to open
-    filename = 'sounds/skrillex.wav'
+    filename = 'sounds/s1.wav'
     #filename = 'sounds/s2.wav'
 
     # 1. extract descriptors from the audiofile using librosa
@@ -51,14 +50,23 @@ if __name__ == '__main__':
     spectral_flatness_frames = librosa.feature.spectral_flatness(y=waveform, S= None, n_fft=features_frame_length )
     chroma_stft_frames = librosa.feature.chroma_stft(y=waveform, S= None, n_fft=features_frame_length)
     zero_crossing_rate_frames = librosa.feature.zero_crossing_rate(y = waveform, frame_length = features_frame_length)
-    donnee_brute = [] #on va réunir toutes les données en une seule liste
+
+    #Normalisation
+    rms_frames_N = FonctionAnalyse.ListeNormalisée(rms_frames)
+    spectral_centroid_frames_N = FonctionAnalyse.ListeNormalisée(spectral_centroid_frames)
+    spectral_flatness_frames_N = FonctionAnalyse.ListeNormalisée(spectral_flatness_frames)
+    chroma_stft_frames_N = FonctionAnalyse.ListeNormalisée(chroma_stft_frames_)
+    zero_crossing_rate_frames_N = FonctionAnalyse.ListeNormalisée(zero_crossing_rate_frames)
+
+    # on va réunir toutes les données en une seule liste
+    donnee_brute = []
     n = len(rms_frames[0]) #peut poser problèmes si les tableaux sont de taille différentes
     for i in range(n):
         _rms = rms_frames[0][i]
-        _spectral = spectral_centroid_frames[0][i]
-        _flat = spectral_flatness_frames[0][i]
-        _chroma = chroma_stft_frames[0][i]
-        _zero = zero_crossing_rate_frames[0][i]
+        _spectral = spectral_centroid_frames_N[0][i]
+        _flat = spectral_flatness_frames_N[0][i]
+        _chroma = chroma_stft_frames_N[0][i]
+        _zero = zero_crossing_rate_frames_N[0][i]
         donnee_brute.append({'rms' : _rms, 'sp_centroid' : _spectral, 'sp_flatness' : _flat,'zero' : _zero, 'chroma' : _chroma})
     debug(donnee_brute)
 
