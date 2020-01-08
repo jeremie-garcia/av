@@ -6,7 +6,8 @@ import librosa
 import main_ui, config_interpreter, config, config_ui, FonctionAnalyse
 
 DEBUG = True
-syncro = -13
+SYNCHRO = 0
+SCALE = 200
 
 def initConf(ui):
     try :
@@ -49,8 +50,7 @@ if __name__ == '__main__':
     initSounds(ui)
 
     # 0. select a sound file to open
-    filename = 'sounds/s8.wav'
-    #filename = 'sounds/s2.wav'
+    filename = 'sounds/clic.wav'
 
     # 1. extract descriptors from the audiofile using librosa
     # Load the audio as a waveform `waveform`
@@ -65,14 +65,22 @@ if __name__ == '__main__':
     spectral_flatness_frames = librosa.feature.spectral_flatness(y=waveform, S= None, n_fft=features_frame_length )
     chroma_stft_frames = librosa.feature.chroma_stft(y=waveform, S= None, n_fft=features_frame_length)
     zero_crossing_rate_frames = librosa.feature.zero_crossing_rate(y = waveform, frame_length = features_frame_length)
+
+    # Normalisation
+    rms_frames_N = FonctionAnalyse.ListeNormalisée(rms_frames)
+    spectral_centroid_frames_N = FonctionAnalyse.ListeNormalisée(spectral_centroid_frames)
+    spectral_flatness_frames_N = FonctionAnalyse.ListeNormalisée(spectral_flatness_frames)
+    chroma_stft_frames_N = FonctionAnalyse.ListeNormalisée(chroma_stft_frames)
+    zero_crossing_rate_frames_N = FonctionAnalyse.ListeNormalisée(zero_crossing_rate_frames)
+
     donnee_brute = [] #on va réunir toutes les données en une seule liste
     n = len(rms_frames[0]) #peut poser problèmes si les tableaux sont de taille différentes
     for i in range(n):
         _rms = rms_frames[0][i]
-        _spectral = spectral_centroid_frames[0][i]
-        _flat = spectral_flatness_frames[0][i]
-        _chroma = chroma_stft_frames[0][i]
-        _zero = zero_crossing_rate_frames[0][i]
+        _spectral = spectral_centroid_frames_N[i]
+        _flat = spectral_flatness_frames_N[i]
+        _chroma = chroma_stft_frames_N[i]
+        _zero = zero_crossing_rate_frames_N[i]
         donnee_brute.append({'rms' : _rms, 'sp_centroid' : _spectral, 'sp_flatness' : _flat,'zero' : _zero, 'chroma' : _chroma})
     debug(donnee_brute)
 
@@ -88,14 +96,14 @@ if __name__ == '__main__':
             current_time = pygame.mixer.music.get_pos()
             # find closest frame in descriptors
             index = current_time // frame_duration_ms
-            index = round(min(index, rms_frames[0].size - 1))+syncro
+            index = round(min(index, rms_frames[0].size - 1)) + ui.horizontalSlider.value()
             if 'largeur' in movements[index]:
                 donné_utile = movements[index]['largeur']
-                dim = donné_utile*250
+                dim = donné_utile*SCALE
                 ui.ellipse.setRect(-dim,-dim, dim*2, dim*2)
             if 'rect' in movements[index]:
                 donnee_utile = movements[index]['rect']
-                dim = donnee_utile/50
+                dim = donnee_utile*SCALE
                 ui.rectangle.setRect(-dim, -dim, dim * 2, dim * 2)
             # if... etc
 

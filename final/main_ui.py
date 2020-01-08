@@ -1,4 +1,4 @@
-import sys, config_ui
+import sys, config_ui, main
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 """
@@ -58,6 +58,21 @@ class Ui_mainWindow(object):
         self.comboBox_2.setObjectName("comboBox_2")
         self.horizontalLayout_3.addWidget(self.comboBox_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.label_3 = QtWidgets.QLabel(mainWindow)
+        self.label_3.setObjectName("label_3")
+        self.horizontalLayout_5.addWidget(self.label_3)
+        self.horizontalSlider = QtWidgets.QSlider(mainWindow)
+        self.horizontalSlider.setMinimum(-200)
+        self.horizontalSlider.setMaximum(200)
+        self.horizontalSlider.setTracking(True)
+        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider.setInvertedAppearance(False)
+        self.horizontalSlider.setInvertedControls(False)
+        self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalLayout_5.addWidget(self.horizontalSlider)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         self.pushButton_3 = QtWidgets.QPushButton(mainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
@@ -72,6 +87,7 @@ class Ui_mainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setObjectName("verticalLayout")
+
         self.frame = QtWidgets.QGraphicsView()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
@@ -80,6 +96,7 @@ class Ui_mainWindow(object):
         self.frame.setSizePolicy(sizePolicy)
         self.frame.setObjectName("frame")
         self.verticalLayout.addWidget(self.frame)
+
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.pushButton_2 = QtWidgets.QPushButton(mainWindow)
@@ -128,6 +145,7 @@ class Ui_mainWindow(object):
         mainWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
         self.label.setText(_translate("mainWindow", "Fichier son"))
         self.label_2.setText(_translate("mainWindow", "Configuration"))
+        self.label_3.setText(_translate("mainWindow", "Synchro"))
         self.pushButton_3.setText(_translate("mainWindow", "Edition des configurations"))
         self.pushButton_2.setText(_translate("mainWindow", "<<"))
         self.pushButton.setText(_translate("mainWindow", "|>"))
