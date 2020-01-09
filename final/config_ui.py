@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 VAROFFSET = 1
 ASSIOFFSET = 1
 
-OUTPUTS = ["size", "border_width", "color", "px", "py"]
+OUTPUTS = ["ellipse", "rect"]
 VARTYPES = ["value", "color", "grad"]
 
 class Line():
@@ -16,7 +16,7 @@ class Line():
 
 
 class Ui_IOConfig(object):
-    def setupUi(self, IOConfig):
+    def setupUi(self, IOConfig, ui):
         IOConfig.assiLines, IOConfig.varLines = [], []
 
         IOConfig.setObjectName("IOConfig")
@@ -239,7 +239,7 @@ class Ui_IOConfig(object):
         self.resetButton.clicked.connect(lambda: self.reset(IOConfig))
         #self.nomConfLine.textChanged.connect(self.updateConfig)
 
-        IOConfig.configs = self.updateConfig()
+        IOConfig.configs = self.updateConfig(ui)
         self.confCombo.currentIndexChanged.connect(lambda x: self.showConfig(IOConfig, x))
         #self.showConfig(IOConfig, 0)
 
@@ -418,12 +418,12 @@ class Ui_IOConfig(object):
                 fillCombo(assiLine.contents[1], INPUTS)
                 assiLine.contents[1].setCurrentIndex(pos)
 
-    def updateConfig(self):
+    def updateConfig(self, ui):
         """
         Màj configs combobox
         :return: liste configs fichiers
         """
-        configs = main.initConf()
+        configs = main.initConf(ui)
         fillCombo(self.confCombo, [c.name for c in list(configs.values())[::-1]])
         return configs
 
@@ -494,11 +494,11 @@ def fillCombo(combo, list):
     combo.clear()
     for x in list: combo.addItem(x)
 
-def openWindow():
+def openWindow(ui):
     #app = QtWidgets.QApplication(sys.argv)
     IOConfig = QtWidgets.QWidget()
-    ui = Ui_IOConfig()
-    ui.setupUi(IOConfig)
+    uiIO = Ui_IOConfig()
+    uiIO.setupUi(IOConfig, ui)
     IOConfig.show()
     #sys.exit(app.exec_())
 

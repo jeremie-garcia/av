@@ -1,15 +1,18 @@
-import sys, config_ui, main
+import sys, config_ui, main, config
 from PyQt5 import QtCore, QtGui, QtWidgets
+import pygame
 
 """
 TODO :
 
-- remplissage liste sons
-- liste configurations
-- remplacer numéros confs par combo box avec nom
+- ajouter curseur échelle
 """
 
 class Ui_mainWindow(object):
+    def __init__(self):
+        self.currentConf = None
+        self.currentSound = None
+
     def setupUi(self, mainWindow):
         mainWindow.setObjectName("mainWindow")
         mainWindow.resize(1018, 529)
@@ -132,13 +135,46 @@ class Ui_mainWindow(object):
         self.retranslateUi(mainWindow)
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
-        self.pushButton_3.clicked.connect(config_ui.openWindow)
+        self.pushButton_3.clicked.connect(lambda: config_ui.openWindow(self))
+        self.pushButton.clicked.connect(lambda: self.soundTimeControl(2))
+        self.comboBox.currentIndexChanged.connect(self.changeSoundFile)
+        self.comboBox_2.currentIndexChanged.connect(self.changeConfigFile)
+        self.pushButton_2.clicked.connect(lambda: self.soundTimeControl(3))
 
         scene = QtWidgets.QGraphicsScene()
         self.frame.setScene(scene)
         self.rectangle = scene.addRect(0,0,0,0)
         self.ellipse = scene.addEllipse(0,0,0,0)
 
+        self.OBJECTS = {"ellipse": self.ellipse, "rect": self.rectangle}
+
+    def soundTimeControl(self, type):
+        if type == 0: #resume song
+            main.debug("resume")
+            self.pushButton.clicked.disconnect()
+            self.pushButton.clicked.connect(lambda: self.soundTimeControl(1))
+            pygame.mixer.music.unpause()
+        elif type == 1: #pause song
+            main.debug("pause")
+            self.pushButton.clicked.disconnect()
+            self.pushButton.clicked.connect(lambda: self.soundTimeControl(0))
+            pygame.mixer.music.pause()
+        elif type == 2: #first load & play
+            main.debug("load & play")
+            self.pushButton.clicked.disconnect()
+            self.pushButton.clicked.connect(lambda: self.soundTimeControl(1))
+            main.loadSound(self, self.currentSound, self.currentConf)
+            pygame.mixer.music.play(0)
+            self.timer.start(self.frame_duration_ms)
+            self.pushButton.setText("|>")
+        else: #rewind
+            main.debug("rewind")
+            self.pushButton.clicked.disconnect()
+            self.pushButton.clicked.connect(lambda: self.soundTimeControl(1))
+            pygame.mixer.music.stop()
+            pygame.mixer.music.play()
+            self.timer.start(self.frame_duration_ms)
+            self.pushButton.setText("|>")
 
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -151,9 +187,15 @@ class Ui_mainWindow(object):
         self.pushButton.setText(_translate("mainWindow", "|>"))
         self.checkBox.setText(_translate("mainWindow", "Boucle"))
 
-    def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
-        painter.drawRect(15,15,120,40)
+    def changeSoundFile(self, index):
+        self.currentSound = config.soundsFolder + "/" + self.comboBox.currentText()
+        self.pushButton.clicked.disconnect()
+        self.pushButton.clicked.connect(lambda:self.soundTimeControl(2))
+
+    def changeConfigFile(self, index):
+        self.currentConf = config.readfile(config.configFolder + "/" + str(index) + config.configExtension)
+        #self.soundTimeControl(2)
+
 
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)
