@@ -5,11 +5,15 @@ import pygame
 import librosa
 import main_ui, config_interpreter, config, config_ui, FonctionAnalyse
 
-DEBUG = True
+DEBUG = False
 SYNCHRO = 0
-SCALE = 200
+SCALE = 300
+WIDTH_SCALE = int(SCALE/4)
 
-def initConf(ui):
+def showConfig(ui):
+    config_ui.fillCombo(ui.comboBox_2, [ui.configs[i].name for i in range(len(ui.configs.keys()))])
+
+def initConf():
     try :
         confFiles = os.listdir(config.configFolder+"/")
     except:
@@ -23,9 +27,6 @@ def initConf(ui):
             configs[tmp.id] = tmp
         except : debug("Erreur {}".format(tmp))
 
-    print(configs.items())
-    config_ui.fillCombo(ui.comboBox_2, [x[1].name for x in configs.items()])
-
     return configs
 
 def initSounds(ui):
@@ -34,7 +35,7 @@ def initSounds(ui):
     except:
         soundFiles = []
 
-    config_ui.fillCombo(ui.comboBox, soundFiles)
+    config_ui.fillCombo(ui.comboBox, sorted(soundFiles))
     return soundFiles
 
 def debug(*args):
@@ -90,10 +91,17 @@ def timer_update(ui, movements):
         index = round(min(index, len(movements) - 1)) + ui.horizontalSlider.value()
 
         for out in config_ui.OUTPUTS:
-            if out in movements[index]:
-                donnee_utile = movements[index][out]
-                dim = donnee_utile*SCALE
-                ui.OBJECTS[out].setRect(-dim,-dim, dim*2, dim*2)
+            if out in movements[index].keys():
+                if out in ["rect", "ellipse"]:
+                    donnee_utile = movements[index][out]
+                    dim = donnee_utile * SCALE
+                    ui.OBJECTS[out].setRect(-dim,-dim, dim*2, dim*2) #A ETOFFER
+                elif out in ["rect_border", "ellipse_border"]:
+                    donnee_utile = movements[index][out]
+                    objName = out.split("_")[0]
+                    dim = donnee_utile * WIDTH_SCALE
+                    pen = QtGui.QPen(QtCore.Qt.red if objName == "ellipse" else QtCore.Qt.blue, dim)
+                    ui.OBJECTS[objName].setPen(pen)
 
     else:
         if ui.checkBox.checkState(): #si mode boucle
@@ -101,6 +109,7 @@ def timer_update(ui, movements):
         else:
             ui.pushButton.clicked.disconnect()
             ui.pushButton.clicked.connect(lambda: ui.soundTimeControl(2))
+            ui.pushButton.setText("|>")
             for x in ui.OBJECTS.keys(): ui.OBJECTS[x].setRect(0,0,0,0)
             ui.timer.stop()
 
@@ -111,14 +120,15 @@ if __name__ == '__main__':
     ui.setupUi(mainWindow)
     mainWindow.show()
 
-    configs = initConf(ui)
-    sounds = initSounds(ui)
+    ui.configs = initConf()
+    showConfig(ui)
+    ui.sounds = initSounds(ui)
     pygame.mixer.init()
 
-    filename = config.soundsFolder + "/" + sounds[0]
+    filename = config.soundsFolder + "/" + ui.sounds[0]
 
     confID = ui.comboBox_2.currentIndex()
-    ui.currentConf = config.readfile(config.configFolder + "/" + str(confID)+ config.configExtension)
+    ui.currentConf = config.readfile(config.configFolder + "/" + str(confID) + config.configExtension)
     ui.currentSound = config.soundsFolder + "/" + ui.comboBox.currentText()
 
     sys.exit(app.exec_())

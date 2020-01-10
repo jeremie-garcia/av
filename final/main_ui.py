@@ -143,19 +143,24 @@ class Ui_mainWindow(object):
 
         scene = QtWidgets.QGraphicsScene()
         self.frame.setScene(scene)
-        self.rectangle = scene.addRect(0,0,0,0)
-        self.ellipse = scene.addEllipse(0,0,0,0)
+
+        self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.rectangle = scene.addRect(0,0,0,0, self.rectangle_pen)
+        self.ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.ellipse = scene.addEllipse(0,0,0,0, self.ellipse_pen)
 
         self.OBJECTS = {"ellipse": self.ellipse, "rect": self.rectangle}
 
     def soundTimeControl(self, type):
         if type == 0: #resume song
             main.debug("resume")
+            self.pushButton.setText("||")
             self.pushButton.clicked.disconnect()
             self.pushButton.clicked.connect(lambda: self.soundTimeControl(1))
             pygame.mixer.music.unpause()
         elif type == 1: #pause song
             main.debug("pause")
+            self.pushButton.setText("|>")
             self.pushButton.clicked.disconnect()
             self.pushButton.clicked.connect(lambda: self.soundTimeControl(0))
             pygame.mixer.music.pause()
@@ -166,7 +171,7 @@ class Ui_mainWindow(object):
             main.loadSound(self, self.currentSound, self.currentConf)
             pygame.mixer.music.play(0)
             self.timer.start(self.frame_duration_ms)
-            self.pushButton.setText("|>")
+            self.pushButton.setText("||")
         else: #rewind
             main.debug("rewind")
             self.pushButton.clicked.disconnect()
@@ -174,7 +179,7 @@ class Ui_mainWindow(object):
             pygame.mixer.music.stop()
             pygame.mixer.music.play()
             self.timer.start(self.frame_duration_ms)
-            self.pushButton.setText("|>")
+            self.pushButton.setText("||")
 
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -193,9 +198,8 @@ class Ui_mainWindow(object):
         self.pushButton.clicked.connect(lambda:self.soundTimeControl(2))
 
     def changeConfigFile(self, index):
-        self.currentConf = config.readfile(config.configFolder + "/" + str(index) + config.configExtension)
-        #self.soundTimeControl(2)
-
+        if index != -1:
+            self.currentConf = config.readfile(config.configFolder + "/" + str(index) + config.configExtension)
 
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)
@@ -203,7 +207,8 @@ def openWindow():
     ui = Ui_mainWindow()
     ui.setupUi(mainWindow)
     mainWindow.show()
-    sys.exit(app.exec_())
+    ui.updateConfigs.connect(ui.dra())
+    #sys.exit(app.exec_())
     return app
 
 if __name__ == "__main__":

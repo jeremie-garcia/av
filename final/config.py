@@ -107,6 +107,9 @@ def save(window, IOConfig):
         for a in conf.assiDict:
             f.write("assign {} to {}\n".format(a, conf.assiDict[a]))
 
+    window.confCombo.setItemText(conf.id, conf.name)
+    main.initConf()
+
     main.debug(conf.assiDict)
     main.debug(conf.varDict)
 
@@ -132,9 +135,11 @@ def winToConf(window, IOConfig):
 
     return conf
 
-def valider(IOConfig):
-    save(IOConfig)
-    main.debug("Goodbye, human")
+def valider(win, IOConfig):
+    save(win, IOConfig)
+    main.debug("Saved")
+    main.initConf()
+    main.showConfig(IOConfig.mainWindow)
     IOConfig.close()
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 VAROFFSET = 1
 ASSIOFFSET = 1
 
-OUTPUTS = ["ellipse", "rect"]
+OUTPUTS = ["ellipse", "rect", "ellipse_border", "rectangle_border"]
 VARTYPES = ["value", "color", "grad"]
 
 class Line():
@@ -14,10 +14,10 @@ class Line():
         self.gridRow = gridRow
         self.contents = contents
 
-
 class Ui_IOConfig(object):
     def setupUi(self, IOConfig, ui):
         IOConfig.assiLines, IOConfig.varLines = [], []
+        IOConfig.mainWindow = ui
 
         IOConfig.setObjectName("IOConfig")
         IOConfig.resize(503, 305)
@@ -235,13 +235,11 @@ class Ui_IOConfig(object):
         self.addAssiButton.clicked.connect(lambda: self.addAssiLine(IOConfig))
         self.addVarButton.clicked.connect(lambda: self.addVarLine(IOConfig))
         self.enregistrerButton.clicked.connect(lambda: config.save(self, IOConfig))
-        self.validerButton.clicked.connect(lambda: config.valider(IOConfig))
+        self.validerButton.clicked.connect(lambda: config.valider(self, IOConfig))
         self.resetButton.clicked.connect(lambda: self.reset(IOConfig))
-        #self.nomConfLine.textChanged.connect(self.updateConfig)
 
         IOConfig.configs = self.updateConfig(ui)
         self.confCombo.currentIndexChanged.connect(lambda x: self.showConfig(IOConfig, x))
-        #self.showConfig(IOConfig, 0)
 
     def retranslateUi(self, IOConfig):
         _translate = QtCore.QCoreApplication.translate
@@ -423,8 +421,8 @@ class Ui_IOConfig(object):
         Màj configs combobox
         :return: liste configs fichiers
         """
-        configs = main.initConf(ui)
-        fillCombo(self.confCombo, [c.name for c in list(configs.values())[::-1]])
+        configs = main.initConf()
+        fillCombo(self.confCombo, [configs[i].name for i in range(len(configs.keys()))])
         return configs
 
     def addConfig(self, IOConfig, name):
@@ -495,12 +493,14 @@ def fillCombo(combo, list):
     for x in list: combo.addItem(x)
 
 def openWindow(ui):
-    #app = QtWidgets.QApplication(sys.argv)
     IOConfig = QtWidgets.QWidget()
     uiIO = Ui_IOConfig()
     uiIO.setupUi(IOConfig, ui)
     IOConfig.show()
-    #sys.exit(app.exec_())
+    uiIO.showConfig(IOConfig, 0)
+    return uiIO
 
 if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
     openWindow()
+    sys.exit(app.exec_())
