@@ -14,7 +14,7 @@ class Selector(QWidget):
         self.ui_selector = Ui_Selector()
 
         self.ui_selector.setupUi(self)
-        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionnary)
+        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionary)
 
         """Window_number"""
         self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_window_number)
@@ -126,7 +126,7 @@ class Selector(QWidget):
 
     def update_sound(self):
         """sound_update"""
-        self.sound.filename = self.sound.sounds_dictionnary[self.ui_selector.SoundComboBox.currentText()]
+        self.sound.filename = self.sound.sounds_dictionary[self.ui_selector.SoundComboBox.currentText()]
 
     def sound_changed(self):
         self.view.isSoundChanged = True

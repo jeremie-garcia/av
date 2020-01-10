@@ -5,7 +5,7 @@ import numpy as np
 class Sound(object):
     def __init__(self):
         self.filename = 'sounds/s1.wav'
-        self.sounds_dictionnary = {'Sound 1': 'sounds/s1.wav', 'Sound 2': 'sounds/s2.wav', 'Sound 3': 'sounds/s3.wav',
+        self.sounds_dictionary = {'Sound 1': 'sounds/s1.wav', 'Sound 2': 'sounds/s2.wav', 'Sound 3': 'sounds/s3.wav',
                                    'Sound 4': 'sounds/s4.wav', 'Sound 5': 'sounds/s5.wav', 'Sound 6': 'sounds/s6.wav',
                                    'Sound 7': 'sounds/s7.wav', 'Sound 8': 'sounds/s8.wav', 'Sound 9': 'sounds/s9.wav',
                                    'Sound 10': 'sounds/s10.wav', 'Sound 11': 'sounds/s11.wav',
@@ -19,9 +19,6 @@ class Sound(object):
         self.waveform = None
         self.sr = None
         self.analyse_parameters = None
-
-    # def change(self,new_sound):
-    #    self.filename='sounds/'+new_sound+'.wav'
 
     def analyze(self):
         print("load '{}'".format(self.filename))
