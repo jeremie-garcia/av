@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Selector_07-01-2020.ui'
+# Form implementation generated from reading ui file 'Selector_10-01-2020.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.1
 #
@@ -140,7 +140,6 @@ class Ui_Selector(object):
         self.FormComboBox_2.addItem("")
         self.FormComboBox_2.addItem("")
         self.FormComboBox_2.addItem("")
-        self.FormComboBox_2.addItem("")
         self.horizontalLayout_7.addWidget(self.FormComboBox_2)
         self.verticalLayout_6.addLayout(self.horizontalLayout_7)
         spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -225,7 +224,6 @@ class Ui_Selector(object):
         self.FormComboBox_3.addItem("")
         self.FormComboBox_3.addItem("")
         self.FormComboBox_3.addItem("")
-        self.FormComboBox_3.addItem("")
         self.horizontalLayout_12.addWidget(self.FormComboBox_3)
         self.verticalLayout_5.addLayout(self.horizontalLayout_12)
         spacerItem13 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -307,7 +305,6 @@ class Ui_Selector(object):
         self.horizontalLayout_17.addWidget(self.FormLabel_4)
         self.FormComboBox_4 = QtWidgets.QComboBox(self.tab_4)
         self.FormComboBox_4.setObjectName("FormComboBox_4")
-        self.FormComboBox_4.addItem("")
         self.FormComboBox_4.addItem("")
         self.FormComboBox_4.addItem("")
         self.FormComboBox_4.addItem("")
@@ -440,7 +437,6 @@ class Ui_Selector(object):
         self.FormComboBox_2.setItemText(0, _translate("Selector", "None"))
         self.FormComboBox_2.setItemText(1, _translate("Selector", "Ellipse"))
         self.FormComboBox_2.setItemText(2, _translate("Selector", "Rectangle"))
-        self.FormComboBox_2.setItemText(3, _translate("Selector", "Triangle"))
         self.HorizontalSizeParameterLabel_2.setText(_translate("Selector", "Horizontal size parameter :"))
         self.HorizontalSizeParameterComboBox_2.setItemText(0, _translate("Selector", "RMS"))
         self.HorizontalSizeParameterComboBox_2.setItemText(1, _translate("Selector", "Spectral flatness"))
@@ -465,7 +461,6 @@ class Ui_Selector(object):
         self.FormComboBox_3.setItemText(0, _translate("Selector", "None"))
         self.FormComboBox_3.setItemText(1, _translate("Selector", "Ellipse"))
         self.FormComboBox_3.setItemText(2, _translate("Selector", "Rectangle"))
-        self.FormComboBox_3.setItemText(3, _translate("Selector", "Triangle"))
         self.HorizontalSizeParameterLabel_3.setText(_translate("Selector", "Horizontal size parameter :"))
         self.HorizontalSizeParameterComboBox_3.setItemText(0, _translate("Selector", "RMS"))
         self.HorizontalSizeParameterComboBox_3.setItemText(1, _translate("Selector", "Spectral flatness"))
@@ -490,7 +485,6 @@ class Ui_Selector(object):
         self.FormComboBox_4.setItemText(0, _translate("Selector", "None"))
         self.FormComboBox_4.setItemText(1, _translate("Selector", "Ellipse"))
         self.FormComboBox_4.setItemText(2, _translate("Selector", "Rectangle"))
-        self.FormComboBox_4.setItemText(3, _translate("Selector", "Triangle"))
         self.HorizontalSizeParameterLabel_4.setText(_translate("Selector", "Horizontal size parameter :"))
         self.HorizontalSizeParameterComboBox_4.setItemText(0, _translate("Selector", "RMS"))
         self.HorizontalSizeParameterComboBox_4.setItemText(1, _translate("Selector", "Spectral flatness"))
