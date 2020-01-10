@@ -44,13 +44,15 @@ class Sound(object):
             if self.rms_frames[0][i] >= 1:
                 self.rms_frames[0][i] = 1
 
-        norm_spectral_centroid = (1 + np.std(self.spectral_centroid_frames[0])) * np.median(self.spectral_centroid_frames[0])
+        norm_spectral_centroid = (1 + np.std(self.spectral_centroid_frames[0])) * \
+                                 np.median(self.spectral_centroid_frames[0])
         for i in range(len(self.spectral_centroid_frames[0])):
             self.spectral_centroid_frames[0][i] /= norm_spectral_centroid
             if self.spectral_centroid_frames[0][i] >= 1:
                 self.spectral_centroid_frames[0][i] = 1
 
-        norm_spectral_flatness = (10 + np.std(self.spectral_flatness_frames[0])) ** 2 * np.median(self.spectral_flatness_frames[0])
+        norm_spectral_flatness = (10 + np.std(self.spectral_flatness_frames[0])) ** 2 * \
+                                 np.median(self.spectral_flatness_frames[0])
         for i in range(len(self.spectral_flatness_frames[0])):
             self.spectral_flatness_frames[0][i] /= norm_spectral_flatness
             if self.spectral_flatness_frames[0][i] >= 1:

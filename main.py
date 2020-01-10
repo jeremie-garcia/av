@@ -1,7 +1,6 @@
-import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
-import pygame
-import view, sound_analyzer  # figures
+from PyQt5 import QtCore, QtWidgets
+import view
+import sound_analyzer  # figures
 import selector
 
 if __name__ == "__main__":
@@ -28,6 +27,6 @@ if __name__ == "__main__":
     win.setWindowTitle("Sound Visualiser")
     win.setCentralWidget(the_view)
     win.addDockWidget(QtCore.Qt.DockWidgetArea(1), selec_dock)
-    win.showMaximized()
+    win.show()  # win.showMaximized()
 
     app.exec_()

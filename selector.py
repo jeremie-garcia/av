@@ -1,7 +1,5 @@
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QWidget, QListView
+from PyQt5.QtWidgets import QWidget
 from selector_ui import Ui_Selector
-
 
 
 class Selector(QWidget):
@@ -19,7 +17,6 @@ class Selector(QWidget):
         self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionnary)
 
         """Window_number"""
-
         self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_window_number)
         self.ui_selector.FormComboBox_3.currentIndexChanged.connect(self.update_window_number)
         self.ui_selector.FormComboBox_4.currentIndexChanged.connect(self.update_window_number)
@@ -56,9 +53,7 @@ class Selector(QWidget):
         self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.update_sound)
         self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.sound_changed)
 
-
     """sound combo box list of sounds"""
-
     # Window 1 updates
     def update_form_window1(self):
         self.zoomview.parameters_window1["form"] = self.ui_selector.FormComboBox_1.currentText()
@@ -76,7 +71,6 @@ class Selector(QWidget):
         self.zoomview.parameters_window1["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_1.currentText()
 
     """Window 2 updates"""
-
     def update_form_window2(self):
         self.zoomview.parameters_window2["form"] = self.ui_selector.FormComboBox_2.currentText()
 
@@ -93,7 +87,6 @@ class Selector(QWidget):
         self.zoomview.parameters_window2["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_2.currentText()
 
     """Window 3 updates"""
-
     def update_form_window3(self):
         self.zoomview.parameters_window3["form"] = self.ui_selector.FormComboBox_3.currentText()
 
@@ -110,7 +103,6 @@ class Selector(QWidget):
         self.zoomview.parameters_window3["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_3.currentText()
 
     """Window 4 updates"""
-
     def update_form_window4(self):
         self.zoomview.parameters_window4["form"] = self.ui_selector.FormComboBox_4.currentText()
 
@@ -132,9 +124,8 @@ class Selector(QWidget):
         self.view.figures_list[2] = self.ui_selector.FormComboBox_3.currentText() != 'None'
         self.view.figures_list[3] = self.ui_selector.FormComboBox_4.currentText() != 'None'
 
-    """sound_update"""
-
     def update_sound(self):
+        """sound_update"""
         self.sound.filename = self.sound.sounds_dictionnary[self.ui_selector.SoundComboBox.currentText()]
 
     def sound_changed(self):
