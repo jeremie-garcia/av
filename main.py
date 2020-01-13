@@ -1,6 +1,7 @@
-from PyQt5 import QtCore, QtWidgets
-import view
-import sound_analyzer  # figures
+import sys
+from PyQt5 import QtCore, QtGui, QtWidgets
+import pygame
+import view, sound_analyzer  # figures
 import selector
 
 if __name__ == "__main__":
@@ -12,6 +13,7 @@ if __name__ == "__main__":
     the_sound = sound_analyzer.Sound()
     the_view = view.View(the_sound)
     the_view.fit_scene_in_view()
+    the_view.setStyleSheet("background-color:lightgray;")
     # the_view.move(10, 10)
 
     # the_sound.change(the_view.chosen_sound)
@@ -27,6 +29,6 @@ if __name__ == "__main__":
     win.setWindowTitle("Sound Visualiser")
     win.setCentralWidget(the_view)
     win.addDockWidget(QtCore.Qt.DockWidgetArea(1), selec_dock)
-    win.show()  # win.showMaximized()
+    win.showMaximized()
 
     app.exec_()

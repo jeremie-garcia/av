@@ -9,12 +9,6 @@ import figures
 import pygame
 
 
-# constants
-WIDTH = 800  # Initial window width (pixels)
-HEIGHT = 450  # Initial window height (pixels)
-ANIMATION_DELAY = 50  # milliseconds
-
-
 class PanZoomView(QtWidgets.QGraphicsView):
     """An interactive view that supports Pan and Zoom functions"""
 
@@ -22,9 +16,6 @@ class PanZoomView(QtWidgets.QGraphicsView):
         super().__init__(scene)
         # enable anti-aliasing
         self.setRenderHint(QtGui.QPainter.Antialiasing)
-        # self.AnchorViewCenter()
-        self.setAlignment(QtCore.Qt.AlignCenter)
-
         # enable drag and drop of the view
         # self.setDragMode(self.ScrollHandDrag)
 
@@ -58,22 +49,20 @@ class View(QtWidgets.QWidget):
         self.isSoundPlayed = False
         self.isSoundChanged = False
 
-        self.figures_list = [True, False, False, False]
+        self.figures_list = [True, True, True, True]
 
         self.zoomview.parameters_window1 = {"form": "Ellipse", "horizPara": "RMS",
-                                            "verticPara": "RMS", "color": "Red", "colorPara": "RMS"}
-        self.zoomview.parameters_window2 = {"form": None, "horizPara": "RMS", "verticPara": "RMS",
-                                            "color": "Red", "colorPara": "RMS"}
-        self.zoomview.parameters_window3 = {"form": None, "horizPara": "RMS", "verticPara": "RMS",
-                                            "color": "Red", "colorPara": "RMS"}
-        self.zoomview.parameters_window4 = {"form": None, "horizPara": "RMS", "verticPara": "RMS",
-                                            "color": "Red", "colorPara": "RMS"}
+                                        "verticPara": "RMS", "color": "Red", "colorPara": "RMS"}
+        self.zoomview.parameters_window2 = {"form": "Ellipse", "horizPara": "Spectral flatness", "verticPara": "Spectral flatness",
+                                        "color": "Blue", "colorPara": "RMS"}
+        self.zoomview.parameters_window3 = {"form": "Ellipse", "horizPara": "Spectral centroid", "verticPara": "Spectral centroid",
+                                        "color": "Green", "colorPara": "RMS"}
+        self.zoomview.parameters_window4 = {"form": "Ellipse", "horizPara": "RMS", "verticPara": "Spectral centroid",
+                                        "color": "Yellow", "colorPara": "RMS"}
 
         self.dict_fig = {'fig1': None, 'fig2': None, 'fig3': None, 'fig4': None}
-        self.dict_parameter_window = {'fig1': self.zoomview.parameters_window1,
-                                      'fig2': self.zoomview.parameters_window2,
-                                      'fig3': self.zoomview.parameters_window3,
-                                      'fig4': self.zoomview.parameters_window4}
+        self.dict_parameter_window = {'fig1': self.zoomview.parameters_window1, 'fig2': self.zoomview.parameters_window2,
+                                 'fig3': self.zoomview.parameters_window3, 'fig4': self.zoomview.parameters_window4}
 
         toolbar = self.create_toolbar()
 
@@ -84,9 +73,9 @@ class View(QtWidgets.QWidget):
         # create and setup the timer
         self.timer = QtCore.QTimer(self)
         # self.timer.timeout.connect(self.advance)
-        # root_layout.
         # show the window
         # self.show()
+        # self.zoomview.setSceneRect(self.zoomview.width() // 2, self.zoomview.height() // 2, self.zoomview.width(), self.zoomview.height())
 
     # connection comboBox chosen Sound
 
@@ -135,32 +124,40 @@ class View(QtWidgets.QWidget):
             else:
                 self.dict_fig['fig{}'.format(index)] = None
 
+        # print(self.dict_fig.values())
+
         nb_figure = sum(self.figures_list)
 
         if nb_figure == 2:
-            self.dict_fig['fig1'].item.setPos(-self.width() // 4, 0)
+            self.dict_fig['fig1'].item.setPos(-self.zoomview.width() // 4, 0)
             for index in range(1, len(self.figures_list)):
                 if self.figures_list[index]:
-                    self.dict_fig['fig{}'.format(index + 1)].item.setPos(self.width() // 4, 0)
+                    self.dict_fig['fig{}'.format(index + 1)].item.setPos(self.zoomview.width() // 4, 0)
 
         elif nb_figure == 3:
-            self.dict_fig['fig1'].item.setPos(-self.width() // 4, -self.height() // 4)
+            self.dict_fig['fig1'].item.setPos(-self.zoomview.width() // 4, -self.zoomview.height() // 4)
             if self.figures_list[1]:
-                self.dict_fig['fig2'].item.setPos(self.width() // 4, -self.height() // 4)
+                self.dict_fig['fig2'].item.setPos(self.zoomview.width() // 4, -self.zoomview.height() // 4)
                 if self.figures_list[2]:
-                    self.dict_fig['fig3'].item.setPos(0, self.height() // 4)
+                    self.dict_fig['fig3'].item.setPos(0, self.zoomview.height() // 4)
                 else:
-                    self.dict_fig['fig4'].item.setPos(0, self.height() // 4)
+                    self.dict_fig['fig4'].item.setPos(0, self.zoomview.height() // 4)
             else:
-                self.dict_fig['fig3'].item.setPos(self.width() // 4, -self.height() // 4)
-                self.dict_fig['fig4'].item.setPos(0, self.height() // 4)
+                self.dict_fig['fig3'].item.setPos(self.zoomview.width() // 4, -self.zoomview.height() // 4)
+                self.dict_fig['fig4'].item.setPos(0, self.zoomview.height() // 4)
 
         elif nb_figure == 4:
-            self.dict_fig['fig1'].item.setPos(-self.width() // 4, -self.height() // 4)
-            self.dict_fig['fig2'].item.setPos(self.width() // 4, -self.height() // 4)
-            self.dict_fig['fig3'].item.setPos(-self.width() // 4, self.height() // 4)
-            self.dict_fig['fig4'].item.setPos(self.width() // 4, self.height() // 4)
+            self.dict_fig['fig1'].item.setPos(-self.zoomview.width() // 4, -self.zoomview.height() // 4)
+            self.dict_fig['fig2'].item.setPos(self.zoomview.width() // 4, -self.zoomview.height() // 4)
+            self.dict_fig['fig3'].item.setPos(-self.zoomview.width() // 4, self.zoomview.height() // 4)
+            self.dict_fig['fig4'].item.setPos(self.zoomview.width() // 4, self.zoomview.height() // 4)
 
+
+
+
+
+
+# {"x": 3*(self.view.width()//4),"y":self.view.height()//2},{"x":self.view.width()//2,"y":self.view.height()//2}
     @QtCore.pyqtSlot()
     def playpause(self):
         """this slot toggles the replay using the timer as model"""
@@ -208,10 +205,9 @@ class View(QtWidgets.QWidget):
                 if figure is not None:
                     figure.update(recorded_values)
 
-            self.zoomview.update()
+            # self.zoomview.update()
 
-            # self.scene.addEllipse(self.view.size().height() // 2, self.view.size().width()//2,
-            #                       10*spectral_centroid, 10*spectral_centroid, qpen, qpaint)
+            # self.scene.addEllipse(self.view.size().height() //2, self.view.size().width()//2,10*spectral_centroid, 10*spectral_centroid, qpen, qpaint)
 
             # print(rms, spectral_flatness, spectral_centroid)
         elif pygame.mixer.music.get_busy() and self.isSoundChanged:
