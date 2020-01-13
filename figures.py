@@ -1,8 +1,9 @@
 """Defines different formes and their characteristics of reprepresented pictures"""
 
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QBrush, QPen, QColor, QLinearGradient
-from PyQt5.QtCore import QRectF
+from PyQt5.QtGui import QPainter, QBrush, QPainterPath, QPen, QColor, QLinearGradient, QRadialGradient
+from PyQt5.QtCore import Qt, QRectF
+import view
 
 
 class Figure(QtWidgets.QGraphicsItem):
@@ -20,6 +21,7 @@ class Figure(QtWidgets.QGraphicsItem):
         self.horizontal_size = None
         self.qrectf = QRectF()
         self.item = None
+
 
     def Item_Init(self):
         if self.parameters["form"] == "Rectangle":
@@ -41,11 +43,21 @@ class Figure(QtWidgets.QGraphicsItem):
 
     def update_gradient(self):
         # sets the starting and the final point of the gradient and its color
-        self.gradient.setStart(0, 0)
-        self.gradient.setFinalStop(self.horizontal_size, self.vertical_size)
-        self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
-        self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
-        self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
+        if self.parameters["form"] == "Rectangle":
+            self.gradient.setStart(0, 0)
+            self.gradient.setFinalStop(self.horizontal_size, self.vertical_size)
+            self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
+            self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
+            self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
+        elif self.parameters["form"] == "Ellipse":
+            #self.gradient = QRadialGradient()
+            #self.gradient.setCenter(self.major_axe//2, self.minor_axe//2)
+            #self.gradient.setRadius(self.major_axe)
+            self.gradient.setStart(0, 0)
+            self.gradient.setFinalStop(self.horizontal_size, self.vertical_size)
+            self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
+            self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
+            self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
         
         # updates brush
         self.brush = QBrush(self.gradient)
@@ -85,41 +97,23 @@ class Figure(QtWidgets.QGraphicsItem):
         self.pen.setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
     def update(self, recorded_frames):
-        nb_figure = sum(self.view.figures_list)
 
-        if nb_figure == 1 or nb_figure == 2:
-            # fix the horizontal value
-            if self.parameters["horizPara"] == "RMS":
-                self.horizontal_size = recorded_frames["rms"] * self.view.width() * 0.80 // nb_figure
-            elif self.parameters["horizPara"] == "Spectral centroid":
-                self.horizontal_size = recorded_frames["spectral_centroid"] * self.view.width() * 0.80 // nb_figure
-            else:
-                self.horizontal_size = recorded_frames["spectral_flatness"] * self.view.width() * 0.80 // nb_figure
+        # fix the horizontal value
+        if self.parameters["horizPara"] == "RMS":
+            self.horizontal_size = recorded_frames["rms"] * self.view.width() * 0.80
+        elif self.parameters["horizPara"] == "Spectral centroid":
+            self.horizontal_size = recorded_frames["spectral_centroid"] * self.view.width() * 0.80
+        else:
+            self.horizontal_size = recorded_frames["spectral_flatness"] * self.view.width() * 0.80
 
-            # fix the vertical value
-            if self.parameters["verticPara"] == "RMS":
-                self.vertical_size = recorded_frames["rms"] * self.view.height() * 0.80
-            elif self.parameters["verticPara"] == "Spectral centroid":
-                self.vertical_size = recorded_frames["spectral_centroid"] * self.view.height() * 0.80
-            else:
-                self.vertical_size = recorded_frames["spectral_flatness"] * self.view.height() * 0.80
-
-        elif nb_figure == 3 or nb_figure == 4:
-            if self.parameters["horizPara"] == "RMS":
-                self.horizontal_size = recorded_frames["rms"] * self.view.width() * 0.80 // 2
-            elif self.parameters["horizPara"] == "Spectral centroid":
-                self.horizontal_size = recorded_frames["spectral_centroid"] * self.view.width() * 0.80 // 2
-            else:
-                self.horizontal_size = recorded_frames["spectral_flatness"] * self.view.width() * 0.80 // 2
-
-            # fix the vertical value
-            if self.parameters["verticPara"] == "RMS":
-                self.vertical_size = recorded_frames["rms"] * self.view.height() * 0.80 // 2
-            elif self.parameters["verticPara"] == "Spectral centroid":
-                self.vertical_size = recorded_frames["spectral_centroid"] * self.view.height() * 0.80 // 2
-            else:
-                self.vertical_size = recorded_frames["spectral_flatness"] * self.view.height() * 0.80 // 2
-
+        # fix the vertical value
+        if self.parameters["verticPara"] == "RMS":
+            self.vertical_size = recorded_frames["rms"] * self.view.height() * 0.80
+        elif self.parameters["verticPara"] == "Spectral centroid":
+            self.vertical_size = recorded_frames["spectral_centroid"] * self.view.height() * 0.80
+        else:
+            self.vertical_size = recorded_frames["spectral_flatness"] * self.view.height() * 0.80
+        
         # updates color and gradient
         self.SetToolsColor(recorded_frames)
         self.update_gradient()
@@ -132,3 +126,4 @@ class Figure(QtWidgets.QGraphicsItem):
         self.item.setPen(self.pen)
 
         self.scene.setSceneRect(self.qrectf)
+

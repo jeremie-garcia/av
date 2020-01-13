@@ -9,10 +9,8 @@ class Sound(object):
                                    'Sound 4': 'sounds/s4.wav', 'Sound 5': 'sounds/s5.wav', 'Sound 6': 'sounds/s6.wav',
                                    'Sound 7': 'sounds/s7.wav', 'Sound 8': 'sounds/s8.wav', 'Sound 9': 'sounds/s9.wav',
                                    'Sound 10': 'sounds/s10.wav', 'Sound 11': 'sounds/s11.wav',
-                                   'La Moulaga': 'sounds/moulaga.wav', 'France Gall': 'sounds/franceGall.wav',
-                                   'Dire Straits': 'sounds/dire_straits.wav', 'Numb': 'sounds/Numb.wav',
-                                   'Djadja': 'sounds/djadja.wav', 'TNT': 'sounds/acdc-tnt.wav',
-                                   'Da Ba Dee': 'sounds/dabadee.wav'}
+                                   'France Gall': 'sounds/s12.wav', 'Djadja': 'sounds/s13.wav',
+                                   'TNT': 'sounds/s14.wav', 'Da Ba Dee': 'sounds/s15.wav'}
         self.rms_frames = None
         self.spectral_centroid_frames = None
         self.spectral_flatness_frames = None
@@ -38,18 +36,21 @@ class Sound(object):
         print("'{}' loaded".format(self.filename))
 
     def normalize(self):
-        norm_rms = max(self.rms_frames[0])
+        norm_rms = (3 + np.std(self.rms_frames[0])) * np.median(self.rms_frames[0])
         for i in range(len(self.rms_frames[0])):
             self.rms_frames[0][i] /= norm_rms
+            if self.rms_frames[0][i] >= 1:
+                self.rms_frames[0][i] = 1
 
-        norm_spectral_centroid = 1.2 * np.median(self.spectral_centroid_frames[0])
+        norm_spectral_centroid = (1 + np.std(self.spectral_centroid_frames[0])) * np.median(self.spectral_centroid_frames[0])
         for i in range(len(self.spectral_centroid_frames[0])):
             self.spectral_centroid_frames[0][i] /= norm_spectral_centroid
             if self.spectral_centroid_frames[0][i] >= 1:
                 self.spectral_centroid_frames[0][i] = 1
 
-        norm_spectral_flatness = (20 + np.std(self.spectral_flatness_frames[0])) * np.median(self.spectral_flatness_frames[0])
+        norm_spectral_flatness = (10 + np.std(self.spectral_flatness_frames[0])) ** 2 * np.median(self.spectral_flatness_frames[0])
         for i in range(len(self.spectral_flatness_frames[0])):
             self.spectral_flatness_frames[0][i] /= norm_spectral_flatness
             if self.spectral_flatness_frames[0][i] >= 1:
                 self.spectral_flatness_frames[0][i] = 1
+
