@@ -1,32 +1,47 @@
+import main, config
+import numpy as np
+
 def Traitement(L,l):
 
-    '''L est la liste contenant pour chaque instant i un dictionnaire( envoyée par Maxence) et l est le dictionnaire de configuration(envoyé par Laurent).
+    '''L est la liste contenant un dictionnaire de valeurs pour chaque instant i (envoyé par Maxence) et l est le dictionnaire de configuration(envoyé par Laurent).
         La fonction crée une liste de dictionnaires qui associent à chaque clé de l (gradation, color) les valeurs correspondantes  pour tous les temps'''
 
-    traducteur = {}
-
-    for cle,valeur in l.assiDict.items(): #optimisable
-        if cle != "errors":
-            traducteur[cle]=valeur
-
-    print(traducteur)
     sortie = []
+    main.debug("L : " + str(L))
+    main.debug("l : " + str(l))
 
-    for i in range(len(L)): #On parcourt L pour s'occuper des dictionnaires un par un
-
-        dico_i = L[i] #Correspond à chaque dictionnaire pour tous les temps i
+    for i in range(len(L['rms'])): #On parcourt L pour s'occuper des dictionnaires un par un
+        main.debug("ma bite : {}".format([L[x][0][0] for x in L.keys()]))
+        dico_i = {x : y for x in L.keys() for y in L[x][0]} #Correspond à chaque dictionnaire pour tous les temps i
+        main.debug("dico_i : "+str(dico_i))
         dico_i_bis = {} # Correpond aux nouveaux dictionnaires ajoutés dans la nouvelle liste sortie
+        modifiedValues = {}
 
+        for cle, valeur in l.assiDict.items():
+            if cle != "errors" and valeur not in config.SOUND_INPUTS:
+                main.debug("should be a formula : {}, {}".format(cle, valeur))
+                modifiedValues[cle] = formulaApplicator(valeur, L)
 
-        for cle1, valeur in dico_i.items():
-            if cle1 in traducteur.keys():
-                cle2 = traducteur[cle1]
-                dico_i_bis[cle2] = valeur
+        for cle, valeur in l.assiDict.items():
+            if cle != "errors":
+                if valeur not in config.SOUND_INPUTS: #si formule -> modifiedValues
+                    dico_i_bis[cle] = modifiedValues[cle][i]
+                else:
+                    dico_i_bis[cle] = dico_i[valeur]
         sortie.append(dico_i_bis)
-
     return(sortie)
 
-if __name__ == "__main__":
-    L=[{"centroide":3 , "rms":7 } , {"centroide":3, "rms":6} ]
-    l={"color": "centroide" , "size":"rms"}
+def formulaApplicator(formula, L):
+    main.debug("We're called to apply {} to {}".format(formula, L))
+    for x in SOUND_INPUTS: #création des variables
+        vars()[x] = np.array(L[x])
+        main.debug(x, vars()[x])
+    exec("a = {}".format(formula), globals(), locals()) #application formule
+    result = locals()['a']
+    return result.tolist()
 
+if __name__ == "__main__":
+    SOUND_INPUTS = ["sp_centroid", "rms"]
+    L={'sp_centroid':[0,0.5,0.8,0.1,0.2,0.3], 'rms':[0.1,0.5,0.2,0.3,0.4,0.6], 'sp_flatness':[0,0.1,0.2,0.1,0.1,0]}
+    l={'errors': [], "rect": "sp_centroid+5", "ellipse":"3*rms"}
+    print(Traitement(L, l))

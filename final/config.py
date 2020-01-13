@@ -96,6 +96,7 @@ def readfile(file):
 
 def save(window, IOConfig):
     conf = winToConf(window, IOConfig)
+    main.debug(conf)
 
     with open(configFileName.format(conf.id), "w") as f:
         f.write(conf.name+"\n")
@@ -105,7 +106,7 @@ def save(window, IOConfig):
             else:
                 f.write("var {} = {}({})\n".format(v, conf.varDict[v][0], conf.varDict[v][1]))
         for a in conf.assiDict:
-            f.write("assign {} to {}\n".format(a, conf.assiDict[a]))
+            f.write("assign {} to {}\n".format(conf.assiDict[a], a))
 
     window.confCombo.setItemText(conf.id, conf.name)
     main.initConf()
@@ -123,7 +124,7 @@ def winToConf(window, IOConfig):
             assignations[line.contents[2].currentText()] = line.contents[1].currentText()
             main.debug("combo")
         else:
-            assignations[line.contents[2].currentText()] = line.contents[1].displayText()
+            assignations[line.contents[1].currentText()] = line.contents[2].displayText()
     for line in IOConfig.varLines: # nom: (type, valeur)
         name = line.contents[0].displayText()
         value = line.contents[2].displayText()

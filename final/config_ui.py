@@ -459,8 +459,8 @@ class Ui_IOConfig(object):
                 self.addAssiLine(IOConfig)
                 line = IOConfig.assiLines[-1]
                 fillCombo(line.contents[1], self.inputs(IOConfig))
-                output = assiDict[assi]
-                input = assi
+                output = assi
+                input = assiDict[assi]
 
                 main.debug(input, output)
                 line.contents[2].setCurrentIndex(line.contents[2].findText(output))
