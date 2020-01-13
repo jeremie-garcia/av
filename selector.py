@@ -16,7 +16,7 @@ class Selector(QWidget):
         self.ui_selector = Ui_Selector()
 
         self.ui_selector.setupUi(self)
-        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionnary)
+        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionary)
 
         """Window_number"""
 
@@ -126,20 +126,16 @@ class Selector(QWidget):
     def update_vertiSizePara_window4(self):
         self.zoomview.parameters_window4["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_4.currentText()
 
-    """window number update"""
-
     def update_window_number(self):
-        if self.ui_selector.FormComboBox_2.currentText() != 'None':
-            self.view.figures_list[1] = True
-        if self.ui_selector.FormComboBox_3.currentText() != 'None':
-            self.view.figures_list[2] = True
-        if self.ui_selector.FormComboBox_4.currentText() != 'None':
-            self.view.figures_list[3] = True
+        """update window number"""
+        self.view.figures_list[1] = self.ui_selector.FormComboBox_2.currentText() != 'None'
+        self.view.figures_list[2] = self.ui_selector.FormComboBox_3.currentText() != 'None'
+        self.view.figures_list[3] = self.ui_selector.FormComboBox_4.currentText() != 'None'
 
     """sound_update"""
 
     def update_sound(self):
-        self.sound.filename = self.sound.sounds_dictionnary[self.ui_selector.SoundComboBox.currentText()]
+        self.sound.filename = self.sound.sounds_dictionary[self.ui_selector.SoundComboBox.currentText()]
 
     def sound_changed(self):
         self.view.isSoundChanged = True

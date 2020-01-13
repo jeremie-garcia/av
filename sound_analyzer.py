@@ -5,7 +5,7 @@ import numpy as np
 class Sound(object):
     def __init__(self):
         self.filename = 'sounds/s1.wav'
-        self.sounds_dictionnary = {'Sound 1': 'sounds/s1.wav', 'Sound 2': 'sounds/s2.wav', 'Sound 3': 'sounds/s3.wav',
+        self.sounds_dictionary = {'Sound 1': 'sounds/s1.wav', 'Sound 2': 'sounds/s2.wav', 'Sound 3': 'sounds/s3.wav',
                                    'Sound 4': 'sounds/s4.wav', 'Sound 5': 'sounds/s5.wav', 'Sound 6': 'sounds/s6.wav',
                                    'Sound 7': 'sounds/s7.wav', 'Sound 8': 'sounds/s8.wav', 'Sound 9': 'sounds/s9.wav',
                                    'Sound 10': 'sounds/s10.wav', 'Sound 11': 'sounds/s11.wav',
@@ -36,21 +36,18 @@ class Sound(object):
         print("'{}' loaded".format(self.filename))
 
     def normalize(self):
-        norm_rms = (3 + np.std(self.rms_frames[0])) * np.median(self.rms_frames[0])
+        norm_rms = max(self.rms_frames[0])
         for i in range(len(self.rms_frames[0])):
             self.rms_frames[0][i] /= norm_rms
-            if self.rms_frames[0][i] >= 1:
-                self.rms_frames[0][i] = 1
 
-        norm_spectral_centroid = (1 + np.std(self.spectral_centroid_frames[0])) * np.median(self.spectral_centroid_frames[0])
+        norm_spectral_centroid = 1.2 * np.median(self.spectral_centroid_frames[0])
         for i in range(len(self.spectral_centroid_frames[0])):
             self.spectral_centroid_frames[0][i] /= norm_spectral_centroid
             if self.spectral_centroid_frames[0][i] >= 1:
                 self.spectral_centroid_frames[0][i] = 1
 
-        norm_spectral_flatness = (10 + np.std(self.spectral_flatness_frames[0])) ** 2 * np.median(self.spectral_flatness_frames[0])
+        norm_spectral_flatness = (20 + np.std(self.spectral_flatness_frames[0])) * np.median(self.spectral_flatness_frames[0])
         for i in range(len(self.spectral_flatness_frames[0])):
             self.spectral_flatness_frames[0][i] /= norm_spectral_flatness
             if self.spectral_flatness_frames[0][i] >= 1:
                 self.spectral_flatness_frames[0][i] = 1
-
