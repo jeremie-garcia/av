@@ -35,19 +35,22 @@ class Sound(object):
                                               n_fft=self.analyse_parameters["features_frame_length"])
         print("'{}' loaded".format(self.filename))
 
-    def normalize(self):
+    def normalize_figures(self):
+
+        def normalize(frames, norm):
+            for i in range(len(frames[0])):
+                frames[0][i] /= norm
+                if frames[0][i] >= 1:
+                    frames[0][i] = 1
+
         norm_rms = max(self.rms_frames[0])
-        for i in range(len(self.rms_frames[0])):
-            self.rms_frames[0][i] /= norm_rms
-
         norm_spectral_centroid = 1.2 * np.median(self.spectral_centroid_frames[0])
-        for i in range(len(self.spectral_centroid_frames[0])):
-            self.spectral_centroid_frames[0][i] /= norm_spectral_centroid
-            if self.spectral_centroid_frames[0][i] >= 1:
-                self.spectral_centroid_frames[0][i] = 1
-
         norm_spectral_flatness = (20 + np.std(self.spectral_flatness_frames[0])) * np.median(self.spectral_flatness_frames[0])
-        for i in range(len(self.spectral_flatness_frames[0])):
-            self.spectral_flatness_frames[0][i] /= norm_spectral_flatness
-            if self.spectral_flatness_frames[0][i] >= 1:
-                self.spectral_flatness_frames[0][i] = 1
+        normalize(self.rms_frames, norm_rms)
+        normalize(self.spectral_flatness_frames, norm_spectral_flatness)
+        normalize(self.spectral_centroid_frames, norm_spectral_centroid)
+
+
+
+
+
