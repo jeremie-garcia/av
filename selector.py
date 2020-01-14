@@ -55,13 +55,12 @@ class Selector(QWidget):
                 else:
                     self.comboBox_list[i][j].addItems(self.view.sound_parameters)
                 self.comboBox_list[i][j].setCurrentText(self.view.figures_parameters[i][j])  # presettings
-
+        self.ui_selector.FormComboBox_1.removeItem(0)
     """setting windows number"""
     def update_figures_status(self):
         """update window number"""
-        self.view.figures_status[1] = self.ui_selector.FormComboBox_2.currentText() != 'None'
-        self.view.figures_status[2] = self.ui_selector.FormComboBox_3.currentText() != 'None'
-        self.view.figures_status[3] = self.ui_selector.FormComboBox_4.currentText() != 'None'
+        for i in range(1, len(self.comboBox_list)):
+            self.view.figures_status[i] = self.comboBox_list[i][0].currentText() != 'None'
 
     def update_figures_parameters(self):
         """update figures parameters when combobox update"""
