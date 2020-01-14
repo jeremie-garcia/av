@@ -14,9 +14,7 @@ if __name__ == "__main__":
     the_view = view.View(the_sound)
     the_view.fit_scene_in_view()
     the_view.setStyleSheet("background-color:lightgray;")
-    # the_view.move(10, 10)
 
-    # the_sound.change(the_view.chosen_sound)
     # create the inspector
     selec = selector.Selector(the_view)
 

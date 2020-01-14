@@ -1,4 +1,4 @@
-"""Defines different formes and their characteristics of reprepresented pictures"""
+"""Module which defines a figure and its characteristics"""
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QBrush, QPen, QColor, QLinearGradient
@@ -6,43 +6,36 @@ from PyQt5.QtCore import QRectF
 
 
 class Figure(QtWidgets.QGraphicsItem):
-    def __init__(self, the_view, window_parameters):
+    def __init__(self, the_view, figure_index, color_dict):
         super().__init__()
-        self.parameters = window_parameters
+
         self.gradient = QLinearGradient()
         self.pen = QPen()
         self.brush = QBrush()
-        self.color = []
+        self.color_dict = color_dict
+        self.color = [0, 0, 0]
+        self.color_basis = [0, 0, 0]
         self.view = the_view
         self.scene = the_view.scene
-
-        self.vertical_size = 100
-        self.horizontal_size = 100
+        self.parameters = self.view.figures_parameters[figure_index]
+        self.size = [0, 0]
         self.qrectf = QRectF()
         self.item = None
 
     def Item_Init(self):
-        if self.parameters["form"] == "Rectangle":
+        if self.parameters[0] == "Rectangle":
             self.item = QtWidgets.QGraphicsRectItem()
-            self.item.setRect(self.qrectf)
-            self.item.setBrush(self.brush)
-            self.item.setPen(self.pen)
-            self.scene.addItem(self.item)
-
-        if self.parameters["form"] == "Ellipse":
-            self.item = QtWidgets.QGraphicsEllipseItem()
-            self.item.setRect(self.qrectf)
-            self.item.setBrush(self.brush)
-            self.item.setPen(self.pen)
-            self.scene.addItem(self.item)
-
         else:
-            print('Forme non définie')
+            self.item = QtWidgets.QGraphicsEllipseItem()
+        self.item.setRect(self.qrectf)
+        self.item.setBrush(self.brush)
+        self.item.setPen(self.pen)
+        self.scene.addItem(self.item)
 
     def update_gradient(self):
         # sets the starting and the final point of the gradient and its color
         self.gradient.setStart(0, 0)
-        self.gradient.setFinalStop(self.horizontal_size, self.vertical_size)
+        self.gradient.setFinalStop(self.size[0], self.size[1])
         self.gradient.setColorAt(0, QColor(self.color[0], self.color[1], self.color[2]))
         self.gradient.setColorAt(0.5, QColor(self.color[0], self.color[1], self.color[2], 150))
         self.gradient.setColorAt(1, QColor(self.color[0], self.color[1], self.color[2]))
@@ -50,82 +43,32 @@ class Figure(QtWidgets.QGraphicsItem):
         # updates brush
         self.brush = QBrush(self.gradient)
 
-    def SetToolsColor(self, recorded_frames):
+    def update_color(self, recorded_values):
         self.pen.setWidth(2)
         # sets color
-        if self.parameters["color"] == "Red":
-            self.color = [255, 0, 0]
-        elif self.parameters["color"] == "Green":
-            self.color = [0, 255, 0]
-        elif self.parameters["color"] == "Blue":
-            self.color = [0, 0, 255]
-        elif self.parameters["color"] == "Yellow":
-            self.color = [255, 255, 0]
-        elif self.parameters["color"] == "Grey":
-            self.color = [255, 255, 255]
-        else:
-            self.color = [255, 0, 255]
+        self.color_basis = self.color_dict[self.parameters[3]][:]
 
         # sets color ratio
-        if self.parameters["colorPara"] == "RMS":
 
-            self.color[0] *= recorded_frames["RMS"]
-            self.color[1] *= recorded_frames["RMS"]
-            self.color[2] *= recorded_frames["RMS"]
-        elif self.parameters["colorPara"] == "Spectral centroid":
-            self.color[0] *= recorded_frames["Spectral centroid"]
-            self.color[1] *= recorded_frames["Spectral centroid"]
-            self.color[2] *= recorded_frames["Spectral centroid"]
-        else:
-            self.color[0] *= recorded_frames["Spectral flatness"]
-            self.color[1] *= recorded_frames["Spectral flatness"]
-            self.color[2] *= recorded_frames["Spectral flatness"]
+        for i in range(len(self.color)):
+            self.color[i] = self.color_basis[i] * recorded_values[self.parameters[4]]
 
         # fix the color of the Tool
         self.pen.setColor(QColor(self.color[0], self.color[1], self.color[2]))
 
-    def update(self, recorded_frames):
-        nb_figure = sum(self.view.figures_list)
-
-        if nb_figure == 1 or nb_figure == 2:
-            # fix the horizontal value
-            if self.parameters["horizPara"] == "RMS":
-                self.horizontal_size = recorded_frames["RMS"] * self.view.width() * 0.80 // nb_figure
-            elif self.parameters["horizPara"] == "Spectral centroid":
-                self.horizontal_size = recorded_frames["Spectral centroid"] * self.view.width() * 0.80 // nb_figure
-            else:
-                self.horizontal_size = recorded_frames["Spectral flatness"] * self.view.width() * 0.80 // nb_figure
-
-            # fix the vertical value
-            if self.parameters["verticPara"] == "RMS":
-                self.vertical_size = recorded_frames["RMS"] * self.view.height() * 0.80
-            elif self.parameters["verticPara"] == "Spectral centroid":
-                self.vertical_size = recorded_frames["Spectral centroid"] * self.view.height() * 0.80
-            else:
-                self.vertical_size = recorded_frames["Spectral flatness"] * self.view.height() * 0.80
-
-        elif nb_figure == 3 or nb_figure == 4:
-            if self.parameters["horizPara"] == "RMS":
-                self.horizontal_size = recorded_frames["RMS"] * self.view.width() * 0.80 // 2
-            elif self.parameters["horizPara"] == "Spectral centroid":
-                self.horizontal_size = recorded_frames["Spectral centroid"] * self.view.width() * 0.80 // 2
-            else:
-                self.horizontal_size = recorded_frames["Spectral flatness"] * self.view.width() * 0.80 // 2
-
-            # fix the vertical value
-            if self.parameters["verticPara"] == "RMS":
-                self.vertical_size = recorded_frames["RMS"] * self.view.height() * 0.80 // 2
-            elif self.parameters["verticPara"] == "Spectral centroid":
-                self.vertical_size = recorded_frames["Spectral centroid"] * self.view.height() * 0.80 // 2
-            else:
-                self.vertical_size = recorded_frames["Spectral flatness"] * self.view.height() * 0.80 // 2
+    def update(self, size_coeff, recorded_values):
 
         # updates color and gradient
-        self.SetToolsColor(recorded_frames)
+        self.update_color(recorded_values)
         self.update_gradient()
 
-        self.qrectf.setHeight(self.vertical_size)
-        self.qrectf.setWidth(self.horizontal_size)
+        # fix the horizontal value with 0.80 arbitrary chosen to provide saturation
+        self.size[0] = size_coeff[0] * recorded_values[self.parameters[1]] * self.view.width() * 0.80
+        # fix the vertical value
+        self.size[1] = size_coeff[1] * recorded_values[self.parameters[2]] * self.view.height() * 0.80
+
+        self.qrectf.setWidth(self.size[0])
+        self.qrectf.setHeight(self.size[1])
 
         self.item.setRect(self.qrectf)
         self.item.setBrush(self.brush)

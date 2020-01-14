@@ -1,8 +1,5 @@
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QWidget, QListView
+from PyQt5.QtWidgets import QWidget
 from selector_ui import Ui_Selector
-
-
 
 class Selector(QWidget):
     """ Widget displaying selection parameters"""
@@ -14,129 +11,75 @@ class Selector(QWidget):
         self.view = the_view
         self.sound = the_view.sound
         self.ui_selector = Ui_Selector()
-
         self.ui_selector.setupUi(self)
-        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionary)
+        self.comboBox_list = [[self.ui_selector.FormComboBox_1, self.ui_selector.HorizontalSizeParameterComboBox_1,
+                               self.ui_selector.VerticalSizeParameterComboBox_1, self.ui_selector.ColorComboBox_1,
+                               self.ui_selector.ColorParameterComboBox_1],
+                              [self.ui_selector.FormComboBox_2, self.ui_selector.HorizontalSizeParameterComboBox_2,
+                               self.ui_selector.VerticalSizeParameterComboBox_2, self.ui_selector.ColorComboBox_2,
+                               self.ui_selector.ColorParameterComboBox_2],
+                              [self.ui_selector.FormComboBox_3, self.ui_selector.HorizontalSizeParameterComboBox_3,
+                               self.ui_selector.VerticalSizeParameterComboBox_3, self.ui_selector.ColorComboBox_3,
+                               self.ui_selector.ColorParameterComboBox_3],
+                              [self.ui_selector.FormComboBox_4, self.ui_selector.HorizontalSizeParameterComboBox_4,
+                               self.ui_selector.VerticalSizeParameterComboBox_4, self.ui_selector.ColorComboBox_4,
+                               self.ui_selector.ColorParameterComboBox_4]]
+        self.set_comboBoxes()
+        #creation of an empty list of functions
+        #self.functions_code = []
+        #self.update_functions()
+        """figures status update"""
+        for i in range(1, len(self.comboBox_list)):
+            self.comboBox_list[i][0].currentIndexChanged.connect(self.update_figures_status)
 
-        """Window_number"""
+        """ComboBox Connection for Updates of Figures Parameters """
+        for i in range(len(self.comboBox_list)):
+            for j in range(len(self.comboBox_list[0])):
+                self.comboBox_list[i][j].currentIndexChanged.connect(self.update_figures_parameters)
+                # instead of the previous line
+                # self.comboBox_list[i][j].currentIndexChanged.connect(lambda n: eval(self.functions_code[i][j]))
 
-        self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_window_number)
-        self.ui_selector.FormComboBox_3.currentIndexChanged.connect(self.update_window_number)
-        self.ui_selector.FormComboBox_4.currentIndexChanged.connect(self.update_window_number)
-
-        """Window 1 connection ComboBox to Parameters"""
-        self.ui_selector.FormComboBox_1.currentIndexChanged.connect(self.update_form_window1)
-        self.ui_selector.ColorComboBox_1.currentIndexChanged.connect(self.update_color_window1)
-        self.ui_selector.ColorParameterComboBox_1.currentIndexChanged.connect(self.update_colorPara_window1)
-        self.ui_selector.HorizontalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_horizSizePara_window1)
-        self.ui_selector.VerticalSizeParameterComboBox_1.currentIndexChanged.connect(self.update_vertiSizePara_window1)
-
-        """Window 2 connection ComboBox to Parameters"""
-        self.ui_selector.FormComboBox_2.currentIndexChanged.connect(self.update_form_window2)
-        self.ui_selector.ColorComboBox_2.currentIndexChanged.connect(self.update_color_window2)
-        self.ui_selector.ColorParameterComboBox_2.currentIndexChanged.connect(self.update_colorPara_window2)
-        self.ui_selector.HorizontalSizeParameterComboBox_2.currentIndexChanged.connect(self.update_horizSizePara_window2)
-        self.ui_selector.VerticalSizeParameterComboBox_2.currentIndexChanged.connect(self.update_vertiSizePara_window2)
-
-        """Window 3 connection ComboBox to Parameters"""
-        self.ui_selector.FormComboBox_3.currentIndexChanged.connect(self.update_form_window3)
-        self.ui_selector.ColorComboBox_3.currentIndexChanged.connect(self.update_color_window3)
-        self.ui_selector.ColorParameterComboBox_3.currentIndexChanged.connect(self.update_colorPara_window3)
-        self.ui_selector.HorizontalSizeParameterComboBox_3.currentIndexChanged.connect(self.update_horizSizePara_window3)
-        self.ui_selector.VerticalSizeParameterComboBox_3.currentIndexChanged.connect(self.update_vertiSizePara_window3)
-
-        """Window 4 connection ComboBox to Parameters"""
-        self.ui_selector.FormComboBox_4.currentIndexChanged.connect(self.update_form_window4)
-        self.ui_selector.ColorComboBox_4.currentIndexChanged.connect(self.update_color_window4)
-        self.ui_selector.ColorParameterComboBox_4.currentIndexChanged.connect(self.update_colorPara_window4)
-        self.ui_selector.HorizontalSizeParameterComboBox_4.currentIndexChanged.connect(self.update_horizSizePara_window4)
-        self.ui_selector.VerticalSizeParameterComboBox_4.currentIndexChanged.connect(self.update_vertiSizePara_window4)
-
-        """sound connection"""
+        """Sound ComboBox Connection"""
         self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.update_sound)
         self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.sound_changed)
 
+    def set_comboBoxes(self):
+        """remplissage comboBoxes"""
+        self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionary)
+        for i in range(len(self.comboBox_list)):
+            for j in range(len(self.comboBox_list[0])):
+                if j == 0:
+                    self.comboBox_list[i][j].addItems(self.view.forms)
+                elif j == 3:
+                    self.comboBox_list[i][j].addItems(self.view.color_dict)
+                else:
+                    self.comboBox_list[i][j].addItems(self.view.sound_parameters)
+                self.comboBox_list[i][j].setCurrentText(self.view.figures_parameters[i][j])  # presettings
 
-    """sound combo box list of sounds"""
-
-    # Window 1 updates
-    def update_form_window1(self):
-        self.zoomview.parameters_window1["form"] = self.ui_selector.FormComboBox_1.currentText()
-
-    def update_color_window1(self):
-        self.zoomview.parameters_window1["color"] = self.ui_selector.ColorComboBox_1.currentText()
-
-    def update_colorPara_window1(self):
-        self.zoomview.parameters_window1["colorPara"] = self.ui_selector.ColorParameterComboBox_1.currentText()
-
-    def update_horizSizePara_window1(self):
-        self.zoomview.parameters_window1["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_1.currentText()
-
-    def update_vertiSizePara_window1(self):
-        self.zoomview.parameters_window1["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_1.currentText()
-
-    """Window 2 updates"""
-
-    def update_form_window2(self):
-        self.zoomview.parameters_window2["form"] = self.ui_selector.FormComboBox_2.currentText()
-
-    def update_color_window2(self):
-        self.zoomview.parameters_window2["color"] = self.ui_selector.ColorComboBox_2.currentText()
-
-    def update_colorPara_window2(self):
-        self.zoomview.parameters_window2["colorPara"] = self.ui_selector.ColorParameterComboBox_2.currentText()
-
-    def update_horizSizePara_window2(self):
-        self.zoomview.parameters_window2["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_2.currentText()
-
-    def update_vertiSizePara_window2(self):
-        self.zoomview.parameters_window2["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_2.currentText()
-
-    """Window 3 updates"""
-
-    def update_form_window3(self):
-        self.zoomview.parameters_window3["form"] = self.ui_selector.FormComboBox_3.currentText()
-
-    def update_color_window3(self):
-        self.zoomview.parameters_window3["color"] = self.ui_selector.ColorComboBox_3.currentText()
-
-    def update_colorPara_window3(self):
-        self.zoomview.parameters_window3["colorPara"] = self.ui_selector.ColorParameterComboBox_3.currentText()
-
-    def update_horizSizePara_window3(self):
-        self.zoomview.parameters_window3["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_3.currentText()
-
-    def update_vertiSizePara_window3(self):
-        self.zoomview.parameters_window3["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_3.currentText()
-
-    """Window 4 updates"""
-
-    def update_form_window4(self):
-        self.zoomview.parameters_window4["form"] = self.ui_selector.FormComboBox_4.currentText()
-
-    def update_color_window4(self):
-        self.zoomview.parameters_window4["color"] = self.ui_selector.ColorComboBox_4.currentText()
-
-    def update_colorPara_window4(self):
-        self.zoomview.parameters_window4["colorPara"] = self.ui_selector.ColorParameterComboBox_4.currentText()
-
-    def update_horizSizePara_window4(self):
-        self.zoomview.parameters_window4["horizPara"] = self.ui_selector.HorizontalSizeParameterComboBox_4.currentText()
-
-    def update_vertiSizePara_window4(self):
-        self.zoomview.parameters_window4["verticPara"] = self.ui_selector.VerticalSizeParameterComboBox_4.currentText()
-
-    def update_window_number(self):
+    """setting windows number"""
+    def update_figures_status(self):
         """update window number"""
-        self.view.figures_list[1] = self.ui_selector.FormComboBox_2.currentText() != 'None'
-        self.view.figures_list[2] = self.ui_selector.FormComboBox_3.currentText() != 'None'
-        self.view.figures_list[3] = self.ui_selector.FormComboBox_4.currentText() != 'None'
+        self.view.figures_status[1] = self.ui_selector.FormComboBox_2.currentText() != 'None'
+        self.view.figures_status[2] = self.ui_selector.FormComboBox_3.currentText() != 'None'
+        self.view.figures_status[3] = self.ui_selector.FormComboBox_4.currentText() != 'None'
+
+    def update_figures_parameters(self):
+        """update figures parameters when combobox update"""
+        for i in range(len(self.comboBox_list)):
+            for j in range(len(self.comboBox_list[0])):
+                self.view.figures_parameters[i][j] = self.comboBox_list[i][j].currentText()
 
     """sound_update"""
-
     def update_sound(self):
         self.sound.filename = self.sound.sounds_dictionary[self.ui_selector.SoundComboBox.currentText()]
 
     def sound_changed(self):
         self.view.isSoundChanged = True
         self.view.isSoundPlayed = False
+
+    # creation de la list de functions
+    # def update_functions(self):
+    #     for i in range(len(self.comboBox_list)):
+    #         self.functions_code.append([])
+    #         for j in range(len(self.comboBox_list[0])):
+    #              self.functions_code[i].append(f"self.view.figures_parameters[{i}][{j}] = self.comboBox_list[{i}][{j}].currentText()")
