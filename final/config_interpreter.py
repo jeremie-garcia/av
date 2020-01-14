@@ -11,9 +11,7 @@ def Traitement(L,l):
     main.debug("l : " + str(l))
 
     for i in range(len(L['rms'])): #On parcourt L pour s'occuper des dictionnaires un par un
-        main.debug("ma bite : {}".format([L[x][0][0] for x in L.keys()]))
-        dico_i = {x : y for x in L.keys() for y in L[x][0]} #Correspond à chaque dictionnaire pour tous les temps i
-        main.debug("dico_i : "+str(dico_i))
+        dico_i = {x:L[x][i] for x in L.keys()} #Correspond à chaque dictionnaire pour tous les temps i
         dico_i_bis = {} # Correpond aux nouveaux dictionnaires ajoutés dans la nouvelle liste sortie
         modifiedValues = {}
 
@@ -33,7 +31,7 @@ def Traitement(L,l):
 
 def formulaApplicator(formula, L):
     main.debug("We're called to apply {} to {}".format(formula, L))
-    for x in SOUND_INPUTS: #création des variables
+    for x in config.SOUND_INPUTS: #création des variables
         vars()[x] = np.array(L[x])
         main.debug(x, vars()[x])
     exec("a = {}".format(formula), globals(), locals()) #application formule

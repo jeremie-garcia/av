@@ -5,7 +5,7 @@ import pygame
 import librosa
 import main_ui, config_interpreter, config, config_ui, FonctionAnalyse
 
-DEBUG = True
+DEBUG = False
 SYNCHRO = 0
 SCALE = 300
 WIDTH_SCALE = int(SCALE/4)
@@ -76,7 +76,7 @@ def loadSound(ui, file, conf):
             {'rms': _rms, 'sp_centroid': _spectral, 'sp_flatness': _flat, 'zero': _zero, 'chroma': _chroma})
 
     movements = {'rms':rms_frames_N, 'sp_centroid':spectral_centroid_frames_N, 'sp_flatness': spectral_flatness_frames_N,\
-                 'zero': zero_crossing_rate_frames_N, 'chroma': chroma_stft_frames_N} #pour formules
+                 'zero_crossing': zero_crossing_rate_frames_N, 'chroma': chroma_stft_frames_N} #pour formules
     movements = config_interpreter.Traitement(movements, conf)
     debug(movements)
 

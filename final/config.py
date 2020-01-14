@@ -124,7 +124,7 @@ def winToConf(window, IOConfig):
             assignations[line.contents[2].currentText()] = line.contents[1].currentText()
             main.debug("combo")
         else:
-            assignations[line.contents[1].currentText()] = line.contents[2].displayText()
+            assignations[line.contents[2].currentText()] = line.contents[1].displayText()
     for line in IOConfig.varLines: # nom: (type, valeur)
         name = line.contents[0].displayText()
         value = line.contents[2].displayText()
