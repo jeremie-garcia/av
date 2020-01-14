@@ -1,8 +1,8 @@
 """Module which defines a figure and its characteristics"""
 
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QBrush, QPen, QColor, QLinearGradient
-from PyQt5.QtCore import QRectF
+from PyQt5.QtGui import QBrush, QPen, QColor, QLinearGradient, QPolygonF
+from PyQt5.QtCore import QRectF, QPointF
 
 
 class Figure(QtWidgets.QGraphicsItem):
@@ -25,9 +25,17 @@ class Figure(QtWidgets.QGraphicsItem):
     def Item_Init(self):
         if self.parameters[0] == "Rectangle":
             self.item = QtWidgets.QGraphicsRectItem()
+            self.item.setRect(self.qrectf)
+        elif self.parameters[0] == "Triangle":
+            polygon = QPolygonF()
+            polygon.append(QPointF(self.size[0] // 2, 0))
+            polygon.append(QPointF(self.size[0], self.size[1]))
+            polygon.append(QPointF(0, self.size[1]))
+            self.item = QtWidgets.QGraphicsPolygonItem(polygon)
         else:
             self.item = QtWidgets.QGraphicsEllipseItem()
-        self.item.setRect(self.qrectf)
+            self.item.setRect(self.qrectf)
+
         self.item.setBrush(self.brush)
         self.item.setPen(self.pen)
         self.scene.addItem(self.item)
@@ -70,7 +78,15 @@ class Figure(QtWidgets.QGraphicsItem):
         self.qrectf.setWidth(self.size[0])
         self.qrectf.setHeight(self.size[1])
 
-        self.item.setRect(self.qrectf)
+        if self.parameters[0] == "Triangle":
+            polygon = QPolygonF()
+            polygon.append(QPointF(self.size[0] // 2, 0))
+            polygon.append(QPointF(self.size[0], self.size[1]))
+            polygon.append(QPointF(0, self.size[1]))
+            self.item.setPolygon(polygon)
+        else:
+            self.item.setRect(self.qrectf)
+
         self.item.setBrush(self.brush)
         self.item.setPen(self.pen)
 
