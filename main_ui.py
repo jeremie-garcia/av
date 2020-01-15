@@ -233,7 +233,7 @@ class Ui_mainWindow(object):
         if index != -1 and self.configs:
             self.currentConf = self.configs[index]
 
-            if self.currentSound:
+            if type(self.currentSound).__name__ == "analyzedSound":
                 self.movements = config_interpreter.Traitement(self.currentSound.donnee_brute, self.currentConf)
                 self.resetScene()
 
