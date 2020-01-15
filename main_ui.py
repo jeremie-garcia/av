@@ -1,15 +1,20 @@
-import sys, config_ui
+import sys, config_ui, main, config, config_interpreter
 from PyQt5 import QtCore, QtGui, QtWidgets
+import pygame
 
 """
 TODO :
 
-- remplissage liste sons
-- liste configurations
-- remplacer numéros confs par combo box avec nom
+- ajouter curseur échelle
 """
 
 class Ui_mainWindow(object):
+    def __init__(self):
+        self.currentConf = None
+        self.currentSound = None
+        self.sounds = None
+        self.configs = None
+
     def setupUi(self, mainWindow):
         mainWindow.setObjectName("mainWindow")
         mainWindow.resize(1018, 529)
@@ -64,8 +69,8 @@ class Ui_mainWindow(object):
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_5.addWidget(self.label_3)
         self.horizontalSlider = QtWidgets.QSlider(mainWindow)
-        self.horizontalSlider.setMinimum(-50)
-        self.horizontalSlider.setMaximum(50)
+        self.horizontalSlider.setMinimum(-200)
+        self.horizontalSlider.setMaximum(200)
         self.horizontalSlider.setTracking(True)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setInvertedAppearance(False)
@@ -88,15 +93,15 @@ class Ui_mainWindow(object):
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setObjectName("verticalLayout")
 
-        self.frame = QtWidgets.QFrame(mainWindow)
-        self.frame.setGeometry(QtCore.QRect(160, 110, 400, 400))
-        self.frame.setFrameShape(QtWidgets.QFrame.Box)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setLineWidth(13)
-        self.frame.setMidLineWidth(0)
+        self.frame = QtWidgets.QGraphicsView()
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
         self.frame.setObjectName("frame")
-
         self.verticalLayout.addWidget(self.frame)
+
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.pushButton_2 = QtWidgets.QPushButton(mainWindow)
@@ -132,6 +137,81 @@ class Ui_mainWindow(object):
         self.retranslateUi(mainWindow)
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
+        self.pushButton_3.clicked.connect(lambda: config_ui.openWindow(self))
+        self.pushButton.clicked.connect(lambda: self.soundLoadPlay())
+        self.comboBox.currentIndexChanged.connect(self.updateSoundFile)
+        self.comboBox_2.currentIndexChanged.connect(self.changeConfigFile)
+        self.pushButton_2.clicked.connect(lambda: self.soundRewind())
+
+        self.scene = QtWidgets.QGraphicsScene()
+        self.frame.setScene(self.scene)
+
+        self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.rectangle = self.scene.addRect(0,0,0,0, self.rectangle_pen)
+        self.ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.ellipse = self.scene.addEllipse(0,0,0,0, self.ellipse_pen)
+
+        self.OBJECTS = {"ellipse": self.ellipse, "rect": self.rectangle}
+
+    """def soundTimeCoggntrol(self, type):
+        main.initConf()
+        main.showConfig(self)
+        if type == 0: #resume song
+
+        elif type == 1: #pause song
+
+        elif type == 2: #first load & play"""
+
+    def resetScene(self):
+        self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.rectangle = self.scene.addRect(0, 0, 0, 0, self.rectangle_pen)
+        self.ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.ellipse = self.scene.addEllipse(0, 0, 0, 0, self.ellipse_pen)
+
+    def soundLoadPlay(self, beggining = True):
+        main.debug(1,"load & play")
+        self.resetScene()
+        sound = main.loadSound(self, self.currentSound, self.currentConf)
+        self.soundPlay(sound, beggining)
+
+    def soundPlay(self, sound, beggining = True):
+        main.debug(1, "play")
+        self.pushButton.clicked.disconnect()
+        self.pushButton.clicked.connect(lambda: self.soundPause())
+        if not beggining:
+            time = pygame.mixer.music.get_pos()
+        else:
+            time = 0
+        pygame.mixer.music.play(0, time)
+        self.timer.start(self.frame_duration_ms)
+        self.pushButton.setText("||")
+
+    def soundPause(self):
+        main.debug(1,"pause")
+        self.pushButton.setText("|>")
+        self.pushButton.clicked.disconnect()
+        self.pushButton.clicked.connect(lambda: self.soundResume())
+        pygame.mixer.music.pause()
+
+    def soundResume(self):
+        main.debug(1,"resume")
+        #self.configUpdater()
+        self.pushButton.setText("||")
+        self.pushButton.clicked.disconnect()
+        self.pushButton.clicked.connect(lambda: self.soundPause())
+        pygame.mixer.music.unpause()
+
+    def soundRewind(self):
+        main.debug(1,"rewind")
+        #self.configUpdater()
+        self.pushButton.clicked.disconnect()
+        self.pushButton.clicked.connect(lambda: self.soundPause())
+        pygame.mixer.music.stop()
+        pygame.mixer.music.play()
+        self.timer.start(self.frame_duration_ms)
+        self.pushButton.setText("||")
+
+
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
@@ -143,14 +223,29 @@ class Ui_mainWindow(object):
         self.pushButton.setText(_translate("mainWindow", "|>"))
         self.checkBox.setText(_translate("mainWindow", "Boucle"))
 
+    def updateSoundFile(self, *args):
+        if self.sounds:
+            self.currentSound = self.sounds[self.comboBox.currentText()]
+            self.pushButton.clicked.disconnect()
+            self.pushButton.clicked.connect(lambda:self.soundLoadPlay())
+
+    def changeConfigFile(self, index):
+        if index != -1 and self.configs:
+            self.currentConf = self.configs[index]
+
+            if self.currentSound:
+                self.movements = config_interpreter.Traitement(self.currentSound.donnee_brute, self.currentConf)
+                self.resetScene()
+
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)
     mainWindow = QtWidgets.QWidget()
     ui = Ui_mainWindow()
     ui.setupUi(mainWindow)
     mainWindow.show()
-    sys.exit(app.exec_())
-
+    ui.updateConfigs.connect(ui.draw())
+    #sys.exit(app.exec_())
+    return app
 
 if __name__ == "__main__":
     openWindow()

@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 VAROFFSET = 1
 ASSIOFFSET = 1
 
-OUTPUTS = ["size", "border_width", "color", "px", "py"]
+OUTPUTS = ["ellipse", "rect", "ellipse_border", "rectangle_border"]
 VARTYPES = ["value", "color", "grad"]
 
 class Line():
@@ -14,10 +14,10 @@ class Line():
         self.gridRow = gridRow
         self.contents = contents
 
-
 class Ui_IOConfig(object):
-    def setupUi(self, IOConfig):
+    def setupUi(self, IOConfig, ui):
         IOConfig.assiLines, IOConfig.varLines = [], []
+        IOConfig.mainWindow = ui
 
         IOConfig.setObjectName("IOConfig")
         IOConfig.resize(503, 305)
@@ -235,13 +235,11 @@ class Ui_IOConfig(object):
         self.addAssiButton.clicked.connect(lambda: self.addAssiLine(IOConfig))
         self.addVarButton.clicked.connect(lambda: self.addVarLine(IOConfig))
         self.enregistrerButton.clicked.connect(lambda: config.save(self, IOConfig))
-        self.validerButton.clicked.connect(lambda: config.valider(IOConfig))
+        self.validerButton.clicked.connect(lambda: config.valider(self, IOConfig))
         self.resetButton.clicked.connect(lambda: self.reset(IOConfig))
-        #self.nomConfLine.textChanged.connect(self.updateConfig)
 
-        IOConfig.configs = self.updateConfig()
+        IOConfig.configs = self.updateConfig(ui)
         self.confCombo.currentIndexChanged.connect(lambda x: self.showConfig(IOConfig, x))
-        #self.showConfig(IOConfig, 0)
 
     def retranslateUi(self, IOConfig):
         _translate = QtCore.QCoreApplication.translate
@@ -274,7 +272,7 @@ class Ui_IOConfig(object):
         try: gridRow = IOConfig.assiLines[-1].gridRow + 1
         except: gridRow = 1
 
-        main.debug("creates assi line index {}, row {}".format(currentRow, gridRow))
+        main.debug(1,"creates assi line index {}, row {}".format(currentRow, gridRow))
 
         IOConfig.assiLines.append(Line("ASSI", currentRow, gridRow, []))
         contents = IOConfig.assiLines[-1].contents
@@ -323,7 +321,7 @@ class Ui_IOConfig(object):
         except:
             gridRow = 1
 
-        main.debug("creates var line index {}, row {}".format(currentRow, gridRow))
+        main.debug(1,"creates var line index {}, row {}".format(currentRow, gridRow))
 
         IOConfig.varLines.append(Line("VAR", currentRow, gridRow, []))
         contents = IOConfig.varLines[-1].contents
@@ -358,7 +356,7 @@ class Ui_IOConfig(object):
         :param IOConfig: fenêtre
         :param line: ligne à supprimer
         """
-        main.debug("destroying {} line #{}".format(line.type, line.tableRow))
+        main.debug(1,"destroying {} line #{}".format(line.type, line.tableRow))
 
         if line.type == "ASSI":
             lines = IOConfig.assiLines
@@ -367,7 +365,7 @@ class Ui_IOConfig(object):
             lines = IOConfig.varLines
             layout = self.varGridLay
 
-        main.debug("index {} in {}".format(line.tableRow, lines))
+        main.debug(2,"index {} in {}".format(line.tableRow, lines))
         for x in lines[line.tableRow].contents:
             layout.removeWidget(x)
             x.deleteLater()
@@ -375,20 +373,20 @@ class Ui_IOConfig(object):
         tableRow = line.tableRow
         gridRow = line.gridRow
 
-        main.debug("destroyed line t {}, g {}".format(tableRow, gridRow))
+        main.debug(1,"destroyed line t {}, g {}".format(tableRow, gridRow))
 
         for x in lines[tableRow + 1:]:
             x.tableRow -= 1
-            main.debug("reco {} {}".format(x.tableRow, x.gridRow))
+            main.debug(2,"reco {} {}".format(x.tableRow, x.gridRow))
 
         del lines[tableRow]
         self.update_inputs(IOConfig)
 
     def lineFormula(self, IOConfig, line, state):
-        main.debug("line t {}, g {}".format(line.tableRow, line.gridRow))
+        main.debug(2,"line t {}, g {}".format(line.tableRow, line.gridRow))
 
         if state == 2:  # si a été cochée
-            main.debug("ligne t{} : to formule".format(line.tableRow))
+            main.debug(2,"ligne t{} : to formule".format(line.tableRow))
             self.assiGridLay.removeWidget(line.contents[1])
             line.contents[1].deleteLater()
             line.contents[1] = QtWidgets.QLineEdit(IOConfig)
@@ -396,7 +394,7 @@ class Ui_IOConfig(object):
             self.assiGridLay.addWidget(line.contents[1], line.gridRow, 1)
 
         else:  # si a été décochée
-            main.debug("ligne {} : fin formule".format(line.tableRow))
+            main.debug(2,"ligne {} : fin formule".format(line.tableRow))
             if line.contents[1].__class__.__name__ == "QLineEdit":
                 self.assiGridLay.removeWidget(line.contents[1])
                 line.contents[1].deleteLater()
@@ -418,13 +416,13 @@ class Ui_IOConfig(object):
                 fillCombo(assiLine.contents[1], INPUTS)
                 assiLine.contents[1].setCurrentIndex(pos)
 
-    def updateConfig(self):
+    def updateConfig(self, ui):
         """
         Màj configs combobox
         :return: liste configs fichiers
         """
         configs = main.initConf()
-        fillCombo(self.confCombo, [c.name for c in list(configs.values())[::-1]])
+        fillCombo(self.confCombo, [configs[i].name for i in range(len(configs.keys()))])
         return configs
 
     def addConfig(self, IOConfig, name):
@@ -432,24 +430,24 @@ class Ui_IOConfig(object):
         IOConfig.append(config.Configuration(id, name))
 
     def showConfig(self, IOConfig, id):
-        main.debug("Loading config {} in {}".format(id, IOConfig.configs))
+        main.debug(1,"Loading config {} in {}".format(id, IOConfig.configs))
         toShow = IOConfig.configs[id]
         IOConfig.currentConf = id
 
         assiDict = toShow.assiDict
         varDict = toShow.varDict
-        main.debug(assiDict, varDict)
+        main.debug(2,assiDict, varDict)
 
         self.reset(IOConfig)
 
         for var in varDict:
             self.addVarLine(IOConfig)
             line = IOConfig.varLines[-1]
-            main.debug(varDict[var])
+            main.debug(2,varDict[var])
             value = varDict[var].getValue()
             typeIndex = 2 if varDict[var].__class__.__name__ == "Gradation" \
                         else 1 if varDict[var].__class__.__name__ == "Color" else 0
-            main.debug("{}: {}".format(var, value))
+            main.debug(2,"{}: {}".format(var, value))
             line.contents[0].setText(var)
             line.contents[1].setCurrentIndex(typeIndex)
             line.contents[2].setText(value)
@@ -461,13 +459,13 @@ class Ui_IOConfig(object):
                 self.addAssiLine(IOConfig)
                 line = IOConfig.assiLines[-1]
                 fillCombo(line.contents[1], self.inputs(IOConfig))
-                output = assiDict[assi]
-                input = assi
+                output = assi
+                input = assiDict[assi]
 
-                main.debug(input, output)
+                main.debug(2,input, output)
                 line.contents[2].setCurrentIndex(line.contents[2].findText(output))
 
-                main.debug("contents : {}, searching {} => {}".format(line.contents[1].count(), input, line.contents[1].findText(input)))
+                main.debug(2,"contents : {}, searching {} => {}".format(line.contents[1].count(), input, line.contents[1].findText(input)))
                 if line.contents[1].findText(input) == -1: # si formule
                     line.contents[0].toggle()
                     line.contents[1].setText(input)
@@ -485,15 +483,6 @@ class Ui_IOConfig(object):
         if len(IOConfig.assiLines) != 0 or len(IOConfig.varLines) != 0:
             self.reset(IOConfig)
 
-    def resete(self,IOConfig):
-        main.debug("assiLines : {} \nvarLines : {}".format(IOConfig.assiLines, IOConfig.varLines))
-        for a in IOConfig.assiLines:
-            main.debug(IOConfig.assiLines.index(a))
-            self.delLine(IOConfig, a)
-
-        for v in IOConfig.varLines:
-            self.delLine(IOConfig, v)
-
 def fillCombo(combo, list):
     """
     Remplit combo avec les valeurs de list
@@ -503,13 +492,15 @@ def fillCombo(combo, list):
     combo.clear()
     for x in list: combo.addItem(x)
 
-def openWindow():
-    app = QtWidgets.QApplication(sys.argv)
+def openWindow(ui):
     IOConfig = QtWidgets.QWidget()
-    ui = Ui_IOConfig()
-    ui.setupUi(IOConfig)
+    uiIO = Ui_IOConfig()
+    uiIO.setupUi(IOConfig, ui)
     IOConfig.show()
-    sys.exit(app.exec_())
+    uiIO.showConfig(IOConfig, 0)
+    return uiIO
 
 if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
     openWindow()
+    sys.exit(app.exec_())
