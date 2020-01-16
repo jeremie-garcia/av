@@ -110,7 +110,7 @@ class View(QtWidgets.QWidget):
                 self.figures[index] = None
 
     def update_figures_in_view(self, recorded_values):
-        """update center and size"""
+        """updates center and size"""
         nb_figures = sum(self.figures_status)
         compteur = 0
         for index in range(len(self.figures_status)):
