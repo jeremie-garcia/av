@@ -101,6 +101,7 @@ class View(QtWidgets.QWidget):
         self.zoomview.fitInView(self.zoomview.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
     def figures_constructor(self):
+        self.scene.clear()
         for index in range(len(self.figures_status)):
             if self.figures_status[index]:
                 self.figures[index] = figures.Figure(self, index, self.color_dict)
@@ -111,18 +112,18 @@ class View(QtWidgets.QWidget):
     def update_figures_in_view(self, recorded_values):
         """update center and size"""
         nb_figures = sum(self.figures_status)
+        compteur = 0
         for index in range(len(self.figures_status)):
             if self.figures_status[index]:
                 # color, size update
-                coeff_size = self.size_presetting[nb_figures-1][index]
+                coeff_size = self.size_presetting[nb_figures-1][compteur]
                 self.figures[index].update(coeff_size, recorded_values)
                 # center update
-                coeff_center = self.center_presetting[nb_figures-1][index]
+                coeff_center = self.center_presetting[nb_figures-1][compteur]
                 x_center = coeff_center[0] * self.zoomview.width() - self.figures[index].size[0]//2
                 y_center = coeff_center[1] * self.zoomview.height() - self.figures[index].size[1]//2
                 self.figures[index].item.setPos(x_center, y_center)
-
-
+                compteur += 1
 
     @QtCore.pyqtSlot()
     def playpause(self):

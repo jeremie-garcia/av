@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget
 from selector_ui import Ui_Selector
 
+
 class Selector(QWidget):
     """ Widget displaying selection parameters"""
 
@@ -25,9 +26,9 @@ class Selector(QWidget):
                                self.ui_selector.VerticalSizeParameterComboBox_4, self.ui_selector.ColorComboBox_4,
                                self.ui_selector.ColorParameterComboBox_4]]
         self.set_comboBoxes()
-        #creation of an empty list of functions
-        #self.functions_code = []
-        #self.update_functions()
+        # creation of an empty list of functions
+        # self.functions_code = []
+        # self.update_functions()
         """figures status update"""
         for i in range(1, len(self.comboBox_list)):
             self.comboBox_list[i][0].currentIndexChanged.connect(self.update_figures_status)
@@ -62,6 +63,8 @@ class Selector(QWidget):
         for i in range(1, len(self.comboBox_list)):
             self.view.figures_status[i] = self.comboBox_list[i][0].currentText() != 'None'
 
+        self.view.figures_constructor()
+
     def update_figures_parameters(self):
         """update figures parameters when combobox update"""
         for i in range(len(self.comboBox_list)):
@@ -81,4 +84,5 @@ class Selector(QWidget):
     #     for i in range(len(self.comboBox_list)):
     #         self.functions_code.append([])
     #         for j in range(len(self.comboBox_list[0])):
-    #              self.functions_code[i].append(f"self.view.figures_parameters[{i}][{j}] = self.comboBox_list[{i}][{j}].currentText()")
+    #              self.functions_code[i].append(f"self.view.figures_parameters[{i}][{j}] = "
+    #                                            f"self.comboBox_list[{i}][{j}].currentText()")
