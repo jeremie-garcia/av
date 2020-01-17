@@ -27,11 +27,7 @@ class Figure(QtWidgets.QGraphicsItem):
             self.item = QtWidgets.QGraphicsRectItem()
             self.item.setRect(self.qrectf)
         elif self.parameters[0] == "Triangle":
-            polygon = QPolygonF()
-            polygon.append(QPointF(self.size[0] // 2, 0))
-            polygon.append(QPointF(self.size[0], self.size[1]))
-            polygon.append(QPointF(0, self.size[1]))
-            self.item = QtWidgets.QGraphicsPolygonItem(polygon)
+            self.item = QtWidgets.QGraphicsPolygonItem(self.create_polygon())
         else:
             self.item = QtWidgets.QGraphicsEllipseItem()
             self.item.setRect(self.qrectf)
@@ -79,11 +75,7 @@ class Figure(QtWidgets.QGraphicsItem):
         self.qrectf.setHeight(self.size[1])
 
         if self.parameters[0] == "Triangle":
-            polygon = QPolygonF()
-            polygon.append(QPointF(self.size[0] // 2, 0))
-            polygon.append(QPointF(self.size[0], self.size[1]))
-            polygon.append(QPointF(0, self.size[1]))
-            self.item.setPolygon(polygon)
+            self.item.setPolygon(self.create_polygon())
         else:
             self.item.setRect(self.qrectf)
 
@@ -91,3 +83,10 @@ class Figure(QtWidgets.QGraphicsItem):
         self.item.setPen(self.pen)
 
         self.scene.setSceneRect(self.qrectf)
+
+    def create_polygon(self):
+        polygon = QPolygonF()
+        polygon.append(QPointF(self.size[0] // 2, 0))
+        polygon.append(QPointF(self.size[0], self.size[1]))
+        polygon.append(QPointF(0, self.size[1]))
+        return polygon

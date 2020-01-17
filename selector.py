@@ -44,6 +44,8 @@ class Selector(QWidget):
         self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.update_sound)
         self.ui_selector.SoundComboBox.currentIndexChanged.connect(self.sound_changed)
 
+        for i in range(len(self.comboBox_list)):
+            self.comboBox_list[i][0].currentIndexChanged.connect(self.form_changed)
     def set_comboBoxes(self):
         """remplissage comboBoxes"""
         self.ui_selector.SoundComboBox.addItems(self.sound.sounds_dictionary)
@@ -71,6 +73,7 @@ class Selector(QWidget):
             for j in range(len(self.comboBox_list[0])):
                 self.view.figures_parameters[i][j] = self.comboBox_list[i][j].currentText()
 
+
     """sound_update"""
     def update_sound(self):
         self.sound.filename = self.sound.sounds_dictionary[self.ui_selector.SoundComboBox.currentText()]
@@ -79,6 +82,9 @@ class Selector(QWidget):
         self.view.isSoundChanged = True
         self.view.isSoundPlayed = False
 
+    def form_changed(self):
+        self.view.isSoundPlayed = False
+        self.view.isFormChanged = True
     # creation de la list de functions
     # def update_functions(self):
     #     for i in range(len(self.comboBox_list)):
@@ -86,3 +92,4 @@ class Selector(QWidget):
     #         for j in range(len(self.comboBox_list[0])):
     #              self.functions_code[i].append(f"self.view.figures_parameters[{i}][{j}] = "
     #                                            f"self.comboBox_list[{i}][{j}].currentText()")
+
