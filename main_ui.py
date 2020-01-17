@@ -1,12 +1,31 @@
 import sys, config_ui, main, config, config_interpreter
 from PyQt5 import QtCore, QtGui, QtWidgets
-import pygame
+import pygame, math
 
 """
 TODO :
 
 - ajouter curseur échelle
 """
+
+class Figure():
+    def _init__(self, gridPos, confID, scene, gridDim):
+        self.gridX = gridPos[0]
+        self.gridY = gridPos[1]
+        self.confID = confID
+        self.scene = scene
+        self.gridDim = gridDim
+
+    def draw(self):
+        sceneW = self.scene.frame.frameGeometry().width()
+        sceneH = self.scene.frame.frameGeometry().height()
+        aX = sceneW / self.gridDim / 2
+        aY = sceneH / self.gridDim / 2
+
+        self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.rectangle = self.scene.addRect(aX, aY, 0, 0, self.rectangle_pen)
+        self.ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
+        self.ellipse = self.scene.addEllipse(aX, aY, 0, 0, self.ellipse_pen)
 
 class Ui_mainWindow(object):
     def __init__(self):
@@ -63,14 +82,62 @@ class Ui_mainWindow(object):
         self.comboBox_2.setObjectName("comboBox_2")
         self.horizontalLayout_3.addWidget(self.comboBox_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setContentsMargins(-1, -1, -1, 0)
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.label_5 = QtWidgets.QLabel(mainWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
+        self.label_5.setSizePolicy(sizePolicy)
+        self.label_5.setObjectName("label_5")
+        self.horizontalLayout_6.addWidget(self.label_5)
+        self.comboBox_3 = QtWidgets.QComboBox(mainWindow)
+        self.comboBox_3.setObjectName("comboBox_3")
+        self.horizontalLayout_6.addWidget(self.comboBox_3)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setContentsMargins(-1, -1, -1, 0)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.label_6 = QtWidgets.QLabel(mainWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
+        self.label_6.setSizePolicy(sizePolicy)
+        self.label_6.setObjectName("label_6")
+        self.horizontalLayout_7.addWidget(self.label_6)
+        self.comboBox_4 = QtWidgets.QComboBox(mainWindow)
+        self.comboBox_4.setObjectName("comboBox_4")
+        self.horizontalLayout_7.addWidget(self.comboBox_4)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_7)
+        self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_8.setContentsMargins(-1, -1, -1, 0)
+        self.horizontalLayout_8.setObjectName("horizontalLayout_8")
+        self.label_7 = QtWidgets.QLabel(mainWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_7.sizePolicy().hasHeightForWidth())
+        self.label_7.setSizePolicy(sizePolicy)
+        self.label_7.setObjectName("label_7")
+        self.horizontalLayout_8.addWidget(self.label_7)
+        self.comboBox_5 = QtWidgets.QComboBox(mainWindow)
+        self.comboBox_5.setObjectName("comboBox_5")
+        self.horizontalLayout_8.addWidget(self.comboBox_5)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_8)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.label_3 = QtWidgets.QLabel(mainWindow)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_5.addWidget(self.label_3)
+        self.label_4 = QtWidgets.QLabel(mainWindow)
+        self.label_4.setObjectName("label_4")
+        self.horizontalLayout_5.addWidget(self.label_4)
         self.horizontalSlider = QtWidgets.QSlider(mainWindow)
-        self.horizontalSlider.setMinimum(-200)
-        self.horizontalSlider.setMaximum(200)
+        self.horizontalSlider.setMinimum(-50)
+        self.horizontalSlider.setMaximum(50)
         self.horizontalSlider.setTracking(True)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setInvertedAppearance(False)
@@ -86,13 +153,24 @@ class Ui_mainWindow(object):
         self.pushButton_3.setSizePolicy(sizePolicy)
         self.pushButton_3.setObjectName("pushButton_3")
         self.verticalLayout_2.addWidget(self.pushButton_3)
+        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
+        self.label_8 = QtWidgets.QLabel(mainWindow)
+        self.label_8.setObjectName("label_8")
+        self.horizontalLayout_9.addWidget(self.label_8)
+        self.pushButton_4 = QtWidgets.QPushButton(mainWindow)
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.horizontalLayout_9.addWidget(self.pushButton_4)
+        self.pushButton_5 = QtWidgets.QPushButton(mainWindow)
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.horizontalLayout_9.addWidget(self.pushButton_5)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_9)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem1)
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setObjectName("verticalLayout")
-
         self.frame = QtWidgets.QGraphicsView()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
@@ -101,7 +179,6 @@ class Ui_mainWindow(object):
         self.frame.setSizePolicy(sizePolicy)
         self.frame.setObjectName("frame")
         self.verticalLayout.addWidget(self.frame)
-
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.pushButton_2 = QtWidgets.QPushButton(mainWindow)
@@ -137,30 +214,35 @@ class Ui_mainWindow(object):
         self.retranslateUi(mainWindow)
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
+        self.scene = QtWidgets.QGraphicsScene()
+        self.scene.setSceneRect(QtCore.QRectF(-50, -50, 100, 100))
+        self.frame.setScene(self.scene)
+        self.scene.frame = self.frame
+
+        self.OBJECTS = self.drawScene()
+
         self.pushButton_3.clicked.connect(lambda: config_ui.openWindow(self))
         self.pushButton.clicked.connect(lambda: self.soundLoadPlay())
         self.comboBox.currentIndexChanged.connect(self.updateSoundFile)
         self.comboBox_2.currentIndexChanged.connect(self.changeConfigFile)
         self.pushButton_2.clicked.connect(lambda: self.soundRewind())
+        self.horizontalSlider.valueChanged.connect(lambda x: self.label_4.setText("{}".format(x)))
+        self.pushButton_4.clicked.connect(lambda: self.frame.scale(1.2,1.2))
+        self.pushButton_5.clicked.connect(lambda: self.frame.scale(0.8, 0.8))
 
-        self.scene = QtWidgets.QGraphicsScene()
-        self.frame.setScene(self.scene)
+    def drawScene(self):
+        factor = 150
+        obj = {}
+        for x in range(2):
+            for y in range(2):
+                rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
+                rectangle = self.scene.addRect(factor*(2*x-1), factor*(2*y-1), 10, 10, rectangle_pen)
+                ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
+                ellipse = self.scene.addEllipse(factor*(2*x-1), factor*(2*y-1), 10, 10, ellipse_pen)
+                obj["rect{}".format(2*y+x)] = rectangle
+                obj["ellipse{}".format(2*y+x)] = ellipse
+        return obj
 
-        self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
-        self.rectangle = self.scene.addRect(0,0,0,0, self.rectangle_pen)
-        self.ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
-        self.ellipse = self.scene.addEllipse(0,0,0,0, self.ellipse_pen)
-
-        self.OBJECTS = {"ellipse": self.ellipse, "rect": self.rectangle}
-
-    """def soundTimeCoggntrol(self, type):
-        main.initConf()
-        main.showConfig(self)
-        if type == 0: #resume song
-
-        elif type == 1: #pause song
-
-        elif type == 2: #first load & play"""
 
     def resetScene(self):
         self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
@@ -172,9 +254,9 @@ class Ui_mainWindow(object):
         main.debug(1,"load & play")
         self.resetScene()
         sound = main.loadSound(self, self.currentSound, self.currentConf)
-        self.soundPlay(sound, beggining)
+        self.soundPlay(beggining)
 
-    def soundPlay(self, sound, beggining = True):
+    def soundPlay(self, beggining = True):
         main.debug(1, "play")
         self.pushButton.clicked.disconnect()
         self.pushButton.clicked.connect(lambda: self.soundPause())
@@ -204,28 +286,37 @@ class Ui_mainWindow(object):
     def soundRewind(self):
         main.debug(1,"rewind")
         #self.configUpdater()
-        self.pushButton.clicked.disconnect()
-        self.pushButton.clicked.connect(lambda: self.soundPause())
-        pygame.mixer.music.stop()
-        pygame.mixer.music.play()
-        self.timer.start(self.frame_duration_ms)
-        self.pushButton.setText("||")
+        if pygame.mixer.get_init():
+            self.pushButton.clicked.disconnect()
+            self.pushButton.clicked.connect(lambda: self.soundPause())
+            pygame.mixer.music.stop()
+            pygame.mixer.music.play()
+            self.timer.start(self.frame_duration_ms)
+            self.pushButton.setText("||")
 
 
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
         self.label.setText(_translate("mainWindow", "Fichier son"))
-        self.label_2.setText(_translate("mainWindow", "Configuration"))
-        self.label_3.setText(_translate("mainWindow", "Synchro"))
+        self.label_2.setText(_translate("mainWindow", "Configuration 1"))
+        self.label_5.setText(_translate("mainWindow", "Configuration 2"))
+        self.label_6.setText(_translate("mainWindow", "Configuration 3"))
+        self.label_7.setText(_translate("mainWindow", "Configuration 4"))
+        self.label_3.setText(_translate("mainWindow", "Décalage :"))
+        self.label_4.setText(_translate("mainWindow", "0"))
         self.pushButton_3.setText(_translate("mainWindow", "Edition des configurations"))
+        self.label_8.setText(_translate("mainWindow", "Zoom"))
+        self.pushButton_4.setText(_translate("mainWindow", "+"))
+        self.pushButton_5.setText(_translate("mainWindow", "-"))
         self.pushButton_2.setText(_translate("mainWindow", "<<"))
         self.pushButton.setText(_translate("mainWindow", "|>"))
         self.checkBox.setText(_translate("mainWindow", "Boucle"))
 
-    def updateSoundFile(self, *args):
+    def updateSoundFile(self):
         if self.sounds:
             self.currentSound = self.sounds[self.comboBox.currentText()]
+            if pygame.mixer.get_init(): self.soundPause()
             self.pushButton.clicked.disconnect()
             self.pushButton.clicked.connect(lambda:self.soundLoadPlay())
 
@@ -243,7 +334,6 @@ def openWindow():
     ui = Ui_mainWindow()
     ui.setupUi(mainWindow)
     mainWindow.show()
-    ui.updateConfigs.connect(ui.draw())
     #sys.exit(app.exec_())
     return app
 

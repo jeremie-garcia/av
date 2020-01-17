@@ -113,8 +113,7 @@ def readfile(file):
 
     return Configuration(id, confName, binds, variables)
 
-def save(window, IOConfig):
-    conf = winToConf(window, IOConfig)
+def save(window, conf):
     main.debug(2,conf)
 
     with open(configFileName.format(conf.id), "w") as f:
@@ -156,10 +155,12 @@ def winToConf(window, IOConfig):
     return conf
 
 def valider(win, IOConfig):
-    save(win, IOConfig)
+    save(win, winToConf(win, IOConfig))
     main.debug(1,"Saved")
-    main.initConf()
+    oldConfID = IOConfig.mainWindow.comboBox_2.currentIndex()
+    IOConfig.mainWindow.configs = main.initConf()
     main.showConfig(IOConfig.mainWindow)
+    IOConfig.mainWindow.comboBox_2.setCurrentIndex(oldConfID)
     IOConfig.close()
 
 if __name__ == "__main__":

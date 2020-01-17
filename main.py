@@ -39,8 +39,8 @@ class Sound():
         return new
 
 def showConfig(ui):
-    config_ui.fillCombo(ui.comboBox_2, [ui.configs[i].name for i in range(len(ui.configs.keys()))])
-
+    for combo in ui.configCombos:
+        config_ui.fillCombo(combo, [ui.configs[i].name for i in range(len(ui.configs.keys()))])
 
 def initConf():
     try:
@@ -58,7 +58,6 @@ def initConf():
             debug(1,"Erreur {}".format(tmp))
 
     return configs
-
 
 def initSounds(ui):
     try:
@@ -123,25 +122,26 @@ def timer_update(ui):
         index = current_time // ui.frame_duration_ms
         index = round(min(index, len(ui.movements) - 1)) + ui.horizontalSlider.value()
 
-        for out in config_ui.OUTPUTS:
-            if out in ui.movements[index].keys():
-                if out in ["rect", "ellipse"]:
-                    donnee_utile = ui.movements[index][out]
-                    dim = donnee_utile * SCALE
-                    ui.OBJECTS[out].setRect(-dim, -dim, dim * 2, dim * 2)  # A ETOFFER
-                elif out in ["rect_border", "ellipse_border"]:
-                    donnee_utile = ui.movements[index][out]
-                    objName = out.split("_")[0]
-                    dim = donnee_utile * WIDTH_SCALE
-                    if dim > 30:
-                        pen = QtGui.QPen(QtCore.Qt.red, dim)
-                    else:
-                        pen = QtGui.QPen(QtCore.Qt.blue, dim)
-                    ui.OBJECTS[objName].setPen(pen)
+        for id in range(len(ui.OBJECTS.keys())//2):
+            for out in config_ui.OUTPUTS:
+                if out in ui.movements[index].keys():
+                    if out in ["rect", "ellipse"]:
+                        donnee_utile = ui.movements[index][out]
+                        dim = donnee_utile * SCALE
+                        ui.OBJECTS[out+str(id)].setRect(-dim, -dim, dim * 2, dim * 2)  # A ETOFFER
+                    elif out in ["rect_border", "ellipse_border"]:
+                        donnee_utile = ui.movements[index][out]
+                        objName = out.split("_")[0]
+                        dim = donnee_utile * WIDTH_SCALE
+                        if dim > 30:
+                            pen = QtGui.QPen(QtCore.Qt.red, dim)
+                        else:
+                            pen = QtGui.QPen(QtCore.Qt.blue, dim)
+                        ui.OBJECTS[objName+str(id)].setPen(pen)
 
-            for x in ["rect", "ellipse"]:
-                if x not in ui.movements[index].keys():
-                    ui.OBJECTS[x].setRect(0,0,0,0)
+                for x in ["rect", "ellipse"]:
+                    if x not in ui.movements[index].keys():
+                        ui.OBJECTS[x+str(id)].setRect(0,0,0,0)
 
     else:
         if ui.checkBox.checkState():  # si mode boucle
@@ -162,6 +162,7 @@ if __name__ == '__main__':
     mainWindow.show()
 
     ui.configs = initConf()
+    ui.configCombos = [ui.comboBox_2, ui.comboBox_3, ui.comboBox_4, ui.comboBox_5]
     showConfig(ui)
     ui.sounds = initSounds(ui)
     ui.updateSoundFile()
@@ -169,7 +170,6 @@ if __name__ == '__main__':
 
     filename = config.soundsFolder + "/" + ui.currentSound.name
 
-    ui.confID = ui.comboBox_2.currentIndex()
-    ui.currentConf = config.readfile(config.configFolder + "/" + str(ui.confID) + config.configExtension)
+    ui.currentConf = ui.configs[ui.comboBox_2.currentIndex()]
 
     sys.exit(app.exec_())

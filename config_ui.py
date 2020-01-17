@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 VAROFFSET = 1
 ASSIOFFSET = 1
 
-OUTPUTS = ["ellipse", "rect", "ellipse_border", "rectangle_border"]
+OUTPUTS = ["ellipse", "rect", "ellipse_border", "rect_border"]
 VARTYPES = ["value", "color", "grad"]
 
 class Line():
@@ -234,16 +234,17 @@ class Ui_IOConfig(object):
         self.annulerButton.clicked.connect(IOConfig.close)
         self.addAssiButton.clicked.connect(lambda: self.addAssiLine(IOConfig))
         self.addVarButton.clicked.connect(lambda: self.addVarLine(IOConfig))
-        self.enregistrerButton.clicked.connect(lambda: config.save(self, IOConfig))
+        self.addConfButton.clicked.connect(lambda: self.addConfig(IOConfig))
+        self.enregistrerButton.clicked.connect(lambda: config.save(self, config.winToConf(self, IOConfig)))
         self.validerButton.clicked.connect(lambda: config.valider(self, IOConfig))
         self.resetButton.clicked.connect(lambda: self.reset(IOConfig))
 
-        IOConfig.configs = self.updateConfig(ui)
+        IOConfig.configs = self.updateConfig()
         self.confCombo.currentIndexChanged.connect(lambda x: self.showConfig(IOConfig, x))
 
     def retranslateUi(self, IOConfig):
         _translate = QtCore.QCoreApplication.translate
-        IOConfig.setWindowTitle(_translate("IOConfig", "I/O Configurateur"))
+        IOConfig.setWindowTitle(_translate("IOConfig", "Editeur de configurations"))
         self.assiLabel.setText(_translate("IOConfig", "Assignations"))
         self.sortielabel.setText(_translate("IOConfig", "Sortie"))
         self.addAssiButton.setText(_translate("IOConfig", "+"))
@@ -416,7 +417,7 @@ class Ui_IOConfig(object):
                 fillCombo(assiLine.contents[1], INPUTS)
                 assiLine.contents[1].setCurrentIndex(pos)
 
-    def updateConfig(self, ui):
+    def updateConfig(self):
         """
         Màj configs combobox
         :return: liste configs fichiers
@@ -425,11 +426,18 @@ class Ui_IOConfig(object):
         fillCombo(self.confCombo, [configs[i].name for i in range(len(configs.keys()))])
         return configs
 
-    def addConfig(self, IOConfig, name):
-        id = IOConfig.configs[-1].id + 1
-        IOConfig.append(config.Configuration(id, name))
+    def addConfig(self, IOConfig):
+        id = len(IOConfig.configs.keys())
+        print("Creating config #{}".format(id))
+        IOConfig.configs[id] = config.Configuration(id, "Config #{}".format(id))
+        config.save(self, IOConfig.configs[id])
+        self.updateConfig()
+        self.showConfig(IOConfig, id)
+        self.confCombo.setCurrentIndex(id)
 
     def showConfig(self, IOConfig, id):
+        if id == -1: return None
+
         main.debug(1,"Loading config {} in {}".format(id, IOConfig.configs))
         toShow = IOConfig.configs[id]
         IOConfig.currentConf = id
@@ -473,6 +481,7 @@ class Ui_IOConfig(object):
                     line.contents[1].setCurrentIndex(line.contents[1].findText(input))
         
         self.nomConfLine.setText(toShow.name)
+        self.confCombo.setCurrentIndex(id)
 
 
     def reset(self, IOConfig):
@@ -497,7 +506,7 @@ def openWindow(ui):
     uiIO = Ui_IOConfig()
     uiIO.setupUi(IOConfig, ui)
     IOConfig.show()
-    uiIO.showConfig(IOConfig, 0)
+    uiIO.showConfig(IOConfig, ui.comboBox_2.currentIndex())
     return uiIO
 
 if __name__ == "__main__":
