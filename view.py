@@ -2,19 +2,17 @@
 This module allows the visualization of a sound and its variations
 on a scalable graphics view"""
 
-
 from PyQt5 import QtWidgets, QtGui, QtCore
 import figures
 import pygame
 
 
 class View(QtWidgets.QWidget):
-    """An interactive view of the sound"""
+    """An interactive view of the sound
+    this object holds a scene (QGraphicsScene) with figures"""
 
     def __init__(self, the_sound):
         super().__init__()
-
-        self.time_increment = 1
 
         # create components
         root_layout = QtWidgets.QVBoxLayout(self)
@@ -26,18 +24,18 @@ class View(QtWidgets.QWidget):
                            "Grey": [255, 255, 255]}
         self.forms = ["None", "Ellipse", "Rectangle", "Triangle"]
         self.sound_parameters = ["RMS", "Spectral centroid", "Spectral flatness"]
+
         self.isSoundPlayed = False
         self.isSoundChanged = False
         self.isFormChanged = False
 
-        self.figures_status = [True, True, True, True]
-
+        # form, horizontalParameter, verticalParameter, color, colorParameter
         self.figures_parameters = [["Ellipse",  "RMS", "RMS", "Red", "RMS"],
                                    ["Ellipse", "Spectral flatness", "Spectral flatness", "Blue", "RMS"],
                                    ["Ellipse", "Spectral centroid", "Spectral centroid", "Green", "RMS"],
                                    ["Ellipse", "RMS", "Spectral centroid", "Yellow", "RMS"]]
-        # form, horizontalPara, verticalPara, color, colorPara
 
+        # define size and center of figures depending on the number of figures
         self.center_presetting = [[(1 / 2, 1 / 2)],
                                   [(1 / 4, 1 / 2), (3 / 4, 1 / 2)],
                                   [(1 / 4, 1 / 4), (3 / 4, 1 / 4), (1 / 2, 3 / 4)],
@@ -47,7 +45,10 @@ class View(QtWidgets.QWidget):
                                 [(1 / 2, 1 / 2), (1 / 2, 1 / 2), (1 / 2, 1 / 2)],
                                 [(1 / 2, 1 / 2), (1 / 2, 1 / 2), (1 / 2, 1 / 2), (1 / 2, 1 / 2)]]
 
+        # create figures
+        self.figures_status = [True, True, True, True]
         self.figures = [None, None, None, None]
+        self.figures_constructor()
 
         toolbar = self.create_toolbar()
 
@@ -55,17 +56,21 @@ class View(QtWidgets.QWidget):
         root_layout.addWidget(self.zoomview)
         root_layout.addLayout(toolbar)
 
-        # create and setup the timer
+        # creates and setup the timer
         self.timer = QtCore.QTimer(self)
 
         self.update_scene_size()
 
     def update_scene_size(self):
-        # fix scene size to the view size
+        """fixes scene size to the view size"""
         self.zoomview.setSceneRect(0, 0, self.zoomview.width(), self.zoomview.height())
 
+    def fit_scene_in_view(self):
+        """fits the scene in the view"""
+        self.zoomview.fitInView(self.zoomview.sceneRect(), QtCore.Qt.KeepAspectRatio)
+
     def create_toolbar(self):
-        # create layout for time controls and entry
+        """creates layout for time controls and entry"""
         toolbar = QtWidgets.QHBoxLayout()
 
         def add_button(text, slot):
@@ -80,9 +85,7 @@ class View(QtWidgets.QWidget):
         add_button('+', lambda: self.zoomview.scale(1.1, 1.1))
 
         toolbar.addStretch()
-
         add_button('|>', self.playpause)
-
         toolbar.addStretch()
 
         # shortcuts and key bindings
@@ -98,27 +101,27 @@ class View(QtWidgets.QWidget):
 
         return toolbar
 
-    def fit_scene_in_view(self):
-        self.zoomview.fitInView(self.zoomview.sceneRect(), QtCore.Qt.KeepAspectRatio)
-
     def figures_constructor(self):
+        """creates figures based on the status of figures"""
         self.scene.clear()
         for index in range(len(self.figures_status)):
             if self.figures_status[index]:
                 self.figures[index] = figures.Figure(self, index, self.color_dict)
-                self.figures[index].Item_Init()
+                self.figures[index].item_init()
             else:
                 self.figures[index] = None
 
     def update_figures_in_view(self, recorded_values):
-        """updates center and size"""
+        """updates center and size in the scene based on presetting lists"""
         nb_figures = sum(self.figures_status)
         index_list = 0
         for index in range(len(self.figures_status)):
             if self.figures_status[index]:
+
                 # color, size update
                 coeff_size = self.size_presetting[nb_figures-1][index_list]
                 self.figures[index].update(coeff_size, recorded_values)
+
                 # center update
                 coeff_center = self.center_presetting[nb_figures-1][index_list]
                 x_center = coeff_center[0] * self.zoomview.width() - self.figures[index].size[0]//2
@@ -129,12 +132,12 @@ class View(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def playpause(self):
         """this slot toggles the replay using the timer as model"""
-        # windows1
 
         if self.timer.isActive():
             self.timer.stop()
             pygame.mixer.music.pause()
-            # pause and play again after <-- to set
+
+        # to set pause and play again after
         else:
             if self.isSoundPlayed:
                 pygame.mixer.music.unpause()
@@ -146,7 +149,6 @@ class View(QtWidgets.QWidget):
                 self.figures_constructor()
 
                 pygame.mixer.init()
-
                 pygame.mixer.music.load(self.sound.filename)
 
                 self.timer.timeout.connect(self.timer_update)
@@ -155,6 +157,8 @@ class View(QtWidgets.QWidget):
                 self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
 
     def timer_update(self):
+        """manages timer, depend on music played or not, figures changed or not, sound changed or not
+        update figures parameters based on the analyzed sound"""
         self.update_scene_size()
 
         if pygame.mixer.music.get_busy() and not (self.isSoundChanged or self.isFormChanged):
@@ -162,11 +166,9 @@ class View(QtWidgets.QWidget):
 
             index = current_time // self.sound.analyse_parameters["frame_duration_ms"]
             index = round(min(index, self.sound.rms_frames[0].size - 1))
-            rms = self.sound.rms_frames[0][index]
-            spectral_centroid = self.sound.spectral_centroid_frames[0][index]
-            spectral_flatness = self.sound.spectral_flatness_frames[0][index]
-            recorded_values = {"RMS": float(rms), "Spectral centroid": float(spectral_centroid),
-                               "Spectral flatness": float(spectral_flatness)}
+            recorded_values = {"RMS": float(self.sound.rms_frames[0][index]),
+                               "Spectral centroid": float(self.sound.spectral_centroid_frames[0][index]),
+                               "Spectral flatness": float(self.sound.spectral_flatness_frames[0][index])}
             self.update_figures_in_view(recorded_values)
 
         elif pygame.mixer.music.get_busy() and (self.isSoundChanged or self.isFormChanged):
