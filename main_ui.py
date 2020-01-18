@@ -8,26 +8,57 @@ TODO :
 - ajouter curseur échelle
 """
 
-class Figure():
-    def _init__(self, gridPos, confID, scene, gridDim):
-        self.gridX = gridPos[0]
-        self.gridY = gridPos[1]
-        self.confID = confID
+class Drawing():
+    def __init__(self, pos, scene):
+        self.posX = pos[0] #position of the center
+        self.posY = pos[1]
         self.scene = scene
-        self.gridDim = gridDim
 
-    def draw(self):
-        sceneW = self.scene.frame.frameGeometry().width()
-        sceneH = self.scene.frame.frameGeometry().height()
-        aX = sceneW / self.gridDim / 2
-        aY = sceneH / self.gridDim / 2
+        self.rectangle = self.scene.addRect(self.posX, self.posY, 0, 0, QtGui.QPen(QtCore.Qt.black, 5))
+        self.ellipse = self.scene.addEllipse(self.posX, self.posY, 0, 0, QtGui.QPen(QtCore.Qt.black, 5))
 
-        self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
-        self.rectangle = self.scene.addRect(aX, aY, 0, 0, self.rectangle_pen)
-        self.ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
-        self.ellipse = self.scene.addEllipse(aX, aY, 0, 0, self.ellipse_pen)
+        self.rectangle.width = 0
+        self.rectangle.height = 0
+        self.ellipse.width = 0
+        self.ellipse.height = 0
+
+        self.objects = {'rect': self.rectangle, 'ellipse': self.ellipse}
+
+    def draw(self, state):
+        if state == 'reset':
+            for o in self.objects:
+                self.resize(self.objects[o], 0, 0)
+        else:
+            for out in state.keys():
+                if out in ["rect", "ellipse"]:
+                    donnee_utile = state[out]
+                    dim = donnee_utile * main.SCALE
+                    self.resize(self.objects[out], dim, dim)
+                elif out in ["rect_border", "ellipse_border"]:
+                    donnee_utile = state[out]
+                    objName = out.split("_")[0]
+                    dim = donnee_utile * main.WIDTH_SCALE
+                    if dim > 30:
+                        pen = QtGui.QPen(QtCore.Qt.red, dim)
+                    else:
+                        pen = QtGui.QPen(QtCore.Qt.blue, dim)
+                    self.objects[objName].setPen(pen)
+
+            for x in ["rect", "ellipse"]:
+                if x not in state.keys():
+                    self.resize(self.objects[x], 0, 0)
+            for x in ["rect_border", "ellipse_border"]:
+                if x not in state.keys():
+                    self.objects[x.split("_")[0]].setPen(QtGui.QPen(QtCore.Qt.black, 5))
+
+    def resize(self, object, width, height):
+        object.width = width
+        object.height = height
+        object.setRect(self.posX - object.width / 2, self.posY - object.height / 2, \
+                       object.width, object.height)
 
 class Ui_mainWindow(object):
+
     def __init__(self):
         self.currentConf = None
         self.currentSound = None
@@ -36,7 +67,7 @@ class Ui_mainWindow(object):
 
     def setupUi(self, mainWindow):
         mainWindow.setObjectName("mainWindow")
-        mainWindow.resize(1018, 529)
+        mainWindow.resize(1100, 700)
         self.gridLayout = QtWidgets.QGridLayout(mainWindow)
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
@@ -215,34 +246,33 @@ class Ui_mainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
         self.scene = QtWidgets.QGraphicsScene()
-        self.scene.setSceneRect(QtCore.QRectF(-50, -50, 100, 100))
+        #self.scene.setSceneRect(QtCore.QRectF(-50, -50, 100, 100))
         self.frame.setScene(self.scene)
         self.scene.frame = self.frame
 
-        self.OBJECTS = self.drawScene()
+        self.figures = self.drawScene()
 
         self.pushButton_3.clicked.connect(lambda: config_ui.openWindow(self))
         self.pushButton.clicked.connect(lambda: self.soundLoadPlay())
         self.comboBox.currentIndexChanged.connect(self.updateSoundFile)
-        self.comboBox_2.currentIndexChanged.connect(self.changeConfigFile)
+        self.comboBox_2.currentIndexChanged.connect(lambda x: self.changeConfigFile(x, 0))
+        self.comboBox_3.currentIndexChanged.connect(lambda x: self.changeConfigFile(x, 1))
+        self.comboBox_4.currentIndexChanged.connect(lambda x: self.changeConfigFile(x, 2))
+        self.comboBox_5.currentIndexChanged.connect(lambda x: self.changeConfigFile(x, 3))
         self.pushButton_2.clicked.connect(lambda: self.soundRewind())
         self.horizontalSlider.valueChanged.connect(lambda x: self.label_4.setText("{}".format(x)))
         self.pushButton_4.clicked.connect(lambda: self.frame.scale(1.2,1.2))
         self.pushButton_5.clicked.connect(lambda: self.frame.scale(0.8, 0.8))
 
+
     def drawScene(self):
         factor = 150
-        obj = {}
+        figs = {}
         for x in range(2):
             for y in range(2):
-                rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
-                rectangle = self.scene.addRect(factor*(2*x-1), factor*(2*y-1), 10, 10, rectangle_pen)
-                ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
-                ellipse = self.scene.addEllipse(factor*(2*x-1), factor*(2*y-1), 10, 10, ellipse_pen)
-                obj["rect{}".format(2*y+x)] = rectangle
-                obj["ellipse{}".format(2*y+x)] = ellipse
-        return obj
-
+                figure = Drawing([factor * (2 * x - 1), factor * (2 * y - 1)], self.scene)
+                figs[x + 2 * y] = figure
+        return figs
 
     def resetScene(self):
         self.rectangle_pen = QtGui.QPen(QtCore.Qt.black, 1)
@@ -253,7 +283,7 @@ class Ui_mainWindow(object):
     def soundLoadPlay(self, beggining = True):
         main.debug(1,"load & play")
         self.resetScene()
-        sound = main.loadSound(self, self.currentSound, self.currentConf)
+        sound = main.loadSound(self, self.currentSound)
         self.soundPlay(beggining)
 
     def soundPlay(self, beggining = True):
@@ -297,7 +327,7 @@ class Ui_mainWindow(object):
 
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
-        mainWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
+        mainWindow.setWindowTitle(_translate("mainWindow", "AV-César - Visualisateur de sons"))
         self.label.setText(_translate("mainWindow", "Fichier son"))
         self.label_2.setText(_translate("mainWindow", "Configuration 1"))
         self.label_5.setText(_translate("mainWindow", "Configuration 2"))
@@ -320,13 +350,14 @@ class Ui_mainWindow(object):
             self.pushButton.clicked.disconnect()
             self.pushButton.clicked.connect(lambda:self.soundLoadPlay())
 
-    def changeConfigFile(self, index):
-        if index != -1 and self.configs:
-            self.currentConf = self.configs[index]
+    def changeConfigFile(self, index, confID):
+        try:
+            self.currentConf[confID] = self.configs[index]
 
             if type(self.currentSound).__name__ == "analyzedSound":
-                self.movements = config_interpreter.Traitement(self.currentSound.donnee_brute, self.currentConf)
+                self.movements[confID] = config_interpreter.Traitement(self.currentSound.donnee_brute, self.currentConf[confID])
                 self.resetScene()
+        except: pass
 
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)

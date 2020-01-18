@@ -75,11 +75,11 @@ def debug(i, *args):
     if DEBUG >= i: print(*args)
 
 
-def loadSound(ui, file, conf):
+def loadSound(ui, file):
     debug(1,"Loading sound {}".format(file.name))
 
     if file.link.split(".")[-1] != "wav":
-        return None
+        raise ValueError
 
     ui.currentSound = file
 
@@ -88,7 +88,10 @@ def loadSound(ui, file, conf):
         ui.currentSound = ui.currentSound.analyze()
 
     debug(1,"Generating movements")
-    ui.movements = config_interpreter.Traitement(ui.currentSound.donnee_brute, conf)
+    ui.movements = []
+    for combo in ui.configCombos:
+        conf = ui.configs[combo.currentIndex()]
+        ui.movements.append(config_interpreter.Traitement(ui.currentSound.donnee_brute, conf))
     debug(1,"Movements generated")
 
     pygame.mixer.music.load(file.link)
@@ -120,28 +123,10 @@ def timer_update(ui):
         current_time = pygame.mixer.music.get_pos()
         # find closest frame in descriptors
         index = current_time // ui.frame_duration_ms
-        index = round(min(index, len(ui.movements) - 1)) + ui.horizontalSlider.value()
+        index = round(min(index, len(ui.movements[0]) - 1)) + ui.horizontalSlider.value()
 
-        for id in range(len(ui.OBJECTS.keys())//2):
-            for out in config_ui.OUTPUTS:
-                if out in ui.movements[index].keys():
-                    if out in ["rect", "ellipse"]:
-                        donnee_utile = ui.movements[index][out]
-                        dim = donnee_utile * SCALE
-                        ui.OBJECTS[out+str(id)].setRect(-dim, -dim, dim * 2, dim * 2)  # A ETOFFER
-                    elif out in ["rect_border", "ellipse_border"]:
-                        donnee_utile = ui.movements[index][out]
-                        objName = out.split("_")[0]
-                        dim = donnee_utile * WIDTH_SCALE
-                        if dim > 30:
-                            pen = QtGui.QPen(QtCore.Qt.red, dim)
-                        else:
-                            pen = QtGui.QPen(QtCore.Qt.blue, dim)
-                        ui.OBJECTS[objName+str(id)].setPen(pen)
-
-                for x in ["rect", "ellipse"]:
-                    if x not in ui.movements[index].keys():
-                        ui.OBJECTS[x+str(id)].setRect(0,0,0,0)
+        for f in ui.figures:
+            ui.figures[f].draw(ui.movements[int(f)][index])
 
     else:
         if ui.checkBox.checkState():  # si mode boucle
@@ -150,7 +135,8 @@ def timer_update(ui):
             ui.pushButton.clicked.disconnect()
             ui.pushButton.clicked.connect(lambda: ui.soundLoadPlay())
             ui.pushButton.setText("|>")
-            for x in ui.OBJECTS.keys(): ui.OBJECTS[x].setRect(0, 0, 0, 0)
+            #for f in ui.figures:
+            #    ui.figures[f].draw('reset')
             ui.timer.stop()
 
 
@@ -170,6 +156,7 @@ if __name__ == '__main__':
 
     filename = config.soundsFolder + "/" + ui.currentSound.name
 
-    ui.currentConf = ui.configs[ui.comboBox_2.currentIndex()]
+    ui.currentConf = [ui.configs[ui.configCombos[i].currentIndex()] for i in range(len(ui.configCombos))]
+
 
     sys.exit(app.exec_())
