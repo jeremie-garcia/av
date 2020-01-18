@@ -6,6 +6,7 @@ ASSIOFFSET = 1
 
 OUTPUTS = ["ellipse", "rect", "ellipse_border", "rect_border", "rect_back", "ellipse_back"]
 VARTYPES = ["value", "color", "grad"]
+sph = "AV-Cesar >> av-fun"
 
 class Line():
     def __init__(self, type, tableRow, gridRow, contents):

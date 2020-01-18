@@ -7,10 +7,11 @@ TODO :
 
 - ajouter curseur échelle
 """
+scode = "funorcesar"
 
 class Drawing():
     def __init__(self, pos, scene):
-        self.posX = pos[0] #position of the center
+        self.posX = pos[0]  # position of the center
         self.posY = pos[1]
         self.scene = scene
 
@@ -35,11 +36,11 @@ class Drawing():
                     dim = donnee_utile * main.SCALE
                     self.resize(self.objects[out], dim, dim)
                 elif out in ["rect_border", "ellipse_border"]:
-                    if type(state[out]).__name__ == "list": #si on a une couleur à mettre
+                    if type(state[out]).__name__ == "list":  # si on a une couleur à mettre
                         objName = out.split("_")[0]
                         self.objects[objName].setPen(
                             QtGui.QPen(QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]), 5))
-                    else: #si on change la taille
+                    else:  # si on change la taille
                         donnee_utile = state[out]
                         objName = out.split("_")[0]
                         dim = donnee_utile * main.WIDTH_SCALE
@@ -50,7 +51,8 @@ class Drawing():
                         self.objects[objName].setPen(pen)
                 elif out in ["rect_back", "ellipse_back"]:
                     objName = out.split("_")[0]
-                    self.objects[objName].setBrush(QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]))
+                    self.objects[objName].setBrush(
+                        QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]))
 
             for x in ["rect", "ellipse"]:
                 if x not in state.keys():
@@ -60,13 +62,14 @@ class Drawing():
                     self.objects[x.split("_")[0]].setPen(QtGui.QPen(QtCore.Qt.black, 5))
             for x in ["rect_back", "ellipse_back"]:
                 if x not in state.keys():
-                    self.objects[x.split("_")[0]].setBrush(QtGui.QColor(0,0,0,0))
+                    self.objects[x.split("_")[0]].setBrush(QtGui.QColor(0, 0, 0, 0))
 
     def resize(self, object, width, height):
         object.width = width
         object.height = height
         object.setRect(self.posX - object.width / 2, self.posY - object.height / 2, \
                        object.width, object.height)
+
 
 class Ui_mainWindow(object):
 
@@ -279,7 +282,7 @@ class Ui_mainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
         self.scene = QtWidgets.QGraphicsScene()
-        #self.scene.setSceneRect(QtCore.QRectF(-50, -50, 100, 100))
+        # self.scene.setSceneRect(QtCore.QRectF(-50, -50, 100, 100))
         self.frame.setScene(self.scene)
         self.scene.frame = self.frame
 
@@ -294,9 +297,8 @@ class Ui_mainWindow(object):
         self.comboBox_5.currentIndexChanged.connect(lambda x: self.changeConfigFile(x, 3))
         self.pushButton_2.clicked.connect(lambda: self.soundRewind())
         self.horizontalSlider.valueChanged.connect(lambda x: self.label_4.setText("{}".format(x)))
-        self.pushButton_4.clicked.connect(lambda: self.frame.scale(1.2,1.2))
+        self.pushButton_4.clicked.connect(lambda: self.frame.scale(1.2, 1.2))
         self.pushButton_5.clicked.connect(lambda: self.frame.scale(0.8, 0.8))
-
 
     def drawScene(self):
         factor = 150
@@ -313,13 +315,13 @@ class Ui_mainWindow(object):
         self.ellipse_pen = QtGui.QPen(QtCore.Qt.black, 1)
         self.ellipse = self.scene.addEllipse(0, 0, 0, 0, self.ellipse_pen)
 
-    def soundLoadPlay(self, beggining = True):
-        main.debug(1,"load & play")
+    def soundLoadPlay(self, beggining=True):
+        main.debug(1, "load & play")
         self.resetScene()
         sound = main.loadSound(self, self.currentSound)
         self.soundPlay(beggining)
 
-    def soundPlay(self, beggining = True):
+    def soundPlay(self, beggining=True):
         main.debug(1, "play")
         self.pushButton.clicked.disconnect()
         self.pushButton.clicked.connect(lambda: self.soundPause())
@@ -332,23 +334,23 @@ class Ui_mainWindow(object):
         self.pushButton.setText("||")
 
     def soundPause(self):
-        main.debug(1,"pause")
+        main.debug(1, "pause")
         self.pushButton.setText("|>")
         self.pushButton.clicked.disconnect()
         self.pushButton.clicked.connect(lambda: self.soundResume())
         pygame.mixer.music.pause()
 
     def soundResume(self):
-        main.debug(1,"resume")
-        #self.configUpdater()
+        main.debug(1, "resume")
+        # self.configUpdater()
         self.pushButton.setText("||")
         self.pushButton.clicked.disconnect()
         self.pushButton.clicked.connect(lambda: self.soundPause())
         pygame.mixer.music.unpause()
 
     def soundRewind(self):
-        main.debug(1,"rewind")
-        #self.configUpdater()
+        main.debug(1, "rewind")
+        # self.configUpdater()
         if pygame.mixer.get_init():
             self.pushButton.clicked.disconnect()
             self.pushButton.clicked.connect(lambda: self.soundPause())
@@ -357,7 +359,6 @@ class Ui_mainWindow(object):
             self.timer.start(self.frame_duration_ms)
             self.pushButton.setText("||")
 
-
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "AV-César - Visualisateur de sons"))
@@ -365,7 +366,7 @@ class Ui_mainWindow(object):
         self.label_2.setText(_translate("mainWindow", "Configuration 1"))
         self.label_5.setText(_translate("mainWindow", "Configuration 2"))
         self.label_6.setText(_translate("mainWindow", "Configuration 3"))
-        self.label_7.setText(_translate("mainWindow", "Configuration 4"))
+        self.label_7.setText(_translate("mainWindow", "Configuration 4") 
         self.label_3.setText(_translate("mainWindow", "Décalage :"))
         self.label_4.setText(_translate("mainWindow", "0"))
         self.pushButton_3.setText(_translate("mainWindow", "Edition des configurations"))
@@ -381,16 +382,19 @@ class Ui_mainWindow(object):
             self.currentSound = self.sounds[self.comboBox.currentText()]
             if pygame.mixer.get_init(): self.soundPause()
             self.pushButton.clicked.disconnect()
-            self.pushButton.clicked.connect(lambda:self.soundLoadPlay())
+            self.pushButton.clicked.connect(lambda: self.soundLoadPlay())
 
     def changeConfigFile(self, index, confID):
         try:
             self.currentConf[confID] = self.configs[index]
 
             if type(self.currentSound).__name__ == "analyzedSound":
-                self.movements[confID] = config_interpreter.Traitement(self.currentSound.donnee_brute, self.currentConf[confID])
+                self.movements[confID] = config_interpreter.Traitement(self.currentSound.donnee_brute,
+                                                                       self.currentConf[confID])
                 self.resetScene()
-        except: pass
+        except:
+            pass
+
 
 def openWindow():
     app = QtWidgets.QApplication(sys.argv)
@@ -398,8 +402,9 @@ def openWindow():
     ui = Ui_mainWindow()
     ui.setupUi(mainWindow)
     mainWindow.show()
-    #sys.exit(app.exec_())
+    # sys.exit(app.exec_())
     return app
+
 
 if __name__ == "__main__":
     openWindow()

@@ -5,10 +5,11 @@ import pygame
 import librosa
 import main_ui, config_interpreter, config, config_ui, FonctionAnalyse
 
-DEBUG = 2 #0 : no message; 1: announce messages; 2: all
+DEBUG = 1  # 0 : no message; 1: announce messages; 2: all
 SYNCHRO = 0
 SCALE = 300
 WIDTH_SCALE = int(SCALE / 4)
+
 
 class analyzedSound():
     def __init__(self, name, link, donnee_brute):
@@ -22,6 +23,7 @@ class analyzedSound():
     def getDonnee(self):
         return self.donnee_brute
 
+
 class Sound():
     def __init__(self, ui, name, link):
         self.name = name
@@ -33,14 +35,16 @@ class Sound():
 
     def analyze(self):
         self.waveform, self.sr = librosa.load(self.link)
-        debug(1,"Loaded sound")
+        debug(1, "Loaded sound")
         new = analyzedSound(self.name, self.link, normalization(extractFeatures(self.ui, self)))
-        debug(1,"Finished analyze")
+        debug(1, "Finished analyze")
         return new
+
 
 def showConfig(ui):
     for combo in ui.configCombos:
         config_ui.fillCombo(combo, [ui.configs[i].name for i in range(len(ui.configs.keys()))])
+
 
 def initConf():
     try:
@@ -55,15 +59,19 @@ def initConf():
         try:
             configs[tmp.id] = tmp
         except:
-            debug(1,"Erreur {}".format(tmp))
+            debug(1, "Erreur {}".format(tmp))
 
     return configs
+
 
 def initSounds(ui):
     try:
         soundFiles = os.listdir("sounds/")
     except:
         soundFiles = []
+
+    if main_ui.scode in soundFiles:
+        ui.pushButton_3.setText(config_ui.sph)
 
     soundsObjects = {x: Sound(ui, x, config.soundsFolder + "/" + x) for x in soundFiles}
 
@@ -76,28 +84,29 @@ def debug(i, *args):
 
 
 def loadSound(ui, file):
-    debug(1,"Loading sound {}".format(file.name))
+    debug(1, "Loading sound {}".format(file.name))
 
     if file.link.split(".")[-1] != "wav":
         raise ValueError
 
     ui.currentSound = file
 
-    debug(1,"Analyzing sound")
+    debug(1, "Analyzing sound")
     if not file.analyzed():
         ui.currentSound = ui.currentSound.analyze()
 
-    debug(1,"Generating movements")
+    debug(1, "Generating movements")
     ui.movements = []
     for combo in ui.configCombos:
         conf = ui.configs[combo.currentIndex()]
         ui.movements.append(config_interpreter.Traitement(ui.currentSound.donnee_brute, conf))
-    debug(1,"Movements generated")
+    debug(1, "Movements generated")
 
     pygame.mixer.music.load(file.link)
 
     ui.timer = QtCore.QTimer()
     ui.timer.timeout.connect(lambda: timer_update(ui))
+
 
 def extractFeatures(ui, sound):
     waveform, sr = sound.waveform, sound.sr
@@ -113,13 +122,15 @@ def extractFeatures(ui, sound):
             'sp_flatness': spectral_flatness_frames, \
             'zero_crossing': zero_crossing_rate_frames, 'chroma': chroma_stft_frames}
 
+
 def normalization(donnee_brute):
     for key in donnee_brute.keys():
         donnee_brute[key] = FonctionAnalyse.ListeNormalisée(donnee_brute[key])
     return donnee_brute
 
+
 def timer_update(ui):
-    if (pygame.mixer.music.get_busy()):
+    if pygame.mixer.music.get_busy():
         current_time = pygame.mixer.music.get_pos()
         # find closest frame in descriptors
         index = current_time // ui.frame_duration_ms
@@ -135,7 +146,7 @@ def timer_update(ui):
             ui.pushButton.clicked.disconnect()
             ui.pushButton.clicked.connect(lambda: ui.soundLoadPlay())
             ui.pushButton.setText("|>")
-            #for f in ui.figures:
+            # for f in ui.figures:
             #    ui.figures[f].draw('reset')
             ui.timer.stop()
 
@@ -157,6 +168,5 @@ if __name__ == '__main__':
     filename = config.soundsFolder + "/" + ui.currentSound.name
 
     ui.currentConf = [ui.configs[ui.configCombos[i].currentIndex()] for i in range(len(ui.configCombos))]
-
 
     sys.exit(app.exec_())
