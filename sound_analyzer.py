@@ -1,16 +1,24 @@
+"""This module allows to analyze sounds and to normalize its parameters"""
+
 import librosa
 import numpy as np
 
 
 class Sound(object):
+    """Sound information"""
+
     def __init__(self):
         self.filename = 'sounds/s1.wav'
+
+        # dictionary of sounds
         self.sounds_dictionary = {'Sound 1': 'sounds/s1.wav', 'Sound 2': 'sounds/s2.wav', 'Sound 3': 'sounds/s3.wav',
-                                   'Sound 4': 'sounds/s4.wav', 'Sound 5': 'sounds/s5.wav', 'Sound 6': 'sounds/s6.wav',
-                                   'Sound 7': 'sounds/s7.wav', 'Sound 8': 'sounds/s8.wav', 'Sound 9': 'sounds/s9.wav',
-                                   'Sound 10': 'sounds/s10.wav', 'Sound 11': 'sounds/s11.wav',
-                                   'France Gall': 'sounds/s12.wav', 'Djadja': 'sounds/s13.wav',
-                                   'TNT': 'sounds/s14.wav', 'Da Ba Dee': 'sounds/s15.wav'}
+                                  'Sound 4': 'sounds/s4.wav', 'Sound 5': 'sounds/s5.wav', 'Sound 6': 'sounds/s6.wav',
+                                  'Sound 7': 'sounds/s7.wav', 'Sound 8': 'sounds/s8.wav', 'Sound 9': 'sounds/s9.wav',
+                                  'Sound 10': 'sounds/s10.wav', 'Sound 11': 'sounds/s11.wav',
+                                  'France Gall': 'sounds/s12.wav', 'Djadja': 'sounds/s13.wav',
+                                  'TNT': 'sounds/s14.wav', 'Da Ba Dee': 'sounds/s15.wav'}
+
+        # sounds parameters
         self.rms_frames = None
         self.spectral_centroid_frames = None
         self.spectral_flatness_frames = None
@@ -18,10 +26,9 @@ class Sound(object):
         self.sr = None
         self.analyse_parameters = None
 
-    # def change(self,new_sound):
-    #    self.filename='sounds/'+new_sound+'.wav'
-
     def analyze(self):
+        """Analyzes sounds and gives three of its characteristics : rms, spectral flatness and spectral centroid"""
+
         print("load '{}'".format(self.filename))
         self.waveform, self.sr = librosa.load(self.filename)
         self.analyse_parameters = {"features_frame_length": 4096, "frame_duration_ms": 1000*(512/self.sr)}
@@ -36,6 +43,7 @@ class Sound(object):
         print("'{}' loaded".format(self.filename))
 
     def normalize_figures(self):
+        """Normalizes sounds parameters"""
 
         def normalize(frames, norm):
             for i in range(len(frames[0])):
