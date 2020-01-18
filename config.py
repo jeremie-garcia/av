@@ -13,16 +13,19 @@ class Color(): #couleur
     Objet de type couleur
     Trois attributs : r, g, b (valeurs de 0 à 255 en RGB)
     """
-    def __init__(self, r, g, b):
+    def __init__(self, name, r, g, b, a):
+        self.name = name
         self.r = r
         self.g = g
         self.b = b
+        self.a = a
+        self.rgba = (r,g,b,a)
 
     def __repr__(self):
-        return "Color {},{},{}".format(self.r, self.g, self.b)
+        return "Color {},{},{},{}".format(self.r, self.g, self.b, self.a)
 
     def getValue(self):
-        return "{},{},{}".format(self.r, self.g, self.b)
+        return "{},{},{},{}".format(self.r, self.g, self.b, self.a)
 
 class Gradation(): #dégradé
     """
@@ -37,7 +40,7 @@ class Gradation(): #dégradé
         return "Gradation from {} to {}".format(self.A, self.B)
 
     def getValue(self):
-        return "{},{}".format(self.A, self.B)
+        return "{},{}".format(self.A.name, self.B.name)
 
 class Value(): #valeur
     """
@@ -93,20 +96,20 @@ def readfile(file):
                         binds["errors"].append(i+1)
                 elif words[0] == "var": #délaration var
                     if "color" in l: #déclaration de couleur
-                        r, g, b = words[-1].split("(")[-1][:-1].split(",") #récupération des trois couleurs
-                        r, g, b = int(r), int(g), int(b)
+                        r, g, b, a = words[-1].split("(")[-1][:-1].split(",") #récupération des trois couleurs
+                        r, g, b, a = int(r), int(g), int(b), int(a)
                         if not(0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
                             main.debug(1,"LINE ERROR (var color): {}".format(l))
                             binds["errors"].append(i+1)
-                        variables[words[1]] = Color(r,g,b)
+                        variables[words[1]] = Color(words[1], r, g, b, a)
 
                     elif "grad" in l: #déclaration de dégradé
                         A, B = words[-1].split("(")[-1][:-1].split(",") #récupération deux couleurs
-                        if not(A in variables.keys() and B in variables.keys()):
+                        if not(A in variables and B in variables):
                             main.debug(1,"LINE ERROR (var deg) : {}".format(l))
                             main.debug(2,variables)
                             binds["errors"].append(i+1)
-                        variables[words[1]] = Gradation(A,B)
+                        variables[words[1]] = Gradation(variables[A], variables[B])
 
                     else: #déclaration valeur
                         variables[words[1]] = Value(words[1], words[-1])

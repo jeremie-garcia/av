@@ -29,20 +29,28 @@ class Drawing():
             for o in self.objects:
                 self.resize(self.objects[o], 0, 0)
         else:
-            for out in state.keys():
+            for out in state:
                 if out in ["rect", "ellipse"]:
                     donnee_utile = state[out]
                     dim = donnee_utile * main.SCALE
                     self.resize(self.objects[out], dim, dim)
                 elif out in ["rect_border", "ellipse_border"]:
-                    donnee_utile = state[out]
+                    if type(state[out]).__name__ == "list": #si on a une couleur à mettre
+                        objName = out.split("_")[0]
+                        self.objects[objName].setPen(
+                            QtGui.QPen(QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]), 5))
+                    else: #si on change la taille
+                        donnee_utile = state[out]
+                        objName = out.split("_")[0]
+                        dim = donnee_utile * main.WIDTH_SCALE
+                        if dim > 30:
+                            pen = QtGui.QPen(QtCore.Qt.red, dim)
+                        else:
+                            pen = QtGui.QPen(QtCore.Qt.blue, dim)
+                        self.objects[objName].setPen(pen)
+                elif out in ["rect_back", "ellipse_back"]:
                     objName = out.split("_")[0]
-                    dim = donnee_utile * main.WIDTH_SCALE
-                    if dim > 30:
-                        pen = QtGui.QPen(QtCore.Qt.red, dim)
-                    else:
-                        pen = QtGui.QPen(QtCore.Qt.blue, dim)
-                    self.objects[objName].setPen(pen)
+                    self.objects[objName].setBrush(QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]))
 
             for x in ["rect", "ellipse"]:
                 if x not in state.keys():
@@ -50,6 +58,9 @@ class Drawing():
             for x in ["rect_border", "ellipse_border"]:
                 if x not in state.keys():
                     self.objects[x.split("_")[0]].setPen(QtGui.QPen(QtCore.Qt.black, 5))
+            for x in ["rect_back", "ellipse_back"]:
+                if x not in state.keys():
+                    self.objects[x.split("_")[0]].setBrush(QtGui.QColor(0,0,0,0))
 
     def resize(self, object, width, height):
         object.width = width

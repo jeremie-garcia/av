@@ -5,7 +5,7 @@ import pygame
 import librosa
 import main_ui, config_interpreter, config, config_ui, FonctionAnalyse
 
-DEBUG = 1 #0 : no message; 1: announce messages; 2: all
+DEBUG = 2 #0 : no message; 1: announce messages; 2: all
 SYNCHRO = 0
 SCALE = 300
 WIDTH_SCALE = int(SCALE / 4)
