@@ -157,8 +157,8 @@ class View(QtWidgets.QWidget):
                 self.timer.start(self.sound.analyse_parameters["frame_duration_ms"])
 
     def timer_update(self):
-        """manages timer, depend on music played or not, figures changed or not, sound changed or not
-        update figures parameters based on the analyzed sound"""
+        """manages timer depending on music played or not, figures changed or not, sound changed or not
+        updates figures parameters based on the analyzed sound"""
         self.update_scene_size()
 
         if pygame.mixer.music.get_busy() and not (self.isSoundChanged or self.isFormChanged):
