@@ -2,11 +2,6 @@ import sys, config_ui, main, config_interpreter
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pygame, os
 
-"""
-TODO :
-
-- ajouter curseur échelle
-"""
 scode = "funorcesar"
 
 class Drawing():
@@ -49,7 +44,7 @@ class Drawing():
                         else:
                             pen = QtGui.QPen(QtCore.Qt.blue, dim)
                         self.objects[objName].setPen(pen)
-                elif out in ["rect_back", "ellipse_back"]:
+                elif out in ["rect_back", "ellipse_back"] and type(state[out]).__name__ in ["tuple", 'list']:
                     objName = out.split("_")[0]
                     self.objects[objName].setBrush(
                         QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]))
@@ -81,7 +76,7 @@ class Ui_mainWindow(object):
 
     def setupUi(self, mainWindow):
         mainWindow.setObjectName("mainWindow")
-        mainWindow.resize(1100, 700)
+        mainWindow.resize(900, 500)
         self.gridLayout = QtWidgets.QGridLayout(mainWindow)
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
@@ -282,9 +277,9 @@ class Ui_mainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
         self.scene = QtWidgets.QGraphicsScene()
-        # self.scene.setSceneRect(QtCore.QRectF(-50, -50, 100, 100))
         self.frame.setScene(self.scene)
         self.scene.frame = self.frame
+        self.frame.scale(0.64, 0.64)
 
         self.figures = self.drawScene()
 
@@ -318,7 +313,7 @@ class Ui_mainWindow(object):
     def soundLoadPlay(self, beggining=True):
         main.debug(1, "load & play")
         self.resetScene()
-        sound = main.loadSound(self, self.currentSound)
+        main.loadSound(self, self.currentSound)
         self.soundPlay(beggining)
 
     def soundPlay(self, beggining=True):
@@ -366,7 +361,7 @@ class Ui_mainWindow(object):
         self.label_2.setText(_translate("mainWindow", "Configuration 1"))
         self.label_5.setText(_translate("mainWindow", "Configuration 2"))
         self.label_6.setText(_translate("mainWindow", "Configuration 3"))
-        self.label_7.setText(_translate("mainWindow", "Configuration 4") 
+        self.label_7.setText(_translate("mainWindow", "Configuration 4"))
         self.label_3.setText(_translate("mainWindow", "Décalage :"))
         self.label_4.setText(_translate("mainWindow", "0"))
         self.pushButton_3.setText(_translate("mainWindow", "Edition des configurations"))

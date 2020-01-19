@@ -32,9 +32,10 @@ class Gradation(): #dégradé
     Objet de type dégradé
     Deux attributs : A, B, deux couleurs (objets de classe color) entre lesquels on fera un dégradé linéaire
     """
-    def __init__(self,  A, B):
+    def __init__(self,  name, A, B):
         self.A = A
         self.B = B
+        self.name = name
 
     def __repr__(self):
         return "Gradation from {} to {}".format(self.A, self.B)
@@ -109,28 +110,37 @@ def readfile(file):
                             main.debug(1,"LINE ERROR (var deg) : {}".format(l))
                             main.debug(2,variables)
                             binds["errors"].append(i+1)
-                        variables[words[1]] = Gradation(variables[A], variables[B])
+                        variables[words[1]] = Gradation(words[1], variables[A], variables[B])
 
                     else: #déclaration valeur
                         variables[words[1]] = Value(words[1], words[-1])
 
     return Configuration(id, confName, binds, variables)
 
-def save(window, conf):
-    main.debug(2,conf)
+def save(window, conf, IOConfig):
+    main.debug(2,"Saving configuration #{} : {}".format(conf.id, conf))
 
     with open(configFileName.format(conf.id), "w") as f:
         f.write(conf.name+"\n")
         for v in conf.varDict:
-            if conf.varDict[v][0] == "value" and conf.varDict[v][0] != "":
-                f.write("var {} = {}\n".format(v, conf.varDict[v][1]))
-            else:
-                f.write("var {} = {}({})\n".format(v, conf.varDict[v][0], conf.varDict[v][1]))
+            typeName = type(conf.varDict[v]).__name__
+            if typeName == "Value" and conf.varDict[v].name != "":
+                f.write("var {} = {}\n".format(v, conf.varDict[v].value))
+            elif typeName in ["Color", 'Gradation'] and conf.varDict[v].name != "":
+                _ = 'grad' if typeName == "Gradation" else 'color'
+                f.write("var {} = {}({})\n".format(v, _, conf.varDict[v].getValue()))
         for a in conf.assiDict:
             f.write("assign {} to {}\n".format(conf.assiDict[a], a))
 
     window.confCombo.setItemText(conf.id, conf.name)
     main.initConf()
+    IOConfig.configs = window.updateConfig()
+    window.showConfig(IOConfig, conf.id)
+
+    oldConfID = IOConfig.mainWindow.comboBox_2.currentIndex()
+    IOConfig.mainWindow.configs = main.initConf()
+    main.fillConfig(IOConfig.mainWindow)
+    IOConfig.mainWindow.comboBox_2.setCurrentIndex(oldConfID)
 
     main.debug(2,conf.assiDict)
     main.debug(2,conf.varDict)
@@ -150,7 +160,15 @@ def winToConf(window, IOConfig):
         name = line.contents[0].displayText()
         value = line.contents[2].displayText()
         if name != "" and value != "":
-            vars[name] = (line.contents[1].currentText(), line.contents[2].displayText())
+            main.debug(2, 'vars are : {}'.format(vars))
+            if line.contents[1].currentText() == "value":
+                vars[name] = Value(name, value)
+            elif line.contents[1].currentText() == "grad":
+                A, B = value.split(",")
+                vars[name] = Gradation(name, vars[A], vars[B])
+            elif line.contents[1].currentText() == "color":
+                r, g, b, a = value.split(",")
+                vars[name] = Color(name, r, g, b, a)
 
     conf.assiDict = assignations
     conf.varDict = vars
@@ -158,12 +176,8 @@ def winToConf(window, IOConfig):
     return conf
 
 def valider(win, IOConfig):
-    save(win, winToConf(win, IOConfig))
+    save(win, winToConf(win, IOConfig), IOConfig)
     main.debug(1,"Saved")
-    oldConfID = IOConfig.mainWindow.comboBox_2.currentIndex()
-    IOConfig.mainWindow.configs = main.initConf()
-    main.showConfig(IOConfig.mainWindow)
-    IOConfig.mainWindow.comboBox_2.setCurrentIndex(oldConfID)
     IOConfig.close()
 
 if __name__ == "__main__":

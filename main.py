@@ -5,7 +5,7 @@ import pygame
 import librosa
 import main_ui, config_interpreter, config, config_ui, FonctionAnalyse
 
-DEBUG = 1  # 0 : no message; 1: announce messages; 2: all
+DEBUG = 2  # 0 : no message; 1: announce messages; 2: all
 SYNCHRO = 0
 SCALE = 300
 WIDTH_SCALE = int(SCALE / 4)
@@ -41,10 +41,9 @@ class Sound():
         return new
 
 
-def showConfig(ui):
+def fillConfig(ui):
     for combo in ui.configCombos:
-        config_ui.fillCombo(combo, [ui.configs[i].name for i in range(len(ui.configs.keys()))])
-
+        config_ui.fillCombo(combo, [ui.configs[c].name for c in sorted([x for x in ui.configs])])
 
 def initConf():
     try:
@@ -157,10 +156,11 @@ if __name__ == '__main__':
     ui = main_ui.Ui_mainWindow()
     ui.setupUi(mainWindow)
     mainWindow.show()
+    app.setWindowIcon(QtGui.QIcon('logo.png'))
 
     ui.configs = initConf()
     ui.configCombos = [ui.comboBox_2, ui.comboBox_3, ui.comboBox_4, ui.comboBox_5]
-    showConfig(ui)
+    fillConfig(ui)
     ui.sounds = initSounds(ui)
     ui.updateSoundFile()
     pygame.mixer.init()

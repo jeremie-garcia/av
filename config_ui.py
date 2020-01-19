@@ -1,4 +1,4 @@
-import config, sys, main
+import config, sys, main, os
 from PyQt5 import QtCore, QtWidgets
 
 VAROFFSET = 1
@@ -47,7 +47,6 @@ class Ui_IOConfig(object):
         self.addConfButton.setObjectName("addConfButton")
         self.confHorLay.addWidget(self.addConfButton)
         self.delConfButton = QtWidgets.QPushButton(IOConfig)
-        self.delConfButton.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -236,7 +235,8 @@ class Ui_IOConfig(object):
         self.addAssiButton.clicked.connect(lambda: self.addAssiLine(IOConfig))
         self.addVarButton.clicked.connect(lambda: self.addVarLine(IOConfig))
         self.addConfButton.clicked.connect(lambda: self.addConfig(IOConfig))
-        self.enregistrerButton.clicked.connect(lambda: config.save(self, config.winToConf(self, IOConfig)))
+        self.delConfButton.clicked.connect(lambda: self.delConfig(IOConfig))
+        self.enregistrerButton.clicked.connect(lambda: config.save(self, config.winToConf(self, IOConfig), IOConfig))
         self.validerButton.clicked.connect(lambda: config.valider(self, IOConfig))
         self.resetButton.clicked.connect(lambda: self.reset(IOConfig))
 
@@ -245,7 +245,7 @@ class Ui_IOConfig(object):
 
     def retranslateUi(self, IOConfig):
         _translate = QtCore.QCoreApplication.translate
-        IOConfig.setWindowTitle(_translate("IOConfig", "Editeur de configurations"))
+        IOConfig.setWindowTitle(_translate("IOConfig", "AV-César - Editeur de configurations"))
         self.assiLabel.setText(_translate("IOConfig", "Assignations"))
         self.sortielabel.setText(_translate("IOConfig", "Sortie"))
         self.addAssiButton.setText(_translate("IOConfig", "+"))
@@ -424,23 +424,39 @@ class Ui_IOConfig(object):
         :return: liste configs fichiers
         """
         configs = main.initConf()
-        fillCombo(self.confCombo, [configs[i].name for i in range(len(configs.keys()))])
+        main.debug(2,[configs[c].name for c in sorted([x for x in configs])])
+        fillCombo(self.confCombo, [configs[c].name for c in sorted([x for x in configs])])
         return configs
 
     def addConfig(self, IOConfig):
         id = len(IOConfig.configs.keys())
-        print("Creating config #{}".format(id))
+        main.debug(1,"Creating config #{}".format(id))
         IOConfig.configs[id] = config.Configuration(id, "Config #{}".format(id))
-        config.save(self, IOConfig.configs[id])
-        self.updateConfig()
+        config.save(self, IOConfig.configs[id], IOConfig)
+        IOConfig.configs = self.updateConfig()
+        IOConfig.currentConf = id
         self.showConfig(IOConfig, id)
         self.confCombo.setCurrentIndex(id)
+
+    def delConfig(self, IOConfig):
+        id = self.confCombo.currentIndex()
+        if id != 0:
+            main.debug(1,"Deleting config #{}".format(id))
+            for p in range(id, len(IOConfig.configs)-1):
+                IOConfig.configs[p+1].id -= 1
+                IOConfig.configs[p] = IOConfig.configs[p+1]
+                config.save(self, IOConfig.configs[p], IOConfig)
+            del(IOConfig.configs[[x for x in IOConfig.configs.keys()][-1]])
+            os.remove(config.configFileName.format(str(len(IOConfig.configs))))
+            IOConfig.configs = self.updateConfig()
+            self.showConfig(IOConfig, id)
+            self.confCombo.setCurrentIndex(id)
 
     def showConfig(self, IOConfig, id):
         if id == -1: return None
 
         main.debug(1,"Loading config {} in {}".format(id, IOConfig.configs))
-        toShow = IOConfig.configs[id]
+        toShow = IOConfig.configs[[k for k in sorted(IOConfig.configs)][id]]
         IOConfig.currentConf = id
 
         assiDict = toShow.assiDict
