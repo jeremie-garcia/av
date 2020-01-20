@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 VAROFFSET = 1
 ASSIOFFSET = 1
 
-OUTPUTS = ["ellipse", "rect", "ellipse_border", "rect_border", "rect_back", "ellipse_back"]
+OUTPUTS = ["ellipse_Vsize", "ellipse_Hsize", "rect_Vsize", "rect_Hsize", "ellipse_border", "rect_border", "rect_back", "ellipse_back"]
 VARTYPES = ["value", "color", "grad"]
 sph = "AV-Cesar >> av-fun"
 

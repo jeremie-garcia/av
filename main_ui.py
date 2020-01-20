@@ -26,12 +26,20 @@ class Drawing():
                 self.resize(self.objects[o], 0, 0)
         else:
             for out in state:
-                if out in ["rect", "ellipse"]:
+                if out in ["rect_Hsize", "ellipse_Hsize"]:
+                    objName = out.split("_")[0]
                     donnee_utile = state[out]
                     dim = donnee_utile * main.SCALE
-                    self.resize(self.objects[out], dim, dim)
+                    print('hsize {}'.format(dim))
+                    self.resize(self.objects[objName], dim, self.objects[objName].height)
+                elif out in ["rect_Vsize", "ellipse_Vsize"]:
+                    objName = out.split("_")[0]
+                    donnee_utile = state[out]
+                    dim = donnee_utile * main.SCALE
+                    print('vsize {}'.format(dim))
+                    self.resize(self.objects[objName], self.objects[objName].width, dim)
                 elif out in ["rect_border", "ellipse_border"]:
-                    if type(state[out]).__name__ == "list":  # si on a une couleur à mettre
+                    if type(state[out]).__name__ in ["list", "tuple"]:  # si on a une couleur à mettre
                         objName = out.split("_")[0]
                         self.objects[objName].setPen(
                             QtGui.QPen(QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]), 5))
@@ -39,19 +47,16 @@ class Drawing():
                         donnee_utile = state[out]
                         objName = out.split("_")[0]
                         dim = donnee_utile * main.WIDTH_SCALE
-                        if dim > 30:
-                            pen = QtGui.QPen(QtCore.Qt.red, dim)
-                        else:
-                            pen = QtGui.QPen(QtCore.Qt.blue, dim)
+                        pen = QtGui.QPen(QtCore.Qt.black, dim)
                         self.objects[objName].setPen(pen)
                 elif out in ["rect_back", "ellipse_back"] and type(state[out]).__name__ in ["tuple", 'list']:
                     objName = out.split("_")[0]
                     self.objects[objName].setBrush(
                         QtGui.QColor(state[out][0], state[out][1], state[out][2], state[out][3]))
 
-            for x in ["rect", "ellipse"]:
+            for x in ["rect_Hsize", "ellipse_Hsize", "rect_Vsize", "ellipse_Vsize"]:
                 if x not in state.keys():
-                    self.resize(self.objects[x], 0, 0)
+                    self.resize(self.objects[x.split("_")[0]], 0, 0)
             for x in ["rect_border", "ellipse_border"]:
                 if x not in state.keys():
                     self.objects[x.split("_")[0]].setPen(QtGui.QPen(QtCore.Qt.black, 5))
@@ -129,6 +134,7 @@ class Ui_mainWindow(object):
         self.comboBox.setObjectName("comboBox")
         self.horizontalLayout_2.addWidget(self.comboBox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setContentsMargins(-1, -1, -1, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -144,6 +150,7 @@ class Ui_mainWindow(object):
         self.comboBox_2.setObjectName("comboBox_2")
         self.horizontalLayout_3.addWidget(self.comboBox_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setContentsMargins(-1, -1, -1, 0)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
