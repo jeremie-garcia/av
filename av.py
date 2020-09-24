@@ -7,7 +7,7 @@ import random
 if __name__ == '__main__':
 
     sounds = ['alarms/al-1.mp3', 'alarms/al-2.mp3', 'alarms/al-4.mp3', 'alarms/al-5.mp3',
-              'alarms/al-7.wav']
+              'alarms/al-7.wav', 'alarms/al-8.mp3']
 
     data_1 = []
     circle_1 = QtWidgets.QGraphicsEllipseItem()
@@ -33,6 +33,7 @@ if __name__ == '__main__':
         # find closest frame in descriptors
         index = current_time // frame_duration_ms
         index = round(min(index, rms_frames.size - 1))
+        index = max(0,index - 2)
 
         # extract data
         rms = rms_frames[index]
@@ -107,7 +108,7 @@ if __name__ == '__main__':
         waveform, sr = librosa.load(filename)
 
         # 2. Extract features (rms, spectral centroid, spectral flatness)
-        features_frame_length = 2048
+        features_frame_length = 4096
         frame_duration_ms = 1000 * (512 / sr)
         print('frameduration for sound', filename, frame_duration_ms)
         rms_frames = librosa.feature.rms(y=waveform, S=None, frame_length=features_frame_length)[0]
@@ -120,6 +121,8 @@ if __name__ == '__main__':
     def start_animation(event):
         global data_1, data_2
         # stop Audio and reset visual
+        timer.stop()
+        pygame.mixer.music.stop()
 
         # find two sounds (randomly)
         sound_1, sound_2 = random.sample(sounds, 2)
@@ -135,11 +138,8 @@ if __name__ == '__main__':
         to_play = random.choice([sound_1, sound_2])
         print('playing', to_play)
 
-        # 3 init pygame
-        pygame.mixer.init()
         try:
             pygame.mixer.music.load(to_play)
-
             pygame.mixer.music.play(0)
             # TODO need to use matching data instead
             timer.start(data_1[0] / 2)
@@ -147,5 +147,7 @@ if __name__ == '__main__':
             print('error')
 
     scene.mousePressEvent = start_animation
+    #init pygame
+    pygame.mixer.init()
 
     sys.exit(app.exec_())
