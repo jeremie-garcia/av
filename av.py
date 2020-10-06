@@ -1,8 +1,14 @@
-import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
-import pygame
-import librosa
 import random
+import sys
+import wave
+import soundfile as sf
+
+import librosa
+
+import sounddevice as sd
+
+
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 if __name__ == '__main__':
 
@@ -23,17 +29,13 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
 
-    def process_snd(data, current_time, circle, id):
+
+    def process_snd(data, index, circle, id):
         # retrieve data
         frame_duration_ms = data[0]
         rms_frames = data[1]
         spectral_centroid_frames = data[2]
         spectral_flatness_frames = data[3]
-
-        # find closest frame in descriptors
-        index = current_time // frame_duration_ms
-        index = round(min(index, rms_frames.size - 1))
-        index = max(0,index - 2)
 
         # extract data
         rms = rms_frames[index]
@@ -52,18 +54,6 @@ if __name__ == '__main__':
 
         circle.setRect(x, -width/2, width, width)
 
-
-    def timer_update():
-        if pygame.mixer.music.get_busy():
-            current_time = pygame.mixer.music.get_pos()
-            process_snd(data_1, current_time, circle_1, 1)
-            process_snd(data_2, current_time, circle_2, 2)
-        else:
-            timer.stop()
-
-
-    timer = QtCore.QTimer()
-    timer.timeout.connect(timer_update)
 
     # 5 create a view and a scene
     view = QtWidgets.QGraphicsView()
@@ -107,9 +97,10 @@ if __name__ == '__main__':
         # Store the sampling rate as `sr`
         waveform, sr = librosa.load(filename)
 
+
         # 2. Extract features (rms, spectral centroid, spectral flatness)
-        features_frame_length = 4096
-        frame_duration_ms = 1000 * (512 / sr)
+        features_frame_length = 1024
+        frame_duration_ms = 1000 * (1024 / sr)
         print('frameduration for sound', filename, frame_duration_ms)
         rms_frames = librosa.feature.rms(y=waveform, S=None, frame_length=features_frame_length)[0]
         spectral_centroid_frames = librosa.feature.spectral_centroid(y=waveform, sr=sr, S=None,
@@ -121,8 +112,6 @@ if __name__ == '__main__':
     def start_animation(event):
         global data_1, data_2
         # stop Audio and reset visual
-        timer.stop()
-        pygame.mixer.music.stop()
 
         # find two sounds (randomly)
         sound_1, sound_2 = random.sample(sounds, 2)
@@ -138,16 +127,11 @@ if __name__ == '__main__':
         to_play = random.choice([sound_1, sound_2])
         print('playing', to_play)
 
-        try:
-            pygame.mixer.music.load(to_play)
-            pygame.mixer.music.play(0)
-            # TODO need to use matching data instead
-            timer.start(data_1[0] / 2)
-        except pygame.error:
-            print('error')
+        waveform, sr = librosa.load(to_play)
+        sd.play(waveform, sr)
+
+
 
     scene.mousePressEvent = start_animation
-    #init pygame
-    pygame.mixer.init()
 
     sys.exit(app.exec_())
